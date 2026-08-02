@@ -278,7 +278,8 @@
             <span class="legend-item"><span class="swatch" style="background:#e8a838"></span>P — частный мир (экземпляры)</span>
             <span class="legend-item"><span class="swatch" style="background:#7c6cf0"></span>H m — смыслы в истории</span>
             <span class="legend-item"><span class="swatch" style="background:#3aa0ff"></span>H k — эпизоды диалога</span>
-            <span class="legend-item"><span class="swatch box" style="background:#ffe566"></span>N — факт-гиперребро</span>
+            <span class="legend-item"><span class="swatch box" style="background:#ffe566"></span>N — факт-гиперребро (хаб)</span>
+            <span class="legend-item"><span class="swatch" style="background:#ffe566;border-style:dashed"></span>mesh — сеть актантов одного N</span>
             <span class="legend-item"><span class="swatch box" style="background:#7b5cff"></span>T — шаблон предиката</span>
             <span class="legend-item"><span class="swatch" style="background:#ff5c5c"></span>подсветка WM / trace</span>
           </div>
@@ -290,7 +291,7 @@
             <span class="legend-item"><span class="swatch" style="background:#f4a261"></span>CAUSE</span>
             <span class="legend-item"><span class="swatch" style="background:#c5d0de"></span>L — бинарные связи</span>
           </div>
-          <div class="legend-note">Миры AH: S словарь · C общее · P частное · H траектория диалога. Жёлтый блок N = факт; цветные спицы от N = роли актантов.</div>
+          <div class="legend-note">Гиперребро N — n-арный факт: жёлтый хаб + цветные роли + пунктирный mesh между всеми актантами одной микротемы. ASSOC-mesh также пишется в L.</div>
         </div>
         <div id="network"></div>
       </section>
@@ -555,6 +556,17 @@
           smooth: { type: "curvedCW", roundness: 0.25 },
         };
       }
+      if (e.kind === "hyper_mesh") {
+        return {
+          id: e.id, from: e.from, to: e.to, label: e.label || "", title: e.title,
+          arrows: { to: false, from: false, middle: false },
+          width: 2.2,
+          dashes: [5, 4],
+          color: { color: "#ffe566", highlight: "#ffffff", opacity: 0.8 },
+          font: labelFont("#ffffff", 9),
+          smooth: { type: "curvedCW", roundness: 0.35 },
+        };
+      }
       if (e.kind === "binary") {
         const isIsa = e.label === "IS-A";
         return {
@@ -593,8 +605,9 @@
         const cx = pts.reduce((s, p) => s + p.x, 0) / pts.length;
         const cy = pts.reduce((s, p) => s + p.y, 0) / pts.length;
         const sorted = pts.slice().sort((a, b) => Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx));
+        const nAct = (he.members || []).length;
         ctx.beginPath();
-        const pad = 28;
+        const pad = 22 + Math.min(18, nAct * 4);
         sorted.forEach((p, i) => {
           const dx = p.x - cx, dy = p.y - cy;
           const len = Math.hypot(dx, dy) || 1;
@@ -603,20 +616,20 @@
           if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         });
         ctx.closePath();
-        ctx.fillStyle = "rgba(255, 229, 102, 0.14)";
-        ctx.strokeStyle = "rgba(255, 229, 102, 0.85)";
-        ctx.lineWidth = 2.5;
+        ctx.fillStyle = nAct >= 3 ? "rgba(255, 229, 102, 0.22)" : "rgba(255, 229, 102, 0.12)";
+        ctx.strokeStyle = "rgba(255, 229, 102, 0.9)";
+        ctx.lineWidth = nAct >= 3 ? 3.2 : 2.2;
         ctx.setLineDash([6, 4]);
         ctx.fill();
         ctx.stroke();
         ctx.setLineDash([]);
-        const text = "⟦" + (he.predicate || "") + "⟧";
+        const text = "⟦" + (he.predicate || "") + "⟧ n=" + nAct;
         ctx.font = "bold 13px Segoe UI";
         ctx.lineWidth = 4;
         ctx.strokeStyle = "#05080c";
-        ctx.strokeText(text, cx - 24, cy - 8);
+        ctx.strokeText(text, cx - 28, cy - 8);
         ctx.fillStyle = "#ffffff";
-        ctx.fillText(text, cx - 24, cy - 8);
+        ctx.fillText(text, cx - 28, cy - 8);
       }
     }
 

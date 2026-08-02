@@ -35,7 +35,9 @@ JSON:
 }
 UID — лемма в UPPER_SNAKE (им. падеж), кириллица ок: СКУЛЬПТУРНАЯ_ЛЕПКА, МОСКВА, ДУШКИН.
 SUBJECT/OBJECT/LOCATION — только сущности: существительные, имена, названия. НЕ глаголы (занимаюсь), НЕ союзы (если, когда, чтобы), НЕ вводные.
+Один факт = одна микротема: заполняй ВСЕ уместные роли сразу (SUBJECT+OBJECT+LOCATION+TIME+…), не дроби на пары, если это одно утверждение.
 «Я занимаюсь лепкой» → USE(SUBJECT=Я, OBJECT=СКУЛЬПТУРНАЯ_ЛЕПКА) или HAVE, не IS(ЗАНИМАЮСЬ,…).
+«Работаю с Душкиным в МИФИ» → USE/LIVE_IN с SUBJECT, OBJECT/LOCATION в одном candidate.
 «Если понадобится…» — не факт (candidates=[]).
 Роли: SUBJECT OBJECT LOCATION TIME CAUSE TOOL MATERIAL PURPOSE HOW-TO.
 Верни только JSON."""

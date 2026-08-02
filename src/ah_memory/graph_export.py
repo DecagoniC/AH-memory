@@ -193,7 +193,7 @@ def dump_graph(
             }
         )
 
-        # incidence spokes: hyperedge hub —role→ actant (undirected visually)
+        # incidence spokes: hub —role→ each actant
         for role, target in roles.items():
             edges.append(
                 {
@@ -210,6 +210,26 @@ def dump_graph(
                     "title": f"hyperedge {pred}: {role} = {target}",
                 }
             )
+
+        # n-ary associative mesh: every pair of actants (shared micro-theme of N)
+        for i, a in enumerate(members):
+            for b in members[i + 1 :]:
+                edges.append(
+                    {
+                        "id": f"{n.uid}__mesh__{a}__{b}",
+                        "from": a,
+                        "to": b,
+                        "label": "",
+                        "kind": "hyper_mesh",
+                        "hyperedge": n.uid,
+                        "predicate": pred,
+                        "arrows": "",
+                        "dashes": True,
+                        "width": 2,
+                        "color": {"color": "#ffe566", "opacity": 0.75, "highlight": "#fff"},
+                        "title": f"mesh ⟦{pred}⟧: {a} ↔ {b} (n={len(members)})",
+                    }
+                )
 
         if mode == "all":
             edges.append(

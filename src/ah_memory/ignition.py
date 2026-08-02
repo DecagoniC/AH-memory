@@ -21,6 +21,8 @@ class TickTrace:
     z_stats: dict[str, float] = field(default_factory=dict)
     trace_factors: list[str] = field(default_factory=list)
     beliefs_top: dict[str, float] = field(default_factory=dict)
+    evidence: dict[str, float] = field(default_factory=dict)
+    seeds_applied: list[str] = field(default_factory=list)
 
 
 class WorkingMemory:
@@ -65,15 +67,19 @@ class IgnitionEngine:
             if self._evidence[v] < 0.05:
                 del self._evidence[v]
 
+        seeds_applied: list[str] = []
         for s in self._pending_seeds:
             # map delta_x ≈ 0.8 → λ ≈ seed_lambda * delta
             lam = hp.fg_lambda * max(0.1, min(1.0, s.delta_x))
             if is_variable(store, s.uid):
                 self._evidence[s.uid] = self._evidence.get(s.uid, 0.0) + lam
+                seeds_applied.append(s.uid)
             # also try M_ form
             m_uid = s.uid if s.uid.startswith("M_") else f"M_{s.uid}"
             if is_variable(store, m_uid):
                 self._evidence[m_uid] = self._evidence.get(m_uid, 0.0) + lam * 0.8
+                if m_uid not in seeds_applied:
+                    seeds_applied.append(m_uid)
         self._pending_seeds.clear()
 
         # pacemaker ν → weak evidence on WM / S
@@ -136,6 +142,10 @@ class IgnitionEngine:
         top = dict(
             sorted(result.beliefs.items(), key=lambda kv: kv[1], reverse=True)[:12]
         )
+        evidence_snap = {
+            k: round(v, 4)
+            for k, v in sorted(self._evidence.items(), key=lambda kv: -kv[1])[:24]
+        }
         trace = TickTrace(
             tau=ah.tau,
             activated=sorted(activated),
@@ -147,8 +157,10 @@ class IgnitionEngine:
                 "n_factors": float(len(graph.factors)),
                 "bp_rounds": float(result.rounds),
             },
-            trace_factors=result.trace_factors,
-            beliefs_top=top,
+            trace_factors=result.trace_factors[:24],
+            beliefs_top={k: round(v, 4) for k, v in top.items()},
+            evidence=evidence_snap,
+            seeds_applied=seeds_applied,
         )
         self.traces.append(trace)
         return trace

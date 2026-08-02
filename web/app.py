@@ -72,6 +72,7 @@ class ChatOut(BaseModel):
     user_facts: list[str] = []
     assistant_facts: list[str] = []
     system_prompt: str = ""
+    activation: dict[str, Any] = Field(default_factory=dict)
 
 
 @app.get("/")
@@ -107,6 +108,32 @@ def full_dump() -> dict[str, Any]:
     return dump_ah_json(agent.store)
 
 
+@app.get("/api/trace")
+def last_trace() -> dict[str, Any]:
+    """Last turn activation trace (evidence / BP ticks / WM)."""
+    act = getattr(dialogue, "last_activation", None) or {}
+    return {
+        "ok": True,
+        "tau": agent.store.ah.tau,
+        "wm": sorted(agent.ignition.wm.contents()),
+        "activation": act,
+        "recent_ticks": [
+            {
+                "tau": t.tau,
+                "seeds": t.seeds_applied,
+                "evidence": t.evidence,
+                "beliefs_top": t.beliefs_top,
+                "wm": t.wm,
+                "activated": t.activated,
+                "trace_factors": t.trace_factors,
+                "weight_updates": t.weight_updates,
+                "stats": t.z_stats,
+            }
+            for t in agent.ignition.traces[-12:]
+        ],
+    }
+
+
 @app.post("/api/chat", response_model=ChatOut)
 def chat(body: ChatIn) -> ChatOut:
     text = body.message.strip()
@@ -128,6 +155,7 @@ def chat(body: ChatIn) -> ChatOut:
         user_facts=turn.user_facts,
         assistant_facts=turn.assistant_facts,
         system_prompt=turn.system_prompt,
+        activation=turn.activation,
     )
 
 

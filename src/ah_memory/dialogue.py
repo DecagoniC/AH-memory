@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 from ah_memory.config import DeepSeekConfig
 from ah_memory.deepseek import DeepSeekClient
+from ah_memory.ignition import TickTrace
 from ah_memory.store import AHStore
 from ah_memory.transform import IngestReport
 from ah_memory.types import AssocLink, ElementList, Hyperlink, LinkId, Property, Section
@@ -19,6 +20,20 @@ DIALOGUE_SYSTEM = """Ты обычный полезный собеседник. 
 Не используй JSON. Не перечисляй внутренние идентификаторы."""
 
 
+def _tick_dict(t: TickTrace) -> dict:
+    return {
+        "tau": t.tau,
+        "seeds": t.seeds_applied,
+        "evidence": t.evidence,
+        "beliefs_top": t.beliefs_top,
+        "activated": t.activated,
+        "wm": t.wm,
+        "trace_factors": t.trace_factors,
+        "weight_updates": t.weight_updates,
+        "stats": t.z_stats,
+    }
+
+
 @dataclass
 class TurnResult:
     reply: str
@@ -29,6 +44,7 @@ class TurnResult:
     backend: str = "deepseek"
     history_len: int = 0
     system_prompt: str = ""
+    activation: dict = field(default_factory=dict)
 
 
 class DialogueAgent:
@@ -41,6 +57,7 @@ class DialogueAgent:
         self.history: list[dict[str, str]] = []
         self._ep_prev: str | None = None
         self._turn = 0
+        self.last_activation: dict = {}
 
     @property
     def store(self) -> AHStore:
@@ -50,12 +67,16 @@ class DialogueAgent:
         self.history.clear()
         self._ep_prev = None
         self._turn = 0
+        self.last_activation = {}
 
     def talk(self, user_text: str, ticks: int = 6) -> TurnResult:
         user_text = user_text.strip()
         self._turn += 1
+        ign = self.agent.ignition
 
+        i0 = len(ign.traces)
         user_rep = self.agent.ingest(user_text, section=Section.H)
+        user_ticks = [_tick_dict(t) for t in ign.traces[i0:]]
         self._record_episode("USER", user_text, user_rep)
 
         mem = self._memory_context(user_text)
@@ -69,7 +90,9 @@ class DialogueAgent:
             reply, system_prompt = self._fallback_reply(user_text, mem, graph_hint)
             backend = "rules+ah"
 
+        i1 = len(ign.traces)
         asst_rep = self.agent.ingest(reply, section=Section.H)
+        asst_ticks = [_tick_dict(t) for t in ign.traces[i1:]]
         self._record_episode("ASSISTANT", reply, asst_rep)
 
         self.history.append({"role": "user", "content": user_text})
@@ -77,12 +100,35 @@ class DialogueAgent:
         if len(self.history) > 24:
             self.history = self.history[-24:]
 
-        wm = sorted(self.agent.ignition.wm.contents())
+        wm = sorted(ign.wm.contents())
         trace = list(
             dict.fromkeys(
                 ask.trace_uids + wm + user_rep.created_n + asst_rep.created_n + user_rep.seed_uids[:8]
             )
         )
+        activation = {
+            "turn": self._turn,
+            "threshold_t": self.agent.hp.threshold_t,
+            "user_ingest": {
+                "created_n": user_rep.created_n,
+                "seeds": user_rep.seed_uids[:24],
+                "skipped": user_rep.skipped[:12],
+                "ticks": user_ticks,
+            },
+            "ask": {
+                "graph_hint": graph_hint,
+                "seed_uids": ask.seed_uids[:24],
+                "ticks": [_tick_dict(t) for t in ask.traces],
+            },
+            "assistant_ingest": {
+                "created_n": asst_rep.created_n,
+                "seeds": asst_rep.seed_uids[:24],
+                "ticks": asst_ticks,
+            },
+            "final_wm": wm,
+            "memory_brief": mem,
+        }
+        self.last_activation = activation
         return TurnResult(
             reply=reply,
             user_facts=user_rep.created_n,
@@ -92,6 +138,7 @@ class DialogueAgent:
             backend=backend,
             history_len=len(self.history),
             system_prompt=system_prompt,
+            activation=activation,
         )
 
     def _compose_system_blocks(self, mem: str, graph_hint: str) -> list[str]:

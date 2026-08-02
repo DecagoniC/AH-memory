@@ -57,9 +57,9 @@
       height: 100%;
     }
     @media (min-width: 960px) {
-      .main { grid-template-columns: minmax(320px, 420px) 1fr; }
+      .main { grid-template-columns: minmax(320px, 400px) minmax(220px, 300px) 1fr; }
     }
-    .chat, .graph-wrap {
+    .chat, .trace-wrap, .graph-wrap {
       min-height: 0;
       display: flex;
       flex-direction: column;
@@ -127,6 +127,41 @@
       overflow: auto;
     }
     .prompt-panel.show { display: block; }
+    #traceView {
+      flex: 1;
+      overflow: auto;
+      padding: 10px 12px;
+      font-size: .78rem;
+      line-height: 1.45;
+      color: #c5d3e3;
+    }
+    #traceView .phase {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    #traceView .phase h3 {
+      margin: 0 0 6px;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--accent2);
+    }
+    #traceView .tick {
+      margin: 6px 0;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: #12181f;
+      border: 1px solid var(--line);
+    }
+    #traceView .tick .tau { color: var(--accent); font-weight: 650; }
+    #traceView code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: .72rem;
+      color: #9ec5ff;
+    }
+    #traceView .muted { color: var(--muted); }
+    #traceView .empty { color: var(--muted); padding: 12px 0; }
     .composer {
       display: flex;
       gap: 8px;
@@ -172,10 +207,37 @@
       border-bottom: 1px solid var(--line);
     }
     .legend {
-      padding: 6px 12px;
-      font-size: .8rem;
+      padding: 8px 12px;
+      font-size: .78rem;
       color: #c5d3e3;
       border-bottom: 1px solid var(--line);
+      line-height: 1.45;
+    }
+    .legend-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      align-items: center;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,.45);
+      flex-shrink: 0;
+    }
+    .swatch.round { border-radius: 50%; }
+    .swatch.box { border-radius: 2px; width: 14px; height: 10px; }
+    .legend-note {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: .72rem;
     }
     button.active { outline: 2px solid var(--accent2); }
   </style>
@@ -195,6 +257,11 @@
           <button id="send">Отправить</button>
         </div>
       </section>
+      <section class="trace-wrap">
+        <div class="pane-title">Трассировка активации</div>
+        <div class="legend">seed → evidence → BP-тики → WM · клик по UID подсветит граф</div>
+        <div id="traceView"><div class="empty">Пока пусто — отправь сообщение.</div></div>
+      </section>
       <section class="graph-wrap">
         <div class="pane-title">Дамп графа АГ-памяти</div>
         <div class="toolbar">
@@ -204,7 +271,27 @@
           <button class="secondary" id="dump">JSON</button>
           <button class="secondary" id="reset">Сброс</button>
         </div>
-        <div class="legend" id="legend">жёлтый блок = гиперребро N · цветные линии = роли · светлые стрелки = бинарные L</div>
+        <div class="legend" id="legend">
+          <div class="legend-grid">
+            <span class="legend-item"><span class="swatch round" style="background:#4f8cff"></span>S — лексика (1-й порядок)</span>
+            <span class="legend-item"><span class="swatch" style="background:#1ec9a8"></span>C — общий мир (знания/m)</span>
+            <span class="legend-item"><span class="swatch" style="background:#e8a838"></span>P — частный мир (экземпляры)</span>
+            <span class="legend-item"><span class="swatch" style="background:#7c6cf0"></span>H m — смыслы в истории</span>
+            <span class="legend-item"><span class="swatch" style="background:#3aa0ff"></span>H k — эпизоды диалога</span>
+            <span class="legend-item"><span class="swatch box" style="background:#ffe566"></span>N — факт-гиперребро</span>
+            <span class="legend-item"><span class="swatch box" style="background:#7b5cff"></span>T — шаблон предиката</span>
+            <span class="legend-item"><span class="swatch" style="background:#ff5c5c"></span>подсветка WM / trace</span>
+          </div>
+          <div class="legend-grid" style="margin-top:8px">
+            <span class="legend-item"><span class="swatch" style="background:#e76f51"></span>роль SUBJECT</span>
+            <span class="legend-item"><span class="swatch" style="background:#2a9d8f"></span>OBJECT</span>
+            <span class="legend-item"><span class="swatch" style="background:#457b9d"></span>LOCATION</span>
+            <span class="legend-item"><span class="swatch" style="background:#9b5de5"></span>TIME</span>
+            <span class="legend-item"><span class="swatch" style="background:#f4a261"></span>CAUSE</span>
+            <span class="legend-item"><span class="swatch" style="background:#c5d0de"></span>L — бинарные связи</span>
+          </div>
+          <div class="legend-note">Миры AH: S словарь · C общее · P частное · H траектория диалога. Жёлтый блок N = факт; цветные спицы от N = роли актантов.</div>
+        </div>
         <div id="network"></div>
       </section>
     </div>
@@ -213,12 +300,108 @@
     const log = document.getElementById("log");
     const input = document.getElementById("input");
     const sendBtn = document.getElementById("send");
+    const traceView = document.getElementById("traceView");
     let network = null;
     let highlight = new Set();
     let graphMode = "hyper";
     let lastHyperedges = [];
+    let lastActivation = null;
 
-    function addMsg(role, text, tag, systemPrompt) {
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    function uidChip(uid) {
+      return `<code class="uid" data-uid="${esc(uid)}" title="подсветить">${esc(uid)}</code>`;
+    }
+
+    function fmtList(arr, lim = 12) {
+      if (!arr || !arr.length) return '<span class="muted">∅</span>';
+      const slice = arr.slice(0, lim);
+      return slice.map(uidChip).join(" ") + (arr.length > lim ? ` <span class="muted">+${arr.length - lim}</span>` : "");
+    }
+
+    function fmtBeliefs(obj) {
+      if (!obj || !Object.keys(obj).length) return '<span class="muted">∅</span>';
+      return Object.entries(obj).map(([k, v]) =>
+        `${uidChip(k)}<span class="muted">=${Number(v).toFixed(3)}</span>`
+      ).join(" · ");
+    }
+
+    function fmtEvidence(obj) {
+      if (!obj || !Object.keys(obj).length) return '<span class="muted">∅</span>';
+      return Object.entries(obj).map(([k, v]) =>
+        `${uidChip(k)}<span class="muted"> λ=${Number(v).toFixed(2)}</span>`
+      ).join(" · ");
+    }
+
+    function renderTicks(ticks) {
+      if (!ticks || !ticks.length) return '<div class="muted">тиков нет</div>';
+      return ticks.map((t) => `
+        <div class="tick">
+          <div><span class="tau">τ=${esc(t.tau)}</span>
+            <span class="muted"> · vars=${esc(t.stats?.n_vars ?? "?")} factors=${esc(t.stats?.n_factors ?? "?")} BP=${esc(t.stats?.bp_rounds ?? "?")} HebbΔ=${esc(t.weight_updates ?? 0)}</span>
+          </div>
+          <div><span class="muted">seeds:</span> ${fmtList(t.seeds, 10)}</div>
+          <div><span class="muted">evidence:</span> ${fmtEvidence(t.evidence)}</div>
+          <div><span class="muted">beliefs top:</span> ${fmtBeliefs(t.beliefs_top)}</div>
+          <div><span class="muted">WM (x&gt;t):</span> ${fmtList(t.wm, 14)}</div>
+          <div><span class="muted">факторы:</span> ${fmtList(t.trace_factors, 8)}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderActivation(act) {
+      if (!act) {
+        traceView.innerHTML = '<div class="empty">Пока пусто — отправь сообщение.</div>';
+        return;
+      }
+      const ui = act.user_ingest || {};
+      const ask = act.ask || {};
+      const ai = act.assistant_ingest || {};
+      traceView.innerHTML = `
+        <div class="phase">
+          <h3>Ход #${esc(act.turn)} · порог t=${esc(act.threshold_t)}</h3>
+          <div><span class="muted">итог WM:</span> ${fmtList(act.final_wm, 16)}</div>
+          ${act.memory_brief ? `<div class="muted" style="margin-top:4px;white-space:pre-wrap">${esc(act.memory_brief)}</div>` : ""}
+        </div>
+        <div class="phase">
+          <h3>1. Ingest пользователя</h3>
+          <div><span class="muted">N:</span> ${fmtList(ui.created_n, 10)}</div>
+          <div><span class="muted">seed-символы:</span> ${fmtList(ui.seeds, 14)}</div>
+          ${renderTicks(ui.ticks)}
+        </div>
+        <div class="phase">
+          <h3>2. Ask / воспламенение</h3>
+          <div><span class="muted">seed ask:</span> ${fmtList(ask.seed_uids, 14)}</div>
+          <div><span class="muted">graph hint:</span> ${esc(ask.graph_hint || "—")}</div>
+          ${renderTicks(ask.ticks)}
+        </div>
+        <div class="phase">
+          <h3>3. Ingest ответа</h3>
+          <div><span class="muted">N:</span> ${fmtList(ai.created_n, 10)}</div>
+          <div><span class="muted">seed-символы:</span> ${fmtList(ai.seeds, 14)}</div>
+          ${renderTicks(ai.ticks)}
+        </div>
+      `;
+      traceView.querySelectorAll("code.uid").forEach((el) => {
+        el.style.cursor = "pointer";
+        el.addEventListener("click", () => {
+          const id = el.getAttribute("data-uid");
+          if (!id) return;
+          highlight = new Set([id, ...highlight]);
+          loadGraph();
+          if (network) {
+            try { network.selectNodes([id]); network.focus(id, { scale: 1.2, animation: true }); } catch (_) {}
+          }
+        });
+      });
+    }
+
+    function addMsg(role, text, tag, extras) {
+      extras = extras || {};
       const el = document.createElement("div");
       el.className = "msg " + role;
       if (tag) {
@@ -231,23 +414,39 @@
       body.className = "body";
       body.textContent = text;
       el.appendChild(body);
-      if (role === "bot" && systemPrompt) {
+      if (role === "bot" && (extras.systemPrompt || extras.activation)) {
         const actions = document.createElement("div");
         actions.className = "msg-actions";
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = "системный промпт";
-        const panel = document.createElement("pre");
-        panel.className = "prompt-panel";
-        panel.textContent = systemPrompt;
-        btn.addEventListener("click", () => {
-          const open = panel.classList.toggle("show");
-          btn.classList.toggle("open", open);
-          btn.textContent = open ? "скрыть промпт" : "системный промпт";
-        });
-        actions.appendChild(btn);
-        el.appendChild(actions);
-        el.appendChild(panel);
+        if (extras.systemPrompt) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = "системный промпт";
+          const panel = document.createElement("pre");
+          panel.className = "prompt-panel";
+          panel.textContent = extras.systemPrompt;
+          btn.addEventListener("click", () => {
+            const open = panel.classList.toggle("show");
+            btn.classList.toggle("open", open);
+            btn.textContent = open ? "скрыть промпт" : "системный промпт";
+          });
+          actions.appendChild(btn);
+          el.appendChild(actions);
+          el.appendChild(panel);
+        }
+        if (extras.activation) {
+          const btnT = document.createElement("button");
+          btnT.type = "button";
+          btnT.textContent = "показать трассировку";
+          btnT.addEventListener("click", () => {
+            lastActivation = extras.activation;
+            renderActivation(lastActivation);
+            traceView.scrollTop = 0;
+          });
+          if (!extras.systemPrompt) {
+            el.appendChild(actions);
+          }
+          actions.appendChild(btnT);
+        }
       }
       log.appendChild(el);
       log.scrollTop = log.scrollHeight;
@@ -320,7 +519,12 @@
         C_m: { background: "#1ec9a8", border: "#d8fff6" },
         C_g: { background: "#ff4d6d", border: "#ffd0d9" },
         C_k: { background: "#6c8cff", border: "#e0e8ff" },
-        P_m: { background: "#2dd4a8", border: "#d9fff2" },
+        C_T: { background: "#7b5cff", border: "#ffffff" },
+        P_m: { background: "#e8a838", border: "#ffe8b8" },
+        P_g: { background: "#d97706", border: "#ffd9a8" },
+        P_k: { background: "#f59e0b", border: "#ffe6b8" },
+        H_m: { background: "#7c6cf0", border: "#ddd6ff" },
+        H_g: { background: "#a78bfa", border: "#ebe4ff" },
         H_k: { background: "#3aa0ff", border: "#d6ecff" },
       };
       const c = colors[n.group] || { background: "#6b7c93", border: "#e8eef6" };
@@ -500,9 +704,11 @@
         addMsg(
           "bot",
           j.reply,
-          `${j.kind} · ${j.backend} · userN=${(j.user_facts||[]).length} asstN=${(j.assistant_facts||[]).length}`,
-          j.system_prompt || ""
+          `${j.kind} · ${j.backend} · userN=${(j.user_facts||[]).length} asstN=${(j.assistant_facts||[]).length} · WM=${(j.wm||[]).length}`,
+          { systemPrompt: j.system_prompt || "", activation: j.activation || null }
         );
+        lastActivation = j.activation || null;
+        renderActivation(lastActivation);
         highlight = new Set(j.trace_uids || []);
         await loadHealth();
         await loadGraph();
@@ -542,6 +748,8 @@
         if (gs !== 0) throw new Error(`граф не очищен: graph_size=${gs}`);
         highlight = new Set();
         log.innerHTML = "";
+        lastActivation = null;
+        renderActivation(null);
         addMsg("bot", "Граф опустошён (S=0, L=0).", "system");
         await loadHealth();
         await loadGraph();

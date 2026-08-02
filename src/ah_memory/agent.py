@@ -19,6 +19,7 @@ class AgentReply:
     trace_uids: list[str]
     traces: list[TickTrace] = field(default_factory=list)
     source: str = "graph"
+    seed_uids: list[str] = field(default_factory=list)
 
 
 class Agent:
@@ -83,7 +84,13 @@ class Agent:
 
         answer = self._compose_answer(question, perc.seed_tokens, trace_uids)
         collect(self.store, self.hp)
-        return AgentReply(answer=answer, trace_uids=trace_uids, traces=traces, source="graph")
+        return AgentReply(
+            answer=answer,
+            trace_uids=trace_uids,
+            traces=traces,
+            source="graph",
+            seed_uids=[s.uid for s in seeds],
+        )
 
     def step_message(self, text: str, ticks: int = 3) -> AgentReply:
         """Continuous perception cycle (bonus track)."""

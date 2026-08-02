@@ -1,0 +1,21 @@
+# AH Memory — локальный конфиг
+# Вставь ключ DeepSeek ниже (или задай DEEPSEEK_API_KEY в .env)
+
+deepseek:
+  api_key: "PASTE_DEEPSEEK_API_KEY_HERE"
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+  timeout_sec: 60
+  # temperature для экстракции фактов
+  temperature: 0.1
+
+web:
+  host: "127.0.0.1"
+  port: 8000
+
+agent:
+  use_llm: true
+  # если LLM недоступен — RulePerception
+  fallback_rules: true
+  ticks: 6
+  preload: "empty"  # rabbit | encyclopedia | empty

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AH Memory</title>
+  <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a222c;
+      --line: #2c3a47;
+      --text: #e7eef5;
+      --muted: #8aa0b4;
+      --accent: #3d9c84;
+      --accent2: #c4a35a;
+      --user: #243041;
+      --bot: #1e2a24;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: "Segoe UI", "IBM Plex Sans", system-ui, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1c2b28 0%, transparent 50%),
+                  radial-gradient(900px 500px at 100% 0%, #2a2430 0%, transparent 45%),
+                  var(--bg);
+      color: var(--text);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      height: 100%;
+      gap: 0;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(15,20,25,.85);
+      backdrop-filter: blur(8px);
+    }
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 650;
+      letter-spacing: .02em;
+      margin: 0;
+    }
+    header .meta { color: var(--muted); font-size: .85rem; }
+    .main {
+      display: grid;
+      grid-template-columns: 1fr;
+      min-height: 0;
+      height: 100%;
+    }
+    @media (min-width: 960px) {
+      .main { grid-template-columns: minmax(320px, 420px) 1fr; }
+    }
+    .chat, .graph-wrap {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: rgba(26,34,44,.72);
+      border-right: 1px solid var(--line);
+    }
+    .graph-wrap { border-right: none; }
+    .pane-title {
+      padding: 10px 14px;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+    }
+    #log {
+      flex: 1;
+      overflow: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg {
+      max-width: 95%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .msg.user { align-self: flex-end; background: var(--user); border: 1px solid var(--line); }
+    .msg.bot { align-self: flex-start; background: var(--bot); border: 1px solid #2f4a40; }
+    .msg .tag { display:block; font-size:.72rem; color: var(--muted); margin-bottom: 4px; }
+    .msg .body { display: block; }
+    .msg-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .msg-actions button {
+      min-height: 32px;
+      padding: 0 10px;
+      font-size: .75rem;
+      font-weight: 600;
+      background: #2a3a48;
+      color: var(--muted);
+    }
+    .msg-actions button:hover { color: var(--text); }
+    .msg-actions button.open { color: var(--accent2); outline: 1px solid var(--accent2); }
+    .prompt-panel {
+      display: none;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #0c1218;
+      border: 1px solid var(--line);
+      color: #b7c7d6;
+      font-size: .72rem;
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 220px;
+      overflow: auto;
+    }
+    .prompt-panel.show { display: block; }
+    .composer {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--line);
+    }
+    .composer textarea {
+      flex: 1;
+      resize: none;
+      min-height: 52px;
+      max-height: 140px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #12181f;
+      color: var(--text);
+      padding: 10px 12px;
+      font: inherit;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 0 16px;
+      background: var(--accent);
+      color: #04140f;
+      font-weight: 650;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    button.secondary { background: #334155; color: var(--text); }
+    button:disabled { opacity: .5; cursor: wait; }
+    #network {
+      flex: 1;
+      min-height: 320px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.04), transparent),
+        #151c26;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .legend {
+      padding: 6px 12px;
+      font-size: .8rem;
+      color: #c5d3e3;
+      border-bottom: 1px solid var(--line);
+    }
+    button.active { outline: 2px solid var(--accent2); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <h1>AH Memory</h1>
+      <span class="meta" id="health">загрузка…</span>
+    </header>
+    <div class="main">
+      <section class="chat">
+        <div class="pane-title">Диалог с агентом</div>
+        <div id="log"></div>
+        <div class="composer">
+          <textarea id="input" placeholder="Факт или вопрос… Например: Кто такой заяц?"></textarea>
+          <button id="send">Отправить</button>
+        </div>
+      </section>
+      <section class="graph-wrap">
+        <div class="pane-title">Дамп графа АГ-памяти</div>
+        <div class="toolbar">
+          <button class="secondary" id="refresh">Обновить</button>
+          <button class="secondary" id="modeHyper">Гиперрёбра</button>
+          <button class="secondary" id="modeAll">Все связи</button>
+          <button class="secondary" id="dump">JSON</button>
+          <button class="secondary" id="reset">Сброс</button>
+        </div>
+        <div class="legend" id="legend">жёлтый блок = гиперребро N · цветные линии = роли · светлые стрелки = бинарные L</div>
+        <div id="network"></div>
+      </section>
+    </div>
+  </div>
+  <script>
+    const log = document.getElementById("log");
+    const input = document.getElementById("input");
+    const sendBtn = document.getElementById("send");
+    let network = null;
+    let highlight = new Set();
+    let graphMode = "hyper";
+    let lastHyperedges = [];
+
+    function addMsg(role, text, tag, systemPrompt) {
+      const el = document.createElement("div");
+      el.className = "msg " + role;
+      if (tag) {
+        const t = document.createElement("span");
+        t.className = "tag";
+        t.textContent = tag;
+        el.appendChild(t);
+      }
+      const body = document.createElement("div");
+      body.className = "body";
+      body.textContent = text;
+      el.appendChild(body);
+      if (role === "bot" && systemPrompt) {
+        const actions = document.createElement("div");
+        actions.className = "msg-actions";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "системный промпт";
+        const panel = document.createElement("pre");
+        panel.className = "prompt-panel";
+        panel.textContent = systemPrompt;
+        btn.addEventListener("click", () => {
+          const open = panel.classList.toggle("show");
+          btn.classList.toggle("open", open);
+          btn.textContent = open ? "скрыть промпт" : "системный промпт";
+        });
+        actions.appendChild(btn);
+        el.appendChild(actions);
+        el.appendChild(panel);
+      }
+      log.appendChild(el);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function loadHealth() {
+      const r = await fetch("/api/health");
+      const j = await r.json();
+      const llm = j.llm_configured ? `DeepSeek:${j.model}` : "rules-only (нет ключа)";
+      document.getElementById("health").textContent =
+        `${j.version || "?"} · ${llm} · preload=${j.preload} · |S|=${j["|S|"] ?? "?"} · τ=${j.tau}`;
+    }
+
+    function labelFont(color = "#ffffff", size = 12) {
+      return {
+        color,
+        size,
+        face: "Segoe UI",
+        bold: true,
+        strokeWidth: 5,
+        strokeColor: "#05080c",
+        multi: true,
+      };
+    }
+
+    function nodeStyle(n) {
+      const act = n.activation || 0;
+      const hi = highlight.has(n.id);
+      if (n.kind === "hyperedge") {
+        return {
+          id: n.id,
+          label: n.label,
+          title: n.title,
+          x: n.x,
+          y: n.y,
+          shape: "box",
+          size: 28 + Math.min(10, act * 12),
+          font: {
+            color: "#0b1020",
+            size: 12,
+            face: "Segoe UI",
+            bold: true,
+            multi: true,
+            strokeWidth: 0,
+          },
+          color: hi
+            ? { background: "#ff8a7a", border: "#ffffff" }
+            : {
+                background: "#ffe566",
+                border: "#ffffff",
+                highlight: { background: "#fff3a3", border: "#ffffff" },
+              },
+          borderWidth: hi ? 3 : 3,
+          margin: 10,
+          shadow: { enabled: true, color: "rgba(0,0,0,0.55)", size: 8, x: 0, y: 2 },
+        };
+      }
+      if (n.kind === "template") {
+        return {
+          id: n.id, label: n.label, title: n.title, x: n.x, y: n.y,
+          shape: "box", size: 18,
+          color: { background: "#7b5cff", border: "#ffffff" },
+          font: labelFont("#ffffff", 11),
+          borderWidth: 2,
+          shadow: { enabled: true, color: "rgba(0,0,0,0.5)", size: 6, x: 0, y: 2 },
+        };
+      }
+      const colors = {
+        S: { background: "#4f8cff", border: "#dceaff" },
+        C_m: { background: "#1ec9a8", border: "#d8fff6" },
+        C_g: { background: "#ff4d6d", border: "#ffd0d9" },
+        C_k: { background: "#6c8cff", border: "#e0e8ff" },
+        P_m: { background: "#2dd4a8", border: "#d9fff2" },
+        H_k: { background: "#3aa0ff", border: "#d6ecff" },
+      };
+      const c = colors[n.group] || { background: "#6b7c93", border: "#e8eef6" };
+      return {
+        id: n.id,
+        label: n.label,
+        title: n.title,
+        x: n.x,
+        y: n.y,
+        shape: n.group === "S" ? "dot" : "ellipse",
+        size: (n.group === "S" ? 14 : 18) + Math.min(10, act * 14),
+        color: hi ? { background: "#ff5c5c", border: "#ffffff" } : c,
+        borderWidth: hi ? 3 : 2,
+        font: labelFont("#ffffff", 12),
+        shadow: { enabled: true, color: "rgba(0,0,0,0.45)", size: 6, x: 0, y: 2 },
+      };
+    }
+
+    function edgeStyle(e) {
+      if (e.kind === "hyper_incidence") {
+        const col = e.color?.color || "#ffe566";
+        return {
+          id: e.id, from: e.from, to: e.to, label: e.label, title: e.title,
+          arrows: { to: false, from: false, middle: false },
+          width: 3.5,
+          color: { color: col, highlight: "#ffffff", opacity: 1 },
+          font: labelFont("#ffffff", 11),
+          smooth: { type: "curvedCW", roundness: 0.25 },
+        };
+      }
+      if (e.kind === "binary") {
+        const isIsa = e.label === "IS-A";
+        return {
+          id: e.id, from: e.from, to: e.to, label: e.label, title: e.title,
+          arrows: "to",
+          width: isIsa ? 2.5 : 2,
+          dashes: !!e.dashes,
+          color: {
+            color: isIsa ? "#9ad0ff" : "#c5d0de",
+            highlight: "#ffffff",
+            opacity: 0.95,
+          },
+          font: labelFont("#f2f6fb", 10),
+          smooth: { type: "continuous" },
+        };
+      }
+      return {
+        id: e.id, from: e.from, to: e.to, label: e.label, title: e.title,
+        arrows: e.arrows || "to", dashes: !!e.dashes, width: e.width || 2,
+        color: { color: "#d0d7e2", opacity: 0.95 },
+        font: labelFont("#ffffff", 10),
+      };
+    }
+
+    function drawHyperHulls(ctx) {
+      if (!network || !lastHyperedges.length) return;
+      const positions = network.getPositions();
+      for (const he of lastHyperedges) {
+        const pts = [];
+        const hub = positions[he.hub];
+        if (hub) pts.push(hub);
+        for (const m of he.members) {
+          if (positions[m]) pts.push(positions[m]);
+        }
+        if (pts.length < 2) continue;
+        const cx = pts.reduce((s, p) => s + p.x, 0) / pts.length;
+        const cy = pts.reduce((s, p) => s + p.y, 0) / pts.length;
+        const sorted = pts.slice().sort((a, b) => Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx));
+        ctx.beginPath();
+        const pad = 28;
+        sorted.forEach((p, i) => {
+          const dx = p.x - cx, dy = p.y - cy;
+          const len = Math.hypot(dx, dy) || 1;
+          const x = cx + (dx / len) * (len + pad);
+          const y = cy + (dy / len) * (len + pad);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = "rgba(255, 229, 102, 0.14)";
+        ctx.strokeStyle = "rgba(255, 229, 102, 0.85)";
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([6, 4]);
+        ctx.fill();
+        ctx.stroke();
+        ctx.setLineDash([]);
+        const text = "⟦" + (he.predicate || "") + "⟧";
+        ctx.font = "bold 13px Segoe UI";
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "#05080c";
+        ctx.strokeText(text, cx - 24, cy - 8);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(text, cx - 24, cy - 8);
+      }
+    }
+
+    function wipeNetwork() {
+      lastHyperedges = [];
+      if (network) {
+        try { network.destroy(); } catch (_) { /* ignore */ }
+        network = null;
+      }
+      const container = document.getElementById("network");
+      container.innerHTML = "";
+    }
+
+    async function loadGraph() {
+      const r = await fetch(`/api/graph?limit=400&mode=${graphMode}&_=${Date.now()}`, {
+        cache: "no-store",
+      });
+      const data = await r.json();
+      wipeNetwork();
+      lastHyperedges = data.hyperedges || [];
+      const container = document.getElementById("network");
+      const h = document.getElementById("health");
+      const base = h.textContent.split(" · |S|=")[0];
+      h.textContent = `${base} · |S|=${data.stats.S} N=${data.stats.hyperedges} graph=${data.stats.graph_size}`;
+      document.getElementById("modeHyper").classList.toggle("active", graphMode === "hyper");
+      document.getElementById("modeAll").classList.toggle("active", graphMode === "all");
+
+      if (!data.nodes.length && !data.edges.length) {
+        container.innerHTML =
+          '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#8aa0b4;font-size:0.95rem;">граф пуст</div>';
+        return;
+      }
+
+      const nodes = new vis.DataSet(data.nodes.map(nodeStyle));
+      const edges = new vis.DataSet(data.edges.map(edgeStyle));
+      const options = {
+        layout: { improvedLayout: true, randomSeed: 42 },
+        physics: {
+          enabled: true,
+          solver: "forceAtlas2Based",
+          forceAtlas2Based: {
+            gravitationalConstant: -55,
+            centralGravity: 0.004,
+            springLength: 140,
+            springConstant: 0.05,
+            avoidOverlap: 1,
+          },
+          stabilization: { enabled: true, iterations: 140, fit: true },
+          minVelocity: 1.5,
+          maxVelocity: 40,
+        },
+        nodes: {
+          font: labelFont("#ffffff", 12),
+          borderWidth: 2,
+        },
+        edges: {
+          font: labelFont("#ffffff", 11),
+          selectionWidth: 3,
+          color: { inherit: false },
+        },
+        interaction: { hover: true, tooltipDelay: 60, multiselect: true },
+      };
+      network = new vis.Network(container, { nodes, edges }, options);
+      network.on("afterDrawing", (ctx) => drawHyperHulls(ctx));
+      network.once("stabilizationIterationsDone", () => {
+        network.setOptions({ physics: { enabled: false } });
+        network.fit({ animation: false });
+      });
+    }
+
+    async function send() {
+      const message = input.value.trim();
+      if (!message) return;
+      addMsg("user", message);
+      input.value = "";
+      sendBtn.disabled = true;
+      try {
+        const r = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.detail || "error");
+        addMsg(
+          "bot",
+          j.reply,
+          `${j.kind} · ${j.backend} · userN=${(j.user_facts||[]).length} asstN=${(j.assistant_facts||[]).length}`,
+          j.system_prompt || ""
+        );
+        highlight = new Set(j.trace_uids || []);
+        await loadHealth();
+        await loadGraph();
+      } catch (e) {
+        addMsg("bot", String(e), "error");
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    sendBtn.addEventListener("click", send);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+    });
+    document.getElementById("refresh").addEventListener("click", loadGraph);
+    document.getElementById("modeHyper").addEventListener("click", () => { graphMode = "hyper"; loadGraph(); });
+    document.getElementById("modeAll").addEventListener("click", () => { graphMode = "all"; loadGraph(); });
+    document.getElementById("dump").addEventListener("click", async () => {
+      const r = await fetch("/api/dump");
+      const blob = await r.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "ah_dump.json";
+      a.click();
+    });
+    document.getElementById("reset").addEventListener("click", async () => {
+      try {
+        wipeNetwork();
+        const r = await fetch("/api/reset?preload=empty", {
+          method: "POST",
+          cache: "no-store",
+        });
+        const j = await r.json();
+        if (!r.ok || !j.ok) throw new Error(j.detail || "reset failed");
+        const gs = j.stats?.graph_size ?? -1;
+        if (gs !== 0) throw new Error(`граф не очищен: graph_size=${gs}`);
+        highlight = new Set();
+        log.innerHTML = "";
+        addMsg("bot", "Граф опустошён (S=0, L=0).", "system");
+        await loadHealth();
+        await loadGraph();
+      } catch (e) {
+        addMsg("bot", String(e), "error");
+      }
+    });
+
+    (async () => {
+      addMsg("bot", "Готов к диалогу. Каждая твоя реплика и ответ модели пишутся в АГ-память.", "system");
+      await loadHealth();
+      await loadGraph();
+    })();
+  </script>
+</body>
+</html>

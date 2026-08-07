@@ -28,6 +28,7 @@ class IngestReport:
     created_n: list[str] = field(default_factory=list)
     seed_uids: list[str] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
+    perception: dict = field(default_factory=dict)
 
 
 def _label_from_uid(uid: str) -> str:
@@ -56,23 +57,15 @@ class Transform:
             report.seed_uids.append(uid)
             report.seed_uids.append(m_uid)
 
-        theme_ms: list[str] = []
         for cand in perception.candidates:
             try:
                 n_uid = self._ingest_candidate(cand, section)
                 report.created_n.append(n_uid)
-                try:
-                    n = self.store.get_hypernode(n_uid)
-                    theme_ms.extend(f.target_uid for f in n.fillers.values())
-                except Exception:
-                    pass
             except Exception as exc:  # noqa: BLE001
                 report.skipped.append(f"{cand.predicate}:{exc}")
 
-        for u in report.seed_uids:
-            if u.startswith("M_"):
-                theme_ms.append(u)
-        self._weave_assoc_mesh(theme_ms, w=max(0.35, self.hp.initial_w * 0.7))
+        # mesh only within each N (see _ingest_candidate), not across bag-of-seeds
+        report.perception = perception.to_graph_json()
         return report
 
     def _ingest_candidate(self, cand: FactCandidate, section: Section) -> str:

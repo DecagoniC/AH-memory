@@ -16,7 +16,7 @@ from ah_memory.deepseek import HybridPerception
 from ah_memory.dialogue import DialogueAgent
 from ah_memory.examples.rabbit import build_rabbit_memory
 from ah_memory.graph_export import dump_ah_json, dump_graph
-from ah_memory.perception import RulePerception
+from ah_memory.perception import SeedPerception
 from ah_memory.store import AHStore
 
 STATIC = Path(__file__).parent / "static"
@@ -27,7 +27,7 @@ app = FastAPI(title="AH Memory", version="0.3.0")
 def _make_perception() -> Any:
     if cfg.agent.use_llm and cfg.deepseek.configured:
         return HybridPerception(cfg.deepseek, fallback=cfg.agent.fallback_rules)
-    return RulePerception()
+    return SeedPerception()
 
 
 def _store_for_preload(mode: str) -> AHStore:
@@ -73,6 +73,7 @@ class ChatOut(BaseModel):
     assistant_facts: list[str] = []
     system_prompt: str = ""
     activation: dict[str, Any] = Field(default_factory=dict)
+    graph_build_json: dict[str, Any] = Field(default_factory=dict)
 
 
 @app.get("/")
@@ -112,11 +113,13 @@ def full_dump() -> dict[str, Any]:
 def last_trace() -> dict[str, Any]:
     """Last turn activation trace (evidence / BP ticks / WM)."""
     act = getattr(dialogue, "last_activation", None) or {}
+    build = getattr(dialogue, "last_graph_build_json", None) or {}
     return {
         "ok": True,
         "tau": agent.store.ah.tau,
         "wm": sorted(agent.ignition.wm.contents()),
         "activation": act,
+        "graph_build_json": build,
         "recent_ticks": [
             {
                 "tau": t.tau,
@@ -156,6 +159,7 @@ def chat(body: ChatIn) -> ChatOut:
         assistant_facts=turn.assistant_facts,
         system_prompt=turn.system_prompt,
         activation=turn.activation,
+        graph_build_json=turn.graph_build_json,
     )
 
 

@@ -415,9 +415,10 @@
       body.className = "body";
       body.textContent = text;
       el.appendChild(body);
-      if (role === "bot" && (extras.systemPrompt || extras.activation)) {
+      if (role === "bot" && (extras.systemPrompt || extras.activation || extras.graphBuildJson)) {
         const actions = document.createElement("div");
         actions.className = "msg-actions";
+        el.appendChild(actions);
         if (extras.systemPrompt) {
           const btn = document.createElement("button");
           btn.type = "button";
@@ -431,8 +432,22 @@
             btn.textContent = open ? "скрыть промпт" : "системный промпт";
           });
           actions.appendChild(btn);
-          el.appendChild(actions);
           el.appendChild(panel);
+        }
+        if (extras.graphBuildJson) {
+          const btnG = document.createElement("button");
+          btnG.type = "button";
+          btnG.textContent = "JSON графа";
+          const panelG = document.createElement("pre");
+          panelG.className = "prompt-panel";
+          panelG.textContent = JSON.stringify(extras.graphBuildJson, null, 2);
+          btnG.addEventListener("click", () => {
+            const open = panelG.classList.toggle("show");
+            btnG.classList.toggle("open", open);
+            btnG.textContent = open ? "скрыть JSON графа" : "JSON графа";
+          });
+          actions.appendChild(btnG);
+          el.appendChild(panelG);
         }
         if (extras.activation) {
           const btnT = document.createElement("button");
@@ -443,9 +458,6 @@
             renderActivation(lastActivation);
             traceView.scrollTop = 0;
           });
-          if (!extras.systemPrompt) {
-            el.appendChild(actions);
-          }
           actions.appendChild(btnT);
         }
       }
@@ -718,7 +730,7 @@
           "bot",
           j.reply,
           `${j.kind} · ${j.backend} · userN=${(j.user_facts||[]).length} asstN=${(j.assistant_facts||[]).length} · WM=${(j.wm||[]).length}`,
-          { systemPrompt: j.system_prompt || "", activation: j.activation || null }
+          { systemPrompt: j.system_prompt || "", activation: j.activation || null, graphBuildJson: j.graph_build_json || null }
         );
         lastActivation = j.activation || null;
         renderActivation(lastActivation);

@@ -20,9 +20,30 @@ STOP = {
     "который", "которая", "которое", "которые", "какой", "какая", "какие",
     "этот", "эта", "эти", "тот", "та", "те", "там", "тут", "здесь", "куда", "откуда",
     "очень", "можно", "нужно", "надо", "есть", "будет", "быть", "был", "была", "были",
+    "привет", "пока", "спасибо", "пожалуйста", "отлично", "хорошо", "ладно", "кстати",
+    "младший", "старший",  # kinship adj — keep брат/имя as head, drop bare adj seeds
     "the", "a", "an", "of", "to", "in", "is", "are", "was", "were", "be", "and", "or",
     "who", "what", "when", "where", "why", "how", "can", "may", "if", "then",
 }
+
+# surface forms pymorphy mangles (acronyms / surnames)
+LEMMA_OVERRIDE = {
+    "мифи": "мифи",
+    "нияу": "нияу",
+    "душкин": "душкин",
+    "душкина": "душкин",
+    "душкину": "душкин",
+    "душкиным": "душкин",
+    "душкине": "душкин",
+    "сергей": "сергей",
+    "максим": "максим",
+    "москве": "москва",
+    "москвы": "москва",
+    "москву": "москва",
+}
+
+# max tokens in a role UID (mega-subjects from whole-clause match)
+MAX_UID_PARTS = 4
 
 _NON_ENTITY_POS = frozenset({
     "VERB", "INFN", "GRND", "PRTF", "PRTS", "ADVB", "CONJ", "PREP", "PRCL",
@@ -52,6 +73,8 @@ def lemma(word: str) -> str:
     w = _norm(word)
     if not w:
         return ""
+    if w in LEMMA_OVERRIDE:
+        return LEMMA_OVERRIDE[w]
     if w.isdigit() or re.fullmatch(r"[a-z0-9_\-]+", w):
         # keep latin/digits stable (UIDs, years)
         return w
@@ -129,8 +152,24 @@ def slug_uid(token: str) -> str:
         # fallback: lemma of whole token
         lem = lemma(parts[0])
         lemmas = [lem] if lem else ["unk"]
+    # prefer last nounish head for overlong spans
+    if len(lemmas) > MAX_UID_PARTS:
+        nouns = [x for x in lemmas if is_nounish(x, allow_pronoun=True)]
+        lemmas = (nouns or lemmas)[-MAX_UID_PARTS:]
     uid = "_".join(lemmas).upper()
     return uid[:48] if uid else "UNK"
+
+
+def uid_too_wide(uid: str) -> bool:
+    bare = uid[2:] if uid.startswith("M_") else uid
+    parts = [p for p in bare.split("_") if p]
+    if len(parts) > MAX_UID_PARTS:
+        return True
+    # clause-glue: repeated pronouns / duplicated stems
+    low = [p.lower() for p in parts]
+    if low.count("я") > 1 or low.count("мы") > 1:
+        return True
+    return False
 
 
 def head_entity(tokens: list[str], *, allow_pronoun: bool = True) -> str | None:
@@ -143,20 +182,39 @@ def head_entity(tokens: list[str], *, allow_pronoun: bool = True) -> str | None:
         return None
     if not any(is_nounish(k, allow_pronoun=allow_pronoun) for k in kept):
         return None
-    return slug_uid(" ".join(kept))
+    if len(kept) > MAX_UID_PARTS:
+        nouns = [k for k in kept if is_nounish(k, allow_pronoun=allow_pronoun)]
+        kept = (nouns or kept)[-MAX_UID_PARTS:]
+    uid = slug_uid(" ".join(kept))
+    if uid_too_wide(uid):
+        return None
+    return uid
 
 
 def filter_entity_uids(uids: list[str], *, allow_pronoun: bool = False) -> list[str]:
     out: list[str] = []
     for u in uids:
         bare = u[2:] if u.startswith("M_") else u
+        if uid_too_wide(bare):
+            continue
         parts = [p for p in re.split(r"[_\s]+", bare.lower()) if p]
         head = head_entity(parts, allow_pronoun=allow_pronoun)
         if head is None:
             continue
-        if head not in out and head != "UNK":
+        if head not in out and head != "UNK" and not uid_too_wide(head):
             out.append(head)
     return out
+
+
+def seeds_from_roles(candidates: list, *, extra: list[str] | None = None) -> list[str]:
+    """Seeds = role fillers (+ optional short extras), not whole-utterance bag-of-nouns."""
+    raw: list[str] = []
+    for c in candidates:
+        roles = getattr(c, "roles", None) or {}
+        raw.extend(str(v) for v in roles.values())
+    if extra:
+        raw.extend(extra)
+    return filter_entity_uids(raw, allow_pronoun=True)
 
 
 def sanitize_roles(roles: dict[str, str]) -> dict[str, str] | None:
@@ -164,6 +222,8 @@ def sanitize_roles(roles: dict[str, str]) -> dict[str, str] | None:
     out: dict[str, str] = {}
     for role, val in roles.items():
         bare = val[2:] if str(val).startswith("M_") else str(val)
+        if uid_too_wide(bare):
+            return None
         parts = [p for p in re.split(r"[_\s]+", bare.lower()) if p]
         if role in {"SUBJECT", "OBJECT", "LOCATION", "TOOL", "MATERIAL"}:
             allow_p = role == "SUBJECT"
@@ -175,6 +235,10 @@ def sanitize_roles(roles: dict[str, str]) -> dict[str, str] | None:
             head = head_entity(parts, allow_pronoun=allow_p)
             if head is None:
                 return None
+            # OBJECT/LOCATION must be nounish (drop pure adjectives like СЕРЬЁЗНЫЙ)
+            if role in {"OBJECT", "LOCATION", "TOOL", "MATERIAL"}:
+                if not any(is_nounish(p, allow_pronoun=False) for p in head.lower().split("_")):
+                    return None
             out[role] = head
         elif role == "TIME":
             out[role] = slug_uid(bare)
@@ -185,5 +249,7 @@ def sanitize_roles(roles: dict[str, str]) -> dict[str, str] | None:
     # SUBJECT must not be a verb lemma
     subj_parts = out["SUBJECT"].lower().split("_")
     if not any(is_nounish(p, allow_pronoun=True) for p in subj_parts):
+        return None
+    if uid_too_wide(out["SUBJECT"]):
         return None
     return out

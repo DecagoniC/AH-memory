@@ -1,4 +1,4 @@
-"""DeepSeek OpenAI-compatible client + HybridPerception."""
+"""DeepSeek OpenAI-compatible client + HybridPerception (LLM → gate; offline seeds)."""
 from __future__ import annotations
 
 import json
@@ -8,14 +8,15 @@ from typing import Any
 import httpx
 
 from ah_memory.config import DeepSeekConfig
-from ah_memory.morph import filter_entity_uids, slug_uid
+from ah_memory.morph import seeds_from_roles, slug_uid
 from ah_memory.perception import (
     FactCandidate,
     PerceptionResult,
-    RulePerception,
-    _finalize_candidates,
+    SeedPerception,
     _is_question,
     _norm,
+    gate_candidates,
+    content_entity_uids,
 )
 
 SYSTEM_PROMPT = """Ты модуль восприятия АГ-памяти.
@@ -68,8 +69,9 @@ class DeepSeekClient:
 
 
 class DeepSeekPerception:
-    def __init__(self, cfg: DeepSeekConfig) -> None:
+    def __init__(self, cfg: DeepSeekConfig, *, require_grounding: bool = True) -> None:
         self.client = DeepSeekClient(cfg)
+        self.require_grounding = require_grounding
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
         user = json.dumps(
@@ -93,66 +95,72 @@ class DeepSeekPerception:
             for c in data.get("candidates", [])
             if c.get("predicate")
         ]
-        cands = _finalize_candidates(cands)
+        gated = gate_candidates(text, cands, require_grounding=self.require_grounding)
         kind = data.get("kind", "fact")
         if kind not in {"fact", "question", "message"}:
             kind = "fact"
         low = _norm(text.strip())
         if _is_question(text.strip(), low):
             kind = "question"
-        seeds = filter_entity_uids(
-            [slug_uid(str(s)) for s in data.get("seed_tokens", [])],
-            allow_pronoun=True,
+            gated = []
+        seeds = seeds_from_roles(
+            gated,
+            extra=[slug_uid(str(s)) for s in data.get("seed_tokens", [])][:12],
         )
         if not seeds:
-            seeds = RulePerception()._content_tokens(low)
+            seeds = content_entity_uids(text)[:8]
+        if kind != "question" and not gated:
+            kind = "message"
         return PerceptionResult(
-            kind=kind, candidates=cands, seed_tokens=seeds, meta={"backend": "deepseek"}
+            kind=kind,
+            candidates=gated,
+            seed_tokens=seeds,
+            meta={
+                "backend": "deepseek",
+                "llm_raw": data,
+                "system_prompt": SYSTEM_PROMPT,
+            },
         )
 
 
 class HybridPerception:
-    """DeepSeek first; merge RulePerception if LLM missed factors."""
+    """LLM → morph gate; offline / error → SeedPerception (seeds only, no facts)."""
 
     def __init__(self, cfg: DeepSeekConfig, fallback: bool = True) -> None:
         self.cfg = cfg
         self.fallback = fallback
-        self.rules = RulePerception()
+        self.seeds = SeedPerception()
         self.llm = DeepSeekPerception(cfg) if cfg.configured else None
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
-        rules = self.rules.parse(text, wm_context)
+        offline = self.seeds.parse(text, wm_context)
         if self.llm is None:
-            return rules
+            return offline
         try:
             llm = self.llm.parse(text, wm_context)
         except Exception as exc:  # noqa: BLE001
             if not self.fallback:
                 raise
             return PerceptionResult(
-                kind=rules.kind,
-                candidates=rules.candidates,
-                seed_tokens=rules.seed_tokens,
-                meta={**rules.meta, "backend": "rules", "llm_error": str(exc)},
+                kind=offline.kind,
+                candidates=[],
+                seed_tokens=offline.seed_tokens,
+                meta={**offline.meta, "backend": "seeds", "llm_error": str(exc)},
             )
 
-        seen: set[tuple[str, tuple[tuple[str, str], ...]]] = set()
-        merged: list[FactCandidate] = []
-        for c in _finalize_candidates(list(llm.candidates) + list(rules.candidates)):
-            key = (c.predicate, tuple(sorted(c.roles.items())))
-            if key in seen:
-                continue
-            seen.add(key)
-            merged.append(c)
-        seeds = filter_entity_uids(
-            list(llm.seed_tokens) + list(rules.seed_tokens),
-            allow_pronoun=True,
-        )
+        seeds = seeds_from_roles(llm.candidates, extra=list(llm.seed_tokens)[:8])
+        if not seeds:
+            seeds = list(offline.seed_tokens)[:8]
         return PerceptionResult(
-            kind=llm.kind if llm.kind != "message" else rules.kind,
-            candidates=merged,
+            kind=llm.kind,
+            candidates=list(llm.candidates),
             seed_tokens=seeds,
-            meta={"backend": "hybrid"},
+            meta={
+                "backend": "hybrid-llm" if llm.candidates else "hybrid-seeds",
+                "llm_raw": llm.meta.get("llm_raw"),
+                "system_prompt": llm.meta.get("system_prompt", SYSTEM_PROMPT),
+                "llm_candidates": len(llm.candidates),
+            },
         )
 
 

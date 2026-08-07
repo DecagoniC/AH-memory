@@ -15,7 +15,7 @@ web:
 
 agent:
   use_llm: true
-  # если LLM недоступен — RulePerception
+  # если LLM недоступен — SeedPerception (только затравки, без фактов)
   fallback_rules: true
   ticks: 6
   preload: "empty"  # rabbit | encyclopedia | empty

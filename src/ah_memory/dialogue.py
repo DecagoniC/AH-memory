@@ -45,6 +45,7 @@ class TurnResult:
     history_len: int = 0
     system_prompt: str = ""
     activation: dict = field(default_factory=dict)
+    graph_build_json: dict = field(default_factory=dict)
 
 
 class DialogueAgent:
@@ -58,6 +59,7 @@ class DialogueAgent:
         self._ep_prev: str | None = None
         self._turn = 0
         self.last_activation: dict = {}
+        self.last_graph_build_json: dict = {}
 
     @property
     def store(self) -> AHStore:
@@ -68,6 +70,7 @@ class DialogueAgent:
         self._ep_prev = None
         self._turn = 0
         self.last_activation = {}
+        self.last_graph_build_json = {}
 
     def talk(self, user_text: str, ticks: int = 6) -> TurnResult:
         user_text = user_text.strip()
@@ -91,7 +94,7 @@ class DialogueAgent:
             backend = "rules+ah"
 
         i1 = len(ign.traces)
-        asst_rep = self.agent.ingest(reply, section=Section.H)
+        asst_rep = self.agent.ingest(reply, section=Section.H, source="assistant")
         asst_ticks = [_tick_dict(t) for t in ign.traces[i1:]]
         self._record_episode("ASSISTANT", reply, asst_rep)
 
@@ -106,6 +109,20 @@ class DialogueAgent:
                 ask.trace_uids + wm + user_rep.created_n + asst_rep.created_n + user_rep.seed_uids[:8]
             )
         )
+        graph_build_json = {
+            "turn": self._turn,
+            "user_text": user_text,
+            "user_perception": user_rep.perception,
+            "ask_perception": ask.perception,
+            "assistant_text": reply,
+            "assistant_perception": asst_rep.perception,
+            "created": {
+                "user_n": user_rep.created_n,
+                "assistant_n": asst_rep.created_n,
+                "user_skipped": user_rep.skipped,
+                "assistant_skipped": asst_rep.skipped,
+            },
+        }
         activation = {
             "turn": self._turn,
             "threshold_t": self.agent.hp.threshold_t,
@@ -129,6 +146,7 @@ class DialogueAgent:
             "memory_brief": mem,
         }
         self.last_activation = activation
+        self.last_graph_build_json = graph_build_json
         return TurnResult(
             reply=reply,
             user_facts=user_rep.created_n,
@@ -139,6 +157,7 @@ class DialogueAgent:
             history_len=len(self.history),
             system_prompt=system_prompt,
             activation=activation,
+            graph_build_json=graph_build_json,
         )
 
     def _compose_system_blocks(self, mem: str, graph_hint: str) -> list[str]:

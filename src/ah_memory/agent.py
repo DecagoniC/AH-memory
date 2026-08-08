@@ -7,10 +7,48 @@ from ah_memory.dsl import DSLInterpreter
 from ah_memory.gc import collect
 from ah_memory.hyperparams import HyperParams
 from ah_memory.ignition import ActivationSeed, IgnitionEngine, TickTrace
-from ah_memory.perception import PerceptionBackend, RulePerception
+from ah_memory.perception import PerceptionBackend, PerceptionResult, SeedPerception, FactCandidate
 from ah_memory.store import AHStore
 from ah_memory.transform import IngestReport, Transform
 from ah_memory.types import Role, Section
+
+
+def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
+    """Keep only confident structural facts from chat replies (drop greetings / fluff)."""
+    from ah_memory.morph import is_nounish, sanitize_roles, seeds_from_roles
+
+    kept: list[FactCandidate] = []
+    for c in perc.candidates:
+        if c.confidence < 0.85:
+            continue
+        if c.predicate not in {
+            "IS",
+            "LIVE_IN",
+            "BE_BORN",
+            "HAVE",
+            "USE",
+            "CREATE",
+            "CAUSE_EVENT",
+            "BE_COLORED",
+        }:
+            continue
+        roles = sanitize_roles(c.roles)
+        if roles is None:
+            continue
+        # OBJECT/LOCATION must stay nounish (evaluative adjectives already rejected in sanitize)
+        for role in ("OBJECT", "LOCATION"):
+            val = roles.get(role)
+            if val and not any(is_nounish(p, allow_pronoun=False) for p in val.lower().split("_")):
+                roles = None
+                break
+        if roles is None:
+            continue
+        kept.append(FactCandidate(c.predicate, roles, c.raw_span, c.confidence))
+    seeds = seeds_from_roles(kept)
+    kind = perc.kind
+    if not kept:
+        kind = "message"
+    return PerceptionResult(kind=kind, candidates=kept, seed_tokens=seeds, meta=dict(perc.meta))
 
 
 @dataclass
@@ -19,6 +57,8 @@ class AgentReply:
     trace_uids: list[str]
     traces: list[TickTrace] = field(default_factory=list)
     source: str = "graph"
+    seed_uids: list[str] = field(default_factory=list)
+    perception: dict = field(default_factory=dict)
 
 
 class Agent:
@@ -30,15 +70,18 @@ class Agent:
     ) -> None:
         self.store = store or AHStore()
         self.hp = hp or HyperParams()
-        self.perception = perception or RulePerception()
+        self.perception = perception or SeedPerception()
         self.transform = Transform(self.store, self.hp)
         self.ignition = IgnitionEngine(self.store, self.hp)
         self.dsl = DSLInterpreter(self.store)
 
-    def ingest(self, text: str, section: Section = Section.C) -> IngestReport:
+    def ingest(self, text: str, section: Section = Section.C, *, source: str = "user") -> IngestReport:
         """Perceive → materialize S/m seeds + N factors."""
         perc = self.perception.parse(text, list(self.ignition.wm.contents()))
+        if source == "assistant":
+            perc = _filter_assistant_perception(perc)
         report = self.transform.apply(perc, section=section)
+        # activate only role-bearing seeds (report.seed_uids already from perception.seed_tokens)
         seeds = [
             ActivationSeed(uid=u, delta_x=self.hp.seed_delta) for u in report.seed_uids
         ]
@@ -54,6 +97,8 @@ class Agent:
         seen: set[str] = set()
         for u in perc.seed_tokens:
             bare = u[2:] if u.startswith("M_") else u
+            if bare.count("_") > 3:
+                continue
             q = bare.lower().replace("_", " ")
             candidates = []
             if bare in self.store.ah.S:
@@ -73,6 +118,8 @@ class Agent:
                     continue
                 seen.add(uid)
                 seeds.append(ActivationSeed(uid=uid, delta_x=self.hp.seed_delta))
+            if len(seeds) >= 16:
+                break
         self.ignition.seed(seeds)
         traces = self.ignition.run(ticks)
         trace_uids: list[str] = []
@@ -86,7 +133,14 @@ class Agent:
             if uid not in trace_uids:
                 trace_uids.append(uid)
         collect(self.store, self.hp)
-        return AgentReply(answer=answer, trace_uids=trace_uids, traces=traces, source="graph")
+        return AgentReply(
+            answer=answer,
+            trace_uids=trace_uids,
+            traces=traces,
+            source="graph",
+            seed_uids=[s.uid for s in seeds],
+            perception=perc.to_graph_json(),
+        )
 
     def step_message(self, text: str, ticks: int = 3) -> AgentReply:
         """Continuous perception cycle (bonus track)."""

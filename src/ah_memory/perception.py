@@ -1,19 +1,20 @@
-"""Perception: NL → FactCandidate. Lemmas via pymorphy3; roles = entities only."""
+"""Perception: NL → FactCandidate. LLM extracts; morph gate validates; offline = seeds only."""
 from __future__ import annotations
 
 import json
 import re
 from dataclasses import dataclass, field
-from typing import Literal, Protocol
+from typing import Any, Literal, Protocol
 
 from ah_memory.morph import (
     STOP,
     filter_entity_uids,
-    head_entity,
     is_entity_token,
     lemma,
     sanitize_roles,
+    seeds_from_roles,
     slug_uid,
+    uid_too_wide,
 )
 
 
@@ -30,11 +31,63 @@ class PerceptionResult:
     kind: Literal["fact", "question", "message"]
     candidates: list[FactCandidate]
     seed_tokens: list[str] = field(default_factory=list)
-    meta: dict[str, str] = field(default_factory=dict)
+    meta: dict[str, Any] = field(default_factory=dict)
+
+    def to_graph_json(self) -> dict[str, Any]:
+        """Normalized JSON that Transform uses to build AH."""
+        out: dict[str, Any] = {
+            "kind": self.kind,
+            "candidates": [
+                {
+                    "predicate": c.predicate,
+                    "roles": dict(c.roles),
+                    "raw_span": c.raw_span,
+                    "confidence": c.confidence,
+                }
+                for c in self.candidates
+            ],
+            "seed_tokens": list(self.seed_tokens),
+            "meta": {k: v for k, v in self.meta.items() if k != "llm_raw"},
+        }
+        if "llm_raw" in self.meta:
+            out["llm_raw"] = self.meta["llm_raw"]
+        return out
 
 
 class PerceptionBackend(Protocol):
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult: ...
+
+
+PREDICATES = {
+    "CREATE",
+    "IS",
+    "LIVE_IN",
+    "BE_BORN",
+    "HAVE",
+    "RUN",
+    "BE_COLORED",
+    "CAUSE_EVENT",
+    "USE",
+    "MOVE",
+}
+
+PRED_ALIASES = {
+    "STUDY_AT": "LIVE_IN",
+    "STUDY": "LIVE_IN",
+    "WORK_AT": "LIVE_IN",
+    "WORK": "LIVE_IN",
+    "LOCATED_IN": "LIVE_IN",
+    "BORN": "BE_BORN",
+    "BORN_IN": "BE_BORN",
+    "BIRTH": "BE_BORN",
+    "ORIGIN": "BE_BORN",
+    "FROM": "BE_BORN",
+    "OWN": "HAVE",
+    "NAME": "IS",
+}
+
+_TOKEN_RE = re.compile(r"[a-zа-я0-9]+", re.IGNORECASE)
+_SHORT_KEEP = frozenset({"я", "мы", "ты", "он", "а"})
 
 
 def _norm(text: str) -> str:
@@ -51,205 +104,149 @@ def _is_question(raw: str, low: str) -> bool:
     )
 
 
+def _collect_text_lemmas(text: str) -> set[str]:
+    low = _norm(text)
+    lemmas: set[str] = set()
+    for w in _TOKEN_RE.findall(low):
+        if len(w) < 2 and w not in _SHORT_KEEP:
+            continue
+        lem = lemma(w)
+        if lem:
+            lemmas.add(lem.replace("ё", "е"))
+    return lemmas
+
+
+def _uid_grounded(uid: str, text_lemmas: set[str], raw_tokens: set[str]) -> bool:
+    bare = uid[2:] if uid.startswith("M_") else uid
+    if bare.isdigit():
+        return bare in raw_tokens
+    parts = [p.lower().replace("ё", "е") for p in bare.split("_") if p]
+    if not parts:
+        return False
+    for p in parts:
+        if p.isdigit():
+            if p not in raw_tokens:
+                return False
+            continue
+        pl = lemma(p).replace("ё", "е")
+        if p not in text_lemmas and pl not in text_lemmas:
+            return False
+    return True
+
+
+def _roles_grounded(roles: dict[str, str], text_lemmas: set[str], raw: str) -> bool:
+    low = _norm(raw)
+    raw_tokens = set(_TOKEN_RE.findall(low))
+    for val in roles.values():
+        bare = val[2:] if str(val).startswith("M_") else str(val)
+        if not _uid_grounded(bare, text_lemmas, raw_tokens):
+            return False
+    return True
+
+
+def _normalize_place_roles(pred: str, roles: dict[str, str]) -> dict[str, str]:
+    """LIVE_IN / BE_BORN: place goes to LOCATION, not OBJECT."""
+    if pred not in {"LIVE_IN", "BE_BORN"}:
+        return roles
+    if "LOCATION" not in roles and "OBJECT" in roles:
+        roles = dict(roles)
+        roles["LOCATION"] = roles.pop("OBJECT")
+    return roles
+
+
 def _finalize_candidates(cands: list[FactCandidate]) -> list[FactCandidate]:
     out: list[FactCandidate] = []
     seen: set[tuple[str, tuple[tuple[str, str], ...]]] = set()
     for c in cands:
+        pred = PRED_ALIASES.get(c.predicate.upper(), c.predicate.upper())
         roles = sanitize_roles(dict(c.roles))
         if roles is None:
             continue
-        key = (c.predicate.upper(), tuple(sorted(roles.items())))
+        roles = _normalize_place_roles(pred, roles)
+        if any(uid_too_wide(v) for v in roles.values()):
+            continue
+        if pred in {"LIVE_IN", "BE_BORN"} and "LOCATION" not in roles:
+            continue
+        key = (pred, tuple(sorted(roles.items())))
         if key in seen:
             continue
         seen.add(key)
-        out.append(
-            FactCandidate(c.predicate.upper(), roles, c.raw_span, c.confidence)
-        )
+        out.append(FactCandidate(pred, roles, c.raw_span, c.confidence))
     return out
 
 
-class RulePerception:
-    """Pattern parser; entity UIDs = lemmas, no verb/conj subjects."""
+def gate_candidates(
+    text: str,
+    cands: list[FactCandidate],
+    *,
+    min_confidence: float = 0.5,
+    require_grounding: bool = True,
+) -> list[FactCandidate]:
+    """Hard acceptor: whitelist predicate, morph roles, optional lemma-in-text."""
+    finalized = _finalize_candidates(cands)
+    text_lemmas = _collect_text_lemmas(text) if require_grounding else set()
+    out: list[FactCandidate] = []
+    for c in finalized:
+        if c.predicate not in PREDICATES:
+            continue
+        if c.confidence < min_confidence:
+            continue
+        if require_grounding and not _roles_grounded(c.roles, text_lemmas, text):
+            continue
+        out.append(c)
+    return out
+
+
+def content_entity_uids(text: str, *, limit: int = 32) -> list[str]:
+    """POS-filtered entity UIDs from text (offline seeds, no facts)."""
+    low = _norm(text)
+    out: list[str] = []
+    for w in _TOKEN_RE.findall(low):
+        if len(w) < 2 and w not in _SHORT_KEEP:
+            continue
+        if w in STOP or not is_entity_token(w, allow_pronoun=True):
+            continue
+        uid = slug_uid(w)
+        if uid in PREDICATES or uid in out:
+            continue
+        out.append(uid)
+        if len(out) >= limit:
+            break
+    return out
+
+
+class SeedPerception:
+    """Offline perception: entity seeds only, never invents N / FactCandidate."""
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
         raw = text.strip()
         low = _norm(raw)
         question = _is_question(raw, low)
-
-        cands: list[FactCandidate] = []
-        for sent in re.split(r"[.!;?\n]\s*", raw):
-            s = sent.strip()
-            if not s:
-                continue
-            cands.extend(self._parse_sentence(s))
-        cands = _finalize_candidates(cands)
-
-        seeds = self._content_tokens(low)
-        for c in cands:
-            seeds.extend(c.roles.values())
-        seed_tokens = filter_entity_uids(seeds, allow_pronoun=True)
-
-        kind: Literal["fact", "question", "message"] = "question" if question else "fact"
-        if not question and not cands:
+        seeds = content_entity_uids(raw)[:8]
+        if question:
+            kind: Literal["fact", "question", "message"] = "question"
+        elif seeds:
             kind = "message"
-        return PerceptionResult(kind=kind, candidates=cands, seed_tokens=seed_tokens, meta={})
-
-    def _content_tokens(self, low: str) -> list[str]:
-        out: list[str] = []
-        for w in re.findall(r"[a-zа-я0-9]{2,}", low):
-            if w in STOP or not is_entity_token(w, allow_pronoun=True):
-                continue
-            uid = slug_uid(w)
-            if uid not in out and uid not in PREDICATES:
-                out.append(uid)
-        return out[:32]
-
-    def _parse_sentence(self, sent: str) -> list[FactCandidate]:
-        low = _norm(sent)
-        out: list[FactCandidate] = []
-
-        if _is_question(sent, low) and not re.search(
-            r"\b(?:является|это|обитает|живет|имеет|появил)\b", low
-        ):
-            return out
-
-        # «меня зовут X» / «зовут X»
-        m = re.search(r"(?:меня\s+)?зовут\s+([a-zа-яё\-]+)", low)
-        if m:
-            name = slug_uid(m.group(1))
-            out.append(FactCandidate("IS", {"SUBJECT": "Я", "OBJECT": name}, sent, 0.9))
-
-        # «мой брат — X» / «брата зовут X»
-        m = re.search(r"(?:моего\s+)?брат[ауи]?\s+зовут\s+([a-zа-яё\-]+)", low)
-        if m:
-            out.append(
-                FactCandidate("IS", {"SUBJECT": "БРАТ", "OBJECT": slug_uid(m.group(1))}, sent, 0.9)
-            )
-
-        # «занимаюсь X» → USE(Я, lemma(X))
-        m = re.search(r"занима(?:юсь|ется|емся|ются)\s+(.+)", low)
-        if m:
-            words = [lemma(w) for w in re.findall(r"[a-zа-я0-9]{2,}", m.group(1))]
-            obj = head_entity(words, allow_pronoun=False)
-            if obj:
-                out.append(
-                    FactCandidate("USE", {"SUBJECT": "Я", "OBJECT": obj}, sent, 0.8)
-                )
-
-        m = re.search(r"^(.+?)\s*-\s*это\s+(.+)$", low)
-        if not m:
-            m = re.search(r"^(.+?)\s+это\s+(.+)$", low)
-        if not m:
-            m = re.search(r"^(.+?)\s*-\s*(.+)$", low)
-        if not m:
-            m = re.search(r"^(.+?)\s+является\s+(.+)$", low)
-        if not m:
-            m = re.search(r"^(.+?)\s+is\s+(?:an?\s+)?(.+)$", low)
-        if m:
-            left = [lemma(w) for w in re.findall(r"[a-zа-я0-9]{2,}", m.group(1))]
-            right = [lemma(w) for w in re.findall(r"[a-zа-я0-9]{2,}", m.group(2))]
-            # skip conditional / discourse left sides
-            if left and left[0] in STOP:
-                left = left[1:]
-            subj = head_entity(left, allow_pronoun=True)
-            objs = filter_entity_uids([slug_uid(x) for x in right], allow_pronoun=False)[:4]
-            if subj and objs:
-                for obj in objs:
-                    if obj != subj:
-                        out.append(
-                            FactCandidate("IS", {"SUBJECT": subj, "OBJECT": obj}, sent, 0.85)
-                        )
-
-        m = re.search(
-            r"(.+?)\s+(?:обитает|живет|живёт|lives|live[sd]?|работа[ею]т)\s+(?:в|на|in|at)\s+(.+)",
-            low,
+        else:
+            kind = "message"
+        return PerceptionResult(
+            kind=kind,
+            candidates=[],
+            seed_tokens=seeds,
+            meta={"backend": "seeds"},
         )
-        if m:
-            left = [lemma(w) for w in re.findall(r"[a-zа-я0-9]{2,}", m.group(1))]
-            subj = head_entity(left, allow_pronoun=True)
-            locs = filter_entity_uids(self._content_tokens(m.group(2)), allow_pronoun=False)[:2]
-            if subj:
-                for loc in locs:
-                    out.append(
-                        FactCandidate("LIVE_IN", {"SUBJECT": subj, "LOCATION": loc}, sent, 0.85)
-                    )
-
-        m = re.search(r"(?:у)\s+(.+?)\s+(?:есть|имеется)\s+(.+)", low)
-        if not m:
-            m = re.search(r"(.+?)\s+(?:имеет|have|has)\s+(.+)", low)
-        if m:
-            left = [lemma(w) for w in re.findall(r"[a-zа-я0-9]{2,}", m.group(1))]
-            subj = head_entity(left, allow_pronoun=True)
-            if subj:
-                for obj in filter_entity_uids(self._content_tokens(m.group(2)), allow_pronoun=False)[:3]:
-                    out.append(
-                        FactCandidate("HAVE", {"SUBJECT": subj, "OBJECT": obj}, sent, 0.8)
-                    )
-
-        m = re.search(r"(.+?)\s+(?:бегает|бежит|runs?|running)\s*(.*)", low)
-        if m:
-            left = [lemma(w) for w in re.findall(r"[a-zа-я0-9]{2,}", m.group(1))]
-            subj = head_entity(left, allow_pronoun=True)
-            if subj:
-                roles: dict[str, str] = {"SUBJECT": subj}
-                rest = filter_entity_uids(self._content_tokens(m.group(2)), allow_pronoun=False)
-                if rest:
-                    roles["HOW-TO"] = rest[0]
-                out.append(FactCandidate("RUN", roles, sent, 0.8))
-
-        m = re.search(
-            r"(.+?)\s+появил(?:ся|ась|ось|ись)\s+(?:в\s+)?(\d{4})",
-            low,
-        )
-        if m:
-            left = [lemma(w) for w in re.findall(r"[a-zа-я0-9]{2,}", m.group(1))]
-            subj = head_entity(left, allow_pronoun=False)
-            year = m.group(2)
-            if subj:
-                out.append(FactCandidate("IS", {"SUBJECT": subj, "OBJECT": year}, sent, 0.7))
-                out.append(
-                    FactCandidate(
-                        "CREATE",
-                        {"SUBJECT": year, "OBJECT": subj, "TIME": year},
-                        sent,
-                        0.7,
-                    )
-                )
-
-        m = re.search(r"(.+?)\s+(\w+)\s+цвет", low)
-        if m:
-            left = [lemma(w) for w in re.findall(r"[a-zа-я0-9]{2,}", m.group(1))]
-            subj = head_entity(left, allow_pronoun=False)
-            color = slug_uid(m.group(2))
-            if subj and is_entity_token(m.group(2)):
-                out.append(
-                    FactCandidate(
-                        "BE_COLORED",
-                        {"SUBJECT": subj, "OBJECT": color},
-                        sent,
-                        0.7,
-                    )
-                )
-
-        return out
 
 
-PREDICATES = {
-    "CREATE",
-    "IS",
-    "LIVE_IN",
-    "HAVE",
-    "RUN",
-    "BE_COLORED",
-    "CAUSE_EVENT",
-    "USE",
-    "MOVE",
-}
+# Backward-compatible name (was regex RulePerception).
+RulePerception = SeedPerception
 
 
 class JsonLLMPerception:
-    def __init__(self, call_fn) -> None:
+    """Callable JSON extractor → gated FactCandidate list."""
+
+    def __init__(self, call_fn, *, require_grounding: bool = True) -> None:
         self.call_fn = call_fn
+        self.require_grounding = require_grounding
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
         prompt = {
@@ -259,7 +256,7 @@ class JsonLLMPerception:
             "schema": {"predicate": "str", "roles": "dict"},
         }
         raw = self.call_fn(json.dumps(prompt, ensure_ascii=False))
-        data = json.loads(raw)
+        data = json.loads(raw) if isinstance(raw, str) else raw
         cands = [
             FactCandidate(
                 predicate=str(c.get("predicate", "")).upper(),
@@ -270,10 +267,28 @@ class JsonLLMPerception:
             for c in data.get("candidates", [])
             if c.get("predicate")
         ]
-        cands = _finalize_candidates(cands)
+        gated = gate_candidates(text, cands, require_grounding=self.require_grounding)
         kind = data.get("kind", "fact")
-        seeds = filter_entity_uids(
-            [slug_uid(str(s)) for s in data.get("seed_tokens", [])],
-            allow_pronoun=True,
+        if kind not in {"fact", "question", "message"}:
+            kind = "fact"
+        low = _norm(text.strip())
+        if _is_question(text.strip(), low):
+            kind = "question"
+            gated = []
+        seeds = seeds_from_roles(
+            gated,
+            extra=filter_entity_uids(
+                [slug_uid(str(s)) for s in data.get("seed_tokens", [])],
+                allow_pronoun=True,
+            )[:12],
         )
-        return PerceptionResult(kind=kind, candidates=cands, seed_tokens=seeds)
+        if not seeds and kind != "question":
+            seeds = content_entity_uids(text)[:8]
+        if kind != "question" and not gated:
+            kind = "message"
+        return PerceptionResult(
+            kind=kind,
+            candidates=gated,
+            seed_tokens=seeds,
+            meta={"backend": "json_llm", "llm_raw": data},
+        )

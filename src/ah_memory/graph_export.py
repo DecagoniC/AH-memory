@@ -193,7 +193,7 @@ def dump_graph(
             }
         )
 
-        # incidence spokes: hyperedge hub —role→ actant (undirected visually)
+        # incidence spokes: hub —role→ each actant
         for role, target in roles.items():
             edges.append(
                 {
@@ -203,13 +203,35 @@ def dump_graph(
                     "label": role,
                     "kind": "hyper_incidence",
                     "role": role,
+                    "w": round(float(n.w), 4),
                     "arrows": "",
                     "dashes": False,
                     "width": 2.5,
                     "color": {"color": _ROLE_COLOR.get(role, "#e9c46a"), "highlight": "#fff"},
-                    "title": f"hyperedge {pred}: {role} = {target}",
+                    "title": f"hyperedge {pred}: {role} = {target} · w={n.w:.3f}",
                 }
             )
+
+        # n-ary associative mesh: every pair of actants (shared micro-theme of N)
+        for i, a in enumerate(members):
+            for b in members[i + 1 :]:
+                edges.append(
+                    {
+                        "id": f"{n.uid}__mesh__{a}__{b}",
+                        "from": a,
+                        "to": b,
+                        "label": "",
+                        "kind": "hyper_mesh",
+                        "hyperedge": n.uid,
+                        "predicate": pred,
+                        "w": round(float(n.w), 4),
+                        "arrows": "",
+                        "dashes": True,
+                        "width": 2,
+                        "color": {"color": "#ffe566", "opacity": 0.75, "highlight": "#fff"},
+                        "title": f"mesh ⟦{pred}⟧: {a} ↔ {b} (n={len(members)}) · w={n.w:.3f}",
+                    }
+                )
 
         if mode == "all":
             edges.append(
@@ -228,21 +250,28 @@ def dump_graph(
 
     # --- binary associative links L ---
     for link in store.ah.L.values():
+        # ASSOC симметрична; IS-A / FOLLOW направлены e1→e2
+        directed = link.id in {"IS-A", "FOLLOW"}
         edges.append(
             {
+                "uid": link.uid,
                 "id": link.uid,
                 "from": link.e1.target_uid,
                 "to": link.e2.target_uid,
                 "label": link.id,
                 "kind": "binary",
-                "arrows": "to",
+                "w": round(float(link.w), 4),
+                "arrows": "to" if directed else "",
                 "dashes": link.id != "IS-A",
                 "width": 1 if link.id != "IS-A" else 2,
                 "color": {
                     "color": "#98c1d9" if link.id == "IS-A" else "#4a5568",
                     "opacity": 0.45,
                 },
-                "title": f"binary {link.id} w={link.w:.3f}",
+                "title": (
+                    f"binary {link.id} w={link.w:.3f}"
+                    + ("" if directed else " (undirected)")
+                ),
             }
         )
 

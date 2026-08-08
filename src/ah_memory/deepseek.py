@@ -2,43 +2,22 @@
 from __future__ import annotations
 
 import json
-import re
 from typing import Any
 
 import httpx
 
 from ah_memory.config import DeepSeekConfig
-from ah_memory.morph import filter_entity_uids, slug_uid
+from ah_memory.gigachat_llm import SYSTEM_PROMPT, _parse_json
+from ah_memory.morph import seeds_from_roles, slug_uid
 from ah_memory.perception import (
     FactCandidate,
     PerceptionResult,
-    RulePerception,
-    _finalize_candidates,
+    SeedPerception,
     _is_question,
     _norm,
+    content_entity_uids,
+    gate_candidates,
 )
-
-SYSTEM_PROMPT = """Ты модуль восприятия АГ-памяти.
-Извлеки только явные утверждения. Не добавляй сущности вне текста.
-JSON:
-{
-  "kind": "fact" | "question" | "message",
-  "candidates": [
-    {
-      "predicate": "IS|LIVE_IN|HAVE|RUN|BE_COLORED|CREATE|CAUSE_EVENT|USE|MOVE",
-      "roles": {"SUBJECT":"UID", "OBJECT":"UID", ...},
-      "raw_span": "фрагмент",
-      "confidence": 0.0-1.0
-    }
-  ],
-  "seed_tokens": ["UID", ...]
-}
-UID — лемма в UPPER_SNAKE (им. падеж), кириллица ок: СКУЛЬПТУРНАЯ_ЛЕПКА, МОСКВА, ДУШКИН.
-SUBJECT/OBJECT/LOCATION — только сущности: существительные, имена, названия. НЕ глаголы (занимаюсь), НЕ союзы (если, когда, чтобы), НЕ вводные.
-«Я занимаюсь лепкой» → USE(SUBJECT=Я, OBJECT=СКУЛЬПТУРНАЯ_ЛЕПКА) или HAVE, не IS(ЗАНИМАЮСЬ,…).
-«Если понадобится…» — не факт (candidates=[]).
-Роли: SUBJECT OBJECT LOCATION TIME CAUSE TOOL MATERIAL PURPOSE HOW-TO.
-Верни только JSON."""
 
 
 class DeepSeekClient:
@@ -46,28 +25,38 @@ class DeepSeekClient:
         self.cfg = cfg
 
     def chat(self, messages: list[dict[str, str]], *, json_mode: bool = True) -> str:
-        url = self.cfg.base_url.rstrip("/") + "/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {self.cfg.api_key}",
-            "Content-Type": "application/json",
-        }
         payload: dict[str, Any] = {
             "model": self.cfg.model,
             "messages": messages,
-            "temperature": self.cfg.temperature if json_mode else min(0.7, self.cfg.temperature + 0.4),
+            "temperature": self.cfg.temperature,
+            "stream": False,
         }
         if json_mode:
             payload["response_format"] = {"type": "json_object"}
         with httpx.Client(timeout=self.cfg.timeout_sec) as client:
-            r = client.post(url, headers=headers, json=payload)
-            r.raise_for_status()
+            r = client.post(
+                self.cfg.base_url.rstrip("/") + "/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.cfg.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+            )
+            if r.status_code >= 400:
+                detail = (r.text or r.reason_phrase or "")[:500]
+                raise httpx.HTTPStatusError(
+                    f"DeepSeek chat failed ({r.status_code}): {detail}",
+                    request=r.request,
+                    response=r,
+                )
             data = r.json()
         return data["choices"][0]["message"]["content"]
 
 
 class DeepSeekPerception:
-    def __init__(self, cfg: DeepSeekConfig) -> None:
+    def __init__(self, cfg: DeepSeekConfig, *, require_grounding: bool = True) -> None:
         self.client = DeepSeekClient(cfg)
+        self.require_grounding = require_grounding
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
         user = json.dumps(
@@ -89,77 +78,72 @@ class DeepSeekPerception:
                 confidence=float(c.get("confidence", 0.8)),
             )
             for c in data.get("candidates", [])
-            if c.get("predicate")
+            if isinstance(c, dict) and c.get("predicate")
         ]
-        cands = _finalize_candidates(cands)
+        gated = gate_candidates(text, cands, require_grounding=self.require_grounding)
         kind = data.get("kind", "fact")
         if kind not in {"fact", "question", "message"}:
             kind = "fact"
         low = _norm(text.strip())
         if _is_question(text.strip(), low):
             kind = "question"
-        seeds = filter_entity_uids(
-            [slug_uid(str(s)) for s in data.get("seed_tokens", [])],
-            allow_pronoun=True,
+            gated = []
+        seeds = seeds_from_roles(
+            gated,
+            extra=[slug_uid(str(s)) for s in data.get("seed_tokens", [])][:12],
         )
         if not seeds:
-            seeds = RulePerception()._content_tokens(low)
+            seeds = content_entity_uids(text)[:8]
+        if kind != "question" and not gated:
+            kind = "message"
         return PerceptionResult(
-            kind=kind, candidates=cands, seed_tokens=seeds, meta={"backend": "deepseek"}
+            kind=kind,
+            candidates=gated,
+            seed_tokens=seeds,
+            meta={
+                "backend": "deepseek",
+                "llm_raw": data,
+                "system_prompt": SYSTEM_PROMPT,
+            },
         )
 
 
-class HybridPerception:
-    """DeepSeek first; merge RulePerception if LLM missed factors."""
+class DeepSeekHybridPerception:
+    """LLM → morph gate; offline / error → SeedPerception."""
 
     def __init__(self, cfg: DeepSeekConfig, fallback: bool = True) -> None:
         self.cfg = cfg
         self.fallback = fallback
-        self.rules = RulePerception()
+        self.seeds = SeedPerception()
         self.llm = DeepSeekPerception(cfg) if cfg.configured else None
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
-        rules = self.rules.parse(text, wm_context)
+        offline = self.seeds.parse(text, wm_context)
         if self.llm is None:
-            return rules
+            return offline
         try:
             llm = self.llm.parse(text, wm_context)
         except Exception as exc:  # noqa: BLE001
             if not self.fallback:
                 raise
             return PerceptionResult(
-                kind=rules.kind,
-                candidates=rules.candidates,
-                seed_tokens=rules.seed_tokens,
-                meta={**rules.meta, "backend": "rules", "llm_error": str(exc)},
+                kind=offline.kind,
+                candidates=[],
+                seed_tokens=offline.seed_tokens,
+                meta={**offline.meta, "backend": "seeds", "llm_error": str(exc)},
             )
 
-        seen: set[tuple[str, tuple[tuple[str, str], ...]]] = set()
-        merged: list[FactCandidate] = []
-        for c in _finalize_candidates(list(llm.candidates) + list(rules.candidates)):
-            key = (c.predicate, tuple(sorted(c.roles.items())))
-            if key in seen:
-                continue
-            seen.add(key)
-            merged.append(c)
-        seeds = filter_entity_uids(
-            list(llm.seed_tokens) + list(rules.seed_tokens),
-            allow_pronoun=True,
-        )
+        seeds = seeds_from_roles(llm.candidates, extra=list(llm.seed_tokens)[:8])
+        if not seeds:
+            seeds = list(offline.seed_tokens)[:8]
         return PerceptionResult(
-            kind=llm.kind if llm.kind != "message" else rules.kind,
-            candidates=merged,
+            kind=llm.kind,
+            candidates=list(llm.candidates),
             seed_tokens=seeds,
-            meta={"backend": "hybrid"},
+            meta={
+                "backend": "hybrid-llm" if llm.candidates else "hybrid-seeds",
+                "llm_raw": llm.meta.get("llm_raw"),
+                "system_prompt": llm.meta.get("system_prompt", SYSTEM_PROMPT),
+                "llm_candidates": len(llm.candidates),
+            },
         )
-
-
-def _parse_json(raw: str) -> dict[str, Any]:
-    raw = raw.strip()
-    try:
-        return json.loads(raw)
-    except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", raw, re.DOTALL)
-        if not m:
-            raise
-        return json.loads(m.group(0))

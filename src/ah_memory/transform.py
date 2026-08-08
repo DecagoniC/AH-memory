@@ -14,6 +14,7 @@ PRED_TO_TEMPLATE = {
     "CREATE": "T_CREATE",
     "IS": "T_IS",
     "LIVE_IN": "T_LIVE_IN",
+    "BE_BORN": "T_BE_BORN",
     "HAVE": "T_HAVE",
     "RUN": "T_RUN",
     "BE_COLORED": "T_COLOR",
@@ -28,6 +29,7 @@ class IngestReport:
     created_n: list[str] = field(default_factory=list)
     seed_uids: list[str] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
+    perception: dict = field(default_factory=dict)
 
 
 def _label_from_uid(uid: str) -> str:
@@ -48,7 +50,6 @@ class Transform:
                 continue
             m_uid = self._m_uid(uid)
             self.store.ensure_abstract(uid, {tok.lower() if tok == tok.lower() else uid.lower()})
-            # keep surface form in R when possible
             s = self.store.ah.S.get(uid)
             if s is not None:
                 forms = s.R.setdefault("TEXT", set())
@@ -63,6 +64,9 @@ class Transform:
                 report.created_n.append(n_uid)
             except Exception as exc:  # noqa: BLE001
                 report.skipped.append(f"{cand.predicate}:{exc}")
+
+        # mesh only within each N (see _ingest_candidate), not across bag-of-seeds
+        report.perception = perception.to_graph_json()
         return report
 
     def _ingest_candidate(self, cand: FactCandidate, section: Section) -> str:
@@ -83,6 +87,7 @@ class Transform:
             raise ValueError("SUBJECT required")
         if Role.OBJECT in slot_roles and Role.OBJECT not in fillers and pred not in {
             "LIVE_IN",
+            "BE_BORN",
             "RUN",
             "MOVE",
         }:
@@ -95,6 +100,11 @@ class Transform:
             if {r.value: f.target_uid for r, f in existing.fillers.items()} == {
                 r.value: f.target_uid for r, f in fillers.items()  # type: ignore[attr-defined]
             }:
+                # still ensure mesh exists for older nodes
+                self._weave_assoc_mesh(
+                    [f.target_uid for f in existing.fillers.values()],
+                    w=self.hp.initial_w,
+                )
                 return existing.uid
 
         n_uid = self.store.new_uid(f"N_{pred}")
@@ -107,6 +117,9 @@ class Transform:
                 fillers=fillers,  # type: ignore[arg-type]
             ),
         )
+        actant_ms = [f.target_uid for f in fillers.values()]  # type: ignore[attr-defined]
+        self._weave_assoc_mesh(actant_ms, w=self.hp.initial_w)
+
         subj = cand.roles.get("SUBJECT")
         if subj:
             s_uid = slug_uid(subj[2:] if subj.startswith("M_") else subj)
@@ -126,6 +139,38 @@ class Transform:
                     )
                 )
         return n_uid
+
+    def _weave_assoc_mesh(self, m_uids: list[str], *, w: float) -> None:
+        """Complete ASSOC graph among distinct m-actants (shared micro-theme)."""
+        uniq: list[str] = []
+        seen: set[str] = set()
+        for u in m_uids:
+            if not u.startswith("M_") or u in seen:
+                continue
+            if u not in self.store.ah.all_hyper():
+                continue
+            seen.add(u)
+            uniq.append(u)
+        if len(uniq) < 2:
+            return
+        for i, a in enumerate(uniq):
+            for b in uniq[i + 1 :]:
+                ends = {a, b}
+                if any(
+                    l.id == LinkId.ASSOC.value
+                    and {l.e1.target_uid, l.e2.target_uid} == ends
+                    for l in self.store.ah.L.values()
+                ):
+                    continue
+                self.store.add_link(
+                    AssocLink(
+                        uid=self.store.new_uid("L_MESH"),
+                        id=LinkId.ASSOC.value,
+                        w=w,
+                        e1=self.store.m_ref(a),
+                        e2=self.store.m_ref(b),
+                    )
+                )
 
     def _resolve_value(self, value: str) -> str:
         raw = value[2:] if str(value).startswith("M_") else str(value)

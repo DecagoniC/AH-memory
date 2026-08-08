@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -12,24 +12,52 @@ from pydantic import BaseModel, Field
 from ah_memory.agent import Agent
 from ah_memory.baselines.vanilla_rag import VanillaRAG
 from ah_memory.compare import CompareEngine
-from ah_memory.config import load_config
+from ah_memory.config import LlmProvider, load_config
 from ah_memory.corpus import build_encyclopedia
-from ah_memory.deepseek import HybridPerception
+from ah_memory.deepseek import DeepSeekClient, DeepSeekHybridPerception
 from ah_memory.dialogue import DialogueAgent
 from ah_memory.examples.rabbit import build_rabbit_memory
+from ah_memory.gigachat_llm import GigaChatClient, HybridPerception
 from ah_memory.graph_export import dump_ah_json, dump_graph
-from ah_memory.perception import RulePerception
+from ah_memory.perception import SeedPerception
 from ah_memory.store import AHStore
 
 STATIC = Path(__file__).parent / "static"
 cfg = load_config()
 app = FastAPI(title="AH Memory", version="0.4.2")
 
+# runtime provider (UI can switch without restart)
+llm_provider: LlmProvider = cfg.agent.llm_provider
 
-def _make_perception() -> Any:
-    if cfg.agent.use_llm and cfg.deepseek.configured:
-        return HybridPerception(cfg.deepseek, fallback=cfg.agent.fallback_rules)
-    return RulePerception()
+
+def _provider_ready(provider: LlmProvider) -> bool:
+    if not cfg.agent.use_llm:
+        return False
+    if provider == "deepseek":
+        return cfg.deepseek.configured
+    return cfg.gigachat.configured
+
+
+def _make_perception(provider: LlmProvider | None = None) -> Any:
+    p = provider or llm_provider
+    if not cfg.agent.use_llm:
+        return SeedPerception()
+    if p == "deepseek" and cfg.deepseek.configured:
+        return DeepSeekHybridPerception(cfg.deepseek, fallback=cfg.agent.fallback_rules)
+    if p == "gigachat" and cfg.gigachat.configured:
+        return HybridPerception(cfg.gigachat, fallback=cfg.agent.fallback_rules)
+    return SeedPerception()
+
+
+def _make_chat_client(provider: LlmProvider | None = None) -> tuple[Any | None, str]:
+    p = provider or llm_provider
+    if not cfg.agent.use_llm:
+        return None, "rules"
+    if p == "deepseek" and cfg.deepseek.configured:
+        return DeepSeekClient(cfg.deepseek), "deepseek"
+    if p == "gigachat" and cfg.gigachat.configured:
+        return GigaChatClient(cfg.gigachat), "gigachat"
+    return None, "rules"
 
 
 def _store_for_preload(mode: str) -> AHStore:
@@ -50,8 +78,25 @@ def _build_core() -> Agent:
 
 
 def _build_dialogue(core: Agent) -> DialogueAgent:
-    ds = cfg.deepseek if (cfg.agent.use_llm and cfg.deepseek.configured) else None
-    return DialogueAgent(core, deepseek=ds)
+    client, name = _make_chat_client()
+    return DialogueAgent(core, chat_client=client, provider=name)
+
+
+def _apply_llm_provider(provider: LlmProvider) -> None:
+    """Swap perception + dialogue client; keep current AH store/graph."""
+    global agent, dialogue, llm_provider
+    llm_provider = provider
+    agent.perception = _make_perception(provider)
+    hist = list(dialogue.history)
+    turn = dialogue._turn
+    last_act = dialogue.last_activation
+    last_gb = dialogue.last_graph_build_json
+    client, name = _make_chat_client(provider)
+    dialogue = DialogueAgent(agent, chat_client=client, provider=name)
+    dialogue.history = hist
+    dialogue._turn = turn
+    dialogue.last_activation = last_act
+    dialogue.last_graph_build_json = last_gb
 
 
 def _build_compare(core: Agent) -> CompareEngine:
@@ -85,6 +130,12 @@ class ChatOut(BaseModel):
     user_facts: list[str] = []
     assistant_facts: list[str] = []
     system_prompt: str = ""
+    activation: dict[str, Any] = Field(default_factory=dict)
+    graph_build_json: dict[str, Any] = Field(default_factory=dict)
+
+
+class ProviderIn(BaseModel):
+    provider: Literal["gigachat", "deepseek"]
 
 
 @app.get("/")
@@ -97,12 +148,29 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
+    model = None
+    ready = _provider_ready(llm_provider)
+    if llm_provider == "deepseek" and cfg.deepseek.configured:
+        model = cfg.deepseek.model
+    elif llm_provider == "gigachat" and cfg.gigachat.configured:
+        model = cfg.gigachat.model
     return {
         "ok": True,
-        "version": "0.4.2-live-compare",
-        "llm_configured": cfg.deepseek.configured,
+        "version": "0.4.3-merged",
+        "llm_provider": llm_provider,
+        "llm_configured": ready,
         "use_llm": cfg.agent.use_llm,
-        "model": cfg.deepseek.model if cfg.deepseek.configured else None,
+        "model": model if ready else None,
+        "providers": {
+            "gigachat": {
+                "configured": cfg.gigachat.configured,
+                "model": cfg.gigachat.model if cfg.gigachat.configured else None,
+            },
+            "deepseek": {
+                "configured": cfg.deepseek.configured,
+                "model": cfg.deepseek.model if cfg.deepseek.configured else None,
+            },
+        },
         "preload": cfg.agent.preload,
         "rag_backend": comparer.rag.backend,
         "corpus_chars": len(comparer.rag.corpus),
@@ -111,6 +179,17 @@ def health() -> dict[str, Any]:
         "graph_size": len(agent.store.ah.S) + len(agent.store.ah.L) + len(agent.store.find_hypernodes()),
         "|S|": len(agent.store.ah.S),
     }
+
+
+@app.post("/api/llm-provider")
+def set_llm_provider(body: ProviderIn) -> dict[str, Any]:
+    if not _provider_ready(body.provider):
+        raise HTTPException(
+            400,
+            f"provider '{body.provider}' not configured (check API key / credentials)",
+        )
+    _apply_llm_provider(body.provider)
+    return health()
 
 
 @app.get("/api/graph")
@@ -123,6 +202,35 @@ def graph(limit: int | None = 400, mode: str = "hyper") -> dict[str, Any]:
 @app.get("/api/dump")
 def full_dump() -> dict[str, Any]:
     return dump_ah_json(agent.store)
+
+
+@app.get("/api/trace")
+def last_trace() -> dict[str, Any]:
+    """Last turn activation trace (evidence / BP ticks / WM)."""
+    act = getattr(dialogue, "last_activation", None) or {}
+    build = getattr(dialogue, "last_graph_build_json", None) or {}
+    return {
+        "ok": True,
+        "tau": agent.store.ah.tau,
+        "wm": sorted(agent.ignition.wm.contents()),
+        "activation": act,
+        "graph_build_json": build,
+        "recent_ticks": [
+            {
+                "tau": t.tau,
+                "seeds": t.seeds_applied,
+                "evidence": t.evidence,
+                "beliefs_top": t.beliefs_top,
+                "wm": t.wm,
+                "activated": t.activated,
+                "trace_factors": t.trace_factors,
+                "weight_updates": t.weight_updates,
+                "stats": t.z_stats,
+                "chains": t.chains,
+            }
+            for t in agent.ignition.traces[-12:]
+        ],
+    }
 
 
 @app.post("/api/chat", response_model=ChatOut)
@@ -149,6 +257,8 @@ def chat(body: ChatIn) -> ChatOut:
         user_facts=turn.user_facts,
         assistant_facts=turn.assistant_facts,
         system_prompt=turn.system_prompt,
+        activation=turn.activation,
+        graph_build_json=turn.graph_build_json,
     )
 
 
@@ -201,17 +311,15 @@ def compare_m4() -> dict[str, Any]:
 @app.post("/api/reset")
 def reset(preload: str = "empty") -> dict[str, Any]:
     """Пересборка агента; по умолчанию empty — чистый граф под ваши запросы."""
-    global agent, dialogue, comparer, cfg
+    global agent, dialogue, comparer, cfg, llm_provider
     cfg = load_config()
+    llm_provider = cfg.agent.llm_provider
     mode = (preload or "empty").strip().lower()
     if mode not in {"empty", "rabbit", "encyclopedia"}:
         mode = "empty"
 
     agent = Agent(store=_store_for_preload(mode), perception=_make_perception())
-    dialogue = DialogueAgent(
-        agent,
-        deepseek=cfg.deepseek if (cfg.agent.use_llm and cfg.deepseek.configured) else None,
-    )
+    dialogue = _build_dialogue(agent)
     dialogue.reset_history()
     comparer = _build_compare(agent)
     comparer.clear()
@@ -220,7 +328,8 @@ def reset(preload: str = "empty") -> dict[str, Any]:
     return {
         "ok": True,
         "preload": mode,
-        "version": "0.4.2-live-compare",
+        "version": "0.4.3-merged",
+        "llm_provider": llm_provider,
         "rag_backend": comparer.rag.backend,
         "corpus_chars": len(comparer.rag.corpus),
         "stats": stats,

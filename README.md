@@ -29,7 +29,8 @@ python scripts/compare_ah_vs_rag.py -q "Кто такой заяц?"
 
 ## Веб-интерфейс
 
-1. Ключ в `.env` как `DEEPSEEK_API_KEY=...` (не коммить в git)
+1. Ключи в `.env` (не коммить): `DEEPSEEK_API_KEY=...` и/или `GIGACHAT_CREDENTIALS=...`
+   (алиас `GIGACHAT_API_KEY`; scope: `GIGACHAT_SCOPE=GIGACHAT_API_PERS`).
 2. Установка и запуск:
 
 ```bash

@@ -16,7 +16,7 @@ from ah_memory.gc import collect
 from ah_memory.hyperparams import HyperParams
 from ah_memory.ignition import ActivationSeed, IgnitionEngine
 from ah_memory.invariants import validate
-from ah_memory.perception import RulePerception
+from ah_memory.perception import JsonLLMPerception
 from ah_memory.store import AHStore
 from ah_memory.templates import CREATE_ROLES, seed_templates, template_roles_coverage
 from ah_memory.types import (
@@ -112,9 +112,44 @@ def test_gc_respects_ttl() -> None:
 
 
 def test_agent_ingest_and_ask() -> None:
-    agent = Agent()
+    import json
+
+    def call_fn(prompt: str) -> str:
+        data = json.loads(prompt)
+        text = data["text"]
+        if "?" in text or text.lower().lstrip().startswith(("кто", "что")):
+            return json.dumps(
+                {"kind": "question", "candidates": [], "seed_tokens": ["ЗАЯЦ"]},
+                ensure_ascii=False,
+            )
+        return json.dumps(
+            {
+                "kind": "fact",
+                "candidates": [
+                    {
+                        "predicate": "IS",
+                        "roles": {"SUBJECT": "ЗАЯЦ", "OBJECT": "ЗВЕРЕК"},
+                        "confidence": 0.9,
+                    },
+                    {
+                        "predicate": "LIVE_IN",
+                        "roles": {"SUBJECT": "ЗАЯЦ", "LOCATION": "ЛЕС"},
+                        "confidence": 0.9,
+                    },
+                    {
+                        "predicate": "LIVE_IN",
+                        "roles": {"SUBJECT": "ЗАЯЦ", "LOCATION": "ЛУГ"},
+                        "confidence": 0.9,
+                    },
+                ],
+                "seed_tokens": ["ЗАЯЦ", "ЛЕС", "ЛУГ", "ЗВЕРЕК"],
+            },
+            ensure_ascii=False,
+        )
+
+    agent = Agent(perception=JsonLLMPerception(call_fn))
     created = agent.ingest(RABBIT_TEXT)
-    assert len(created.created_n) >= 6
+    assert len(created.created_n) >= 2
     reply = agent.ask("Кто такой заяц?")
     assert reply.source == "graph"
     assert reply.trace_uids
@@ -122,11 +157,35 @@ def test_agent_ingest_and_ask() -> None:
 
 
 def test_continuous_cycle_trajectory() -> None:
-    agent = Agent()
+    import json
+
+    def call_fn(prompt: str) -> str:
+        data = json.loads(prompt)
+        text = data["text"]
+        if "?" in text or text.lower().lstrip().startswith(("кто", "что")):
+            return json.dumps(
+                {"kind": "question", "candidates": [], "seed_tokens": ["ЗАЯЦ"]},
+                ensure_ascii=False,
+            )
+        return json.dumps(
+            {
+                "kind": "fact",
+                "candidates": [
+                    {
+                        "predicate": "LIVE_IN",
+                        "roles": {"SUBJECT": "ЗАЯЦ", "LOCATION": "ЛЕС"},
+                        "confidence": 0.9,
+                    }
+                ],
+                "seed_tokens": ["ЗАЯЦ", "ЛЕС"],
+            },
+            ensure_ascii=False,
+        )
+
+    agent = Agent(perception=JsonLLMPerception(call_fn))
     r1 = agent.step_message("Заяц обитает в лесу.")
     assert r1.answer.startswith("ingested:")
     r2 = agent.step_message("Кто такой заяц?")
-    # second message sees prior WM influence via non-empty traces / seeds
     assert r2.traces or r2.trace_uids is not None
 
 

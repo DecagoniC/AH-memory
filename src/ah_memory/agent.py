@@ -1,7 +1,7 @@
 """Cognitive agent loop: perceive → transform → ignite → answer."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 
 from ah_memory.dsl import DSLInterpreter
 from ah_memory.gc import collect
@@ -21,17 +21,6 @@ def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
     for c in perc.candidates:
         if c.confidence < 0.85:
             continue
-        if c.predicate not in {
-            "IS",
-            "LIVE_IN",
-            "BE_BORN",
-            "HAVE",
-            "USE",
-            "CREATE",
-            "CAUSE_EVENT",
-            "BE_COLORED",
-        }:
-            continue
         roles = sanitize_roles(c.roles)
         if roles is None:
             continue
@@ -43,7 +32,16 @@ def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
                 break
         if roles is None:
             continue
-        kept.append(FactCandidate(c.predicate, roles, c.raw_span, c.confidence))
+        kept.append(
+            FactCandidate(
+                c.predicate,
+                roles,
+                c.raw_span,
+                c.confidence,
+                raw_relation=c.raw_relation,
+                canonical_relation=c.canonical_relation,
+            )
+        )
     seeds = seeds_from_roles(kept)
     kind = perc.kind
     if not kept:
@@ -59,6 +57,7 @@ class AgentReply:
     source: str = "graph"
     seed_uids: list[str] = field(default_factory=list)
     perception: dict = field(default_factory=dict)
+    full_trace: dict = field(default_factory=dict)
 
 
 class Agent:
@@ -67,11 +66,21 @@ class Agent:
         store: AHStore | None = None,
         perception: PerceptionBackend | None = None,
         hp: HyperParams | None = None,
+        *,
+        relation_normalizer=None,
+        parameter_generator=None,
+        state_engine=None,
     ) -> None:
         self.store = store or AHStore()
         self.hp = hp or HyperParams()
         self.perception = perception or SeedPerception()
-        self.transform = Transform(self.store, self.hp)
+        self.transform = Transform(
+            self.store,
+            self.hp,
+            relation_normalizer=relation_normalizer,
+            parameter_generator=parameter_generator,
+            state_engine=state_engine,
+        )
         self.ignition = IgnitionEngine(self.store, self.hp)
         self.dsl = DSLInterpreter(self.store)
 
@@ -137,6 +146,7 @@ class Agent:
             source="graph",
             seed_uids=[s.uid for s in seeds],
             perception=perc.to_graph_json(),
+            full_trace=self._full_trace(traces, trace_uids, answer=answer),
         )
 
     def step_message(self, text: str, ticks: int = 3) -> AgentReply:
@@ -151,7 +161,81 @@ class Agent:
             trace_uids=wm,
             traces=self.ignition.traces[-ticks:],
             source="graph",
+            full_trace=self._full_trace(
+                self.ignition.traces[-ticks:],
+                wm,
+                answer=f"ingested:{len(report.created_n)} wm:{len(wm)}",
+            ),
         )
+
+    def _full_trace(
+        self,
+        traces: list[TickTrace],
+        activated_nodes: list[str],
+        *,
+        answer: str = "",
+    ) -> dict:
+        requested = set(activated_nodes)
+        semantic_factor_ids = set(self.store.semantic_factors)
+        actual_nodes = [
+            uid for uid in activated_nodes if uid not in semantic_factor_ids
+        ]
+        activated_set = set(actual_nodes)
+        factor_uids = list(
+            dict.fromkeys(
+                factor_uid
+                for trace in traces
+                for factor_uid in trace.trace_factors
+            )
+        )
+        semantic_factors = [
+            factor
+            for factor in self.store.list_semantic_factors()
+            if factor.uid in requested
+            or activated_set.intersection(factor.variables)
+        ]
+        relation_data = []
+        seen_relations: set[str] = set()
+        for factor in semantic_factors:
+            if factor.relation is None:
+                continue
+            canonical = factor.relation.canonical_label
+            if canonical in seen_relations:
+                continue
+            seen_relations.add(canonical)
+            relation_data.append(factor.relation.to_dict())
+        relevant_events = [
+            event.to_dict()
+            for event in self.store.list_events()
+            if activated_set.intersection(
+                reference.uid for reference in event.arguments.values()
+            )
+        ]
+        return {
+            "answer": answer,
+            "activated_nodes": actual_nodes,
+            "activated_factors": list(
+                dict.fromkeys(
+                    factor_uids
+                    + [factor.uid for factor in semantic_factors]
+                )
+            ),
+            "timesteps": [
+                {
+                    "tau": trace.tau,
+                    "activation": dict(trace.activation_top),
+                    "messages": [
+                        asdict(event) for event in trace.events
+                    ],
+                }
+                for trace in traces
+            ],
+            "relations": relation_data,
+            "events": relevant_events,
+            "state": self.store.state.to_dict(),
+            "state_transitions": list(self.store.state_transitions),
+            "final_evidence": actual_nodes,
+        }
 
     def _compose_answer(self, question: str, seeds: list[str], trace: list[str]) -> str:
         q = question.lower()

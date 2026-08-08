@@ -1,0 +1,13 @@
+{
+  "name": "09_noise",
+  "input": "Вчера была хорошая погода. Отец купил Opel. Кажется, день прошёл спокойно.",
+  "expected_events": [
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "OPEL"}
+  ],
+  "expected_relations": ["PURCHASE"],
+  "expected_state": {
+    "owns": {"FATHER": {"OPEL": true}},
+    "last_purchase": {"FATHER": "OPEL"},
+    "purchase_history": {"FATHER": ["OPEL"]}
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "01_simple_purchase",
+  "input": "Отец купил BMW.",
+  "expected_events": [
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "BMW"}
+  ],
+  "expected_relations": ["PURCHASE"],
+  "expected_state": {
+    "owns": {"FATHER": {"BMW": true}},
+    "last_purchase": {"FATHER": "BMW"},
+    "purchase_history": {"FATHER": ["BMW"]}
+  }
+}

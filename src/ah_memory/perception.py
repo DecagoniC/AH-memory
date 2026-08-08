@@ -24,6 +24,8 @@ class FactCandidate:
     roles: dict[str, str]
     raw_span: str | None = None
     confidence: float = 1.0
+    raw_relation: str | None = None
+    canonical_relation: str | None = None
 
 
 @dataclass(frozen=True)
@@ -40,6 +42,8 @@ class PerceptionResult:
             "candidates": [
                 {
                     "predicate": c.predicate,
+                    "raw_relation": c.raw_relation or c.predicate,
+                    "canonical_relation": c.canonical_relation or c.predicate,
                     "roles": dict(c.roles),
                     "raw_span": c.raw_span,
                     "confidence": c.confidence,
@@ -158,7 +162,12 @@ def _finalize_candidates(cands: list[FactCandidate]) -> list[FactCandidate]:
     out: list[FactCandidate] = []
     seen: set[tuple[str, tuple[tuple[str, str], ...]]] = set()
     for c in cands:
-        pred = PRED_ALIASES.get(c.predicate.upper(), c.predicate.upper())
+        raw_relation = (c.raw_relation or c.predicate).strip()
+        requested_canonical = c.canonical_relation or c.predicate
+        pred = PRED_ALIASES.get(
+            requested_canonical.upper(),
+            requested_canonical.upper(),
+        )
         roles = sanitize_roles(dict(c.roles))
         if roles is None:
             continue
@@ -171,7 +180,16 @@ def _finalize_candidates(cands: list[FactCandidate]) -> list[FactCandidate]:
         if key in seen:
             continue
         seen.add(key)
-        out.append(FactCandidate(pred, roles, c.raw_span, c.confidence))
+        out.append(
+            FactCandidate(
+                pred,
+                roles,
+                c.raw_span,
+                c.confidence,
+                raw_relation=raw_relation,
+                canonical_relation=pred,
+            )
+        )
     return out
 
 
@@ -181,13 +199,14 @@ def gate_candidates(
     *,
     min_confidence: float = 0.5,
     require_grounding: bool = True,
+    allow_open_relations: bool = False,
 ) -> list[FactCandidate]:
     """Hard acceptor: whitelist predicate, morph roles, optional lemma-in-text."""
     finalized = _finalize_candidates(cands)
     text_lemmas = _collect_text_lemmas(text) if require_grounding else set()
     out: list[FactCandidate] = []
     for c in finalized:
-        if c.predicate not in PREDICATES:
+        if c.predicate not in PREDICATES and not allow_open_relations:
             continue
         if c.confidence < min_confidence:
             continue
@@ -244,30 +263,58 @@ RulePerception = SeedPerception
 class JsonLLMPerception:
     """Callable JSON extractor → gated FactCandidate list."""
 
-    def __init__(self, call_fn, *, require_grounding: bool = True) -> None:
+    def __init__(
+        self,
+        call_fn,
+        *,
+        require_grounding: bool = True,
+        allow_open_relations: bool = False,
+    ) -> None:
         self.call_fn = call_fn
         self.require_grounding = require_grounding
+        self.allow_open_relations = allow_open_relations
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
         prompt = {
             "task": "extract_facts",
             "text": text,
             "wm": wm_context or [],
-            "schema": {"predicate": "str", "roles": "dict"},
+            "schema": {
+                "raw_relation": "str",
+                "canonical_relation": "str|null",
+                "predicate": "legacy canonical fallback",
+                "roles": "dict",
+            },
         }
         raw = self.call_fn(json.dumps(prompt, ensure_ascii=False))
         data = json.loads(raw) if isinstance(raw, str) else raw
         cands = [
             FactCandidate(
-                predicate=str(c.get("predicate", "")).upper(),
+                predicate=str(
+                    c.get("canonical_relation")
+                    or c.get("predicate")
+                    or c.get("raw_relation")
+                    or c.get("relation", "")
+                ).upper(),
                 roles={str(k).upper(): slug_uid(str(v)) for k, v in (c.get("roles") or {}).items()},
                 raw_span=c.get("raw_span"),
                 confidence=float(c.get("confidence", 0.8)),
+                raw_relation=str(
+                    c.get("raw_relation")
+                    or c.get("relation")
+                    or c.get("predicate", "")
+                ),
+                canonical_relation=c.get("canonical_relation"),
             )
             for c in data.get("candidates", [])
-            if c.get("predicate")
+            if c.get("predicate") or c.get("raw_relation") or c.get("relation")
         ]
-        gated = gate_candidates(text, cands, require_grounding=self.require_grounding)
+        gated = gate_candidates(
+            text,
+            cands,
+            require_grounding=self.require_grounding,
+            allow_open_relations=self.allow_open_relations,
+        )
         kind = data.get("kind", "fact")
         if kind not in {"fact", "question", "message"}:
             kind = "fact"

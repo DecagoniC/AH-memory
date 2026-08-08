@@ -1,7 +1,7 @@
 """Serialize AH as hypergraph: vertices + hyperedges N + binary L."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Mapping
 
 from ah_memory.perception import PREDICATES
 from ah_memory.store import AHStore
@@ -39,6 +39,7 @@ def dump_graph(
     *,
     limit_nodes: int | None = None,
     mode: str = "hyper",
+    activation: Mapping[str, float] | None = None,
 ) -> dict[str, Any]:
     """
     mode:
@@ -49,6 +50,11 @@ def dump_graph(
     edges: list[dict[str, Any]] = []
     hyperedges: list[dict[str, Any]] = []
     layer_counters: dict[str, int] = {}
+
+    def _act(uid: str, fallback: float = 0.0) -> float:
+        if activation is not None:
+            return float(activation.get(uid, fallback))
+        return fallback
 
     def _place(layer: str) -> tuple[float, float]:
         i = layer_counters.get(layer, 0)
@@ -69,10 +75,10 @@ def dump_graph(
                 "label": next(iter(s.R.get("TEXT", (uid,))), uid),
                 "group": "S",
                 "kind": "vertex",
-                "activation": round(s.x, 4),
+                "activation": round(_act(uid, s.x), 4),
                 "x": px,
                 "y": py,
-                "title": f"S {uid}\nR={{{_fmt_R(s.R)}}}\nact={s.x:.3f}",
+                "title": f"S {uid}\nR={{{_fmt_R(s.R)}}}\nact={_act(uid, s.x):.3f}",
             }
         )
 
@@ -83,7 +89,7 @@ def dump_graph(
             if isinstance(e, Template) and mode != "all":
                 continue
 
-            act = float(getattr(e, "x", 0.0))
+            act = _act(uid, float(getattr(e, "x", 0.0)))
             if isinstance(e, SecondOrderSymbol):
                 label = uid
                 for p in e.Pr:
@@ -165,6 +171,14 @@ def dump_graph(
         label = f"⟦{pred}⟧\n{role_lines}" if roles else f"⟦{pred}⟧"
 
         px, py = _place("hyperedge")
+        n_activation = _act(
+            n.uid,
+            (
+                sum(_act(uid) for uid in members) / len(members)
+                if activation is not None and members
+                else n.x
+            ),
+        )
         nodes.append(
             {
                 "id": n.uid,
@@ -172,7 +186,7 @@ def dump_graph(
                 "group": "hyperedge",
                 "kind": "hyperedge",
                 "predicate": pred,
-                "activation": round(n.x, 4),
+                "activation": round(n_activation, 4),
                 "x": px,
                 "y": py,
                 "title": (
@@ -248,6 +262,104 @@ def dump_graph(
                 }
             )
 
+    # --- open semantic factors (legacy-backed factors are shown by N above) ---
+    for factor in store.list_semantic_factors():
+        if factor.metadata.get("legacy_source_uid"):
+            continue
+        roles = dict(factor.roles)
+        members = list(dict.fromkeys(factor.variables))
+        relation = factor.relation
+        canonical = (
+            relation.canonical_label if relation is not None else "RELATED_TO"
+        )
+        raw_relation = str(factor.metadata.get("raw_relation") or canonical)
+        role_lines = "\n".join(
+            f"{role} → {_short(uid)}" for role, uid in roles.items()
+        )
+        label = (
+            f"⟦{raw_relation} / {canonical}⟧\n{role_lines}"
+            if roles
+            else f"⟦{raw_relation} / {canonical}⟧"
+        )
+        px, py = _place("hyperedge")
+        factor_activation = (
+            sum(_act(uid) for uid in members) / len(members)
+            if members
+            else 0.0
+        )
+        nodes.append(
+            {
+                "id": factor.uid,
+                "label": label,
+                "group": "hyperedge",
+                "kind": "semantic_factor",
+                "predicate": canonical,
+                "raw_relation": raw_relation,
+                "activation": round(factor_activation, 4),
+                "x": px,
+                "y": py,
+                "title": (
+                    f"SEMANTIC FACTOR {factor.uid}\n"
+                    f"raw={raw_relation}\ncanonical={canonical}\n"
+                    f"w={factor.weight:.3f} confidence={factor.confidence:.3f}\n"
+                    f"parameters={factor.parameters.to_dict() if factor.parameters else {}}"
+                ),
+            }
+        )
+        hyperedges.append(
+            {
+                "id": factor.uid,
+                "predicate": canonical,
+                "raw_relation": raw_relation,
+                "w": factor.weight,
+                "confidence": factor.confidence,
+                "roles": roles,
+                "members": members,
+                "hub": factor.uid,
+                "parameters": (
+                    factor.parameters.to_dict()
+                    if factor.parameters is not None
+                    else {}
+                ),
+            }
+        )
+        directional = bool(
+            relation is not None
+            and relation.properties.directional
+            and not relation.properties.symmetric
+        )
+        source = (
+            str(factor.metadata.get("source_variable") or "")
+            or roles.get("SUBJECT", "")
+            or (members[0] if members else "")
+        )
+        for role, target in roles.items():
+            source_spoke = directional and target == source
+            edges.append(
+                {
+                    "id": f"{factor.uid}__{role}",
+                    "from": target if source_spoke else factor.uid,
+                    "to": factor.uid if source_spoke else target,
+                    "label": role,
+                    "kind": "semantic_incidence",
+                    "role": role,
+                    "relation": canonical,
+                    "w": round(float(factor.weight), 4),
+                    "confidence": round(float(factor.confidence), 4),
+                    "arrows": "to" if directional else "",
+                    "dashes": False,
+                    "width": 2.5,
+                    "color": {
+                        "color": _ROLE_COLOR.get(role, "#e9c46a"),
+                        "highlight": "#fff",
+                    },
+                    "title": (
+                        f"{raw_relation} / {canonical}: {role} = {target} · "
+                        f"w={factor.weight:.3f} c={factor.confidence:.3f}"
+                    ),
+                }
+            )
+
     # --- binary associative links L ---
     for link in store.ah.L.values():
         # ASSOC симметрична; IS-A / FOLLOW направлены e1→e2
@@ -303,6 +415,9 @@ def dump_graph(
             "H": len(store.ah.H),
             "L": len(store.ah.L),
             "hyperedges": len(store.find_hypernodes()),
+            "semantic_factors": len(store.semantic_factors),
+            "relations": len(store.list_relations()),
+            "events": len(store.events),
             "graph_size": store.graph_size(),
             "tau": store.ah.tau,
         },
@@ -329,6 +444,31 @@ def dump_ah_json(store: AHStore) -> dict[str, Any]:
             }
             for l in store.ah.L.values()
         ],
+        "relations": store.relations.to_dict(),
+        "semantic_factors": [
+            {
+                "uid": factor.uid,
+                "relation": (
+                    factor.relation.canonical_label
+                    if factor.relation is not None
+                    else None
+                ),
+                "variables": list(factor.variables),
+                "roles": dict(factor.roles),
+                "weight": factor.weight,
+                "confidence": factor.confidence,
+                "parameters": (
+                    factor.parameters.to_dict()
+                    if factor.parameters is not None
+                    else None
+                ),
+                "metadata": dict(factor.metadata),
+            }
+            for factor in store.list_semantic_factors()
+        ],
+        "events": [event.to_dict() for event in store.list_events()],
+        "state": store.state.to_dict(),
+        "state_transitions": list(store.state_transitions),
     }
 
 

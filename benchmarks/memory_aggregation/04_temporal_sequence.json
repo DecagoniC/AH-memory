@@ -1,0 +1,15 @@
+{
+  "name": "04_temporal_sequence",
+  "input": "Сначала отец купил BMW. После этого отец купил Audi. Затем отец продал BMW.",
+  "expected_events": [
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "BMW"},
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "AUDI"},
+    {"relation": "SELL", "subject": "FATHER", "object": "BMW"}
+  ],
+  "expected_relations": ["PURCHASE", "SELL", "AFTER"],
+  "expected_state": {
+    "owns": {"FATHER": {"BMW": false, "AUDI": true}},
+    "last_purchase": {"FATHER": "AUDI"},
+    "purchase_history": {"FATHER": ["BMW", "AUDI"]}
+  }
+}

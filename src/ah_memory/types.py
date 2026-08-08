@@ -21,6 +21,8 @@ class LinkId(str, Enum):
     IS_A = "IS-A"
     FOLLOW = "FOLLOW"
     ASSOC = "ASSOC"
+    BIND = "BIND"
+    CAUSE = "CAUSE"
 
 
 class Role(str, Enum):
@@ -198,6 +200,7 @@ class AH:
     H: dict[str, HyperElement] = field(default_factory=dict)
     L: dict[str, AssocLink] = field(default_factory=dict)
     tau: int = 0
+    revision: int = 0
 
     def section(self, name: Section) -> dict[str, HyperElement]:
         return {Section.C: self.C, Section.P: self.P, Section.H: self.H}[name]

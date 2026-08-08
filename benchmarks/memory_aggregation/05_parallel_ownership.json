@@ -1,0 +1,14 @@
+{
+  "name": "05_parallel_ownership",
+  "input": "Отец купил BMW. Мать купила Audi.",
+  "expected_events": [
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "BMW"},
+    {"relation": "PURCHASE", "subject": "MOTHER", "object": "AUDI"}
+  ],
+  "expected_relations": ["PURCHASE"],
+  "expected_state": {
+    "owns": {"FATHER": {"BMW": true}, "MOTHER": {"AUDI": true}},
+    "last_purchase": {"FATHER": "BMW", "MOTHER": "AUDI"},
+    "purchase_history": {"FATHER": ["BMW"], "MOTHER": ["AUDI"]}
+  }
+}

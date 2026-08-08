@@ -95,21 +95,45 @@ class TickTrace:
     activated: list[str]        # UID с x > t
     wm: list[str]
     weight_updates: int
+    beliefs_top: dict[str, float]
+    activation_top: dict[str, float]
+    events: list[ActivationEvent]
+    convergence: float
+    timings_ms: dict[str, float]
 ```
 
 - `seed(seeds: list[ActivationSeed])` — до/во время такта.
-- `tick() → TickTrace` — один такт 8 шагов.
+- `tick() → TickTrace` — compatibility API для Agent/UI.
+- `initialize(evidence) → BPState`, `tick(state) → BPState` — независимый simulation API.
 - Pacemaker с частотой `ν` вызывает `seed` на выбранных UID.
+
+```python
+@dataclass
+class BPState:
+    tick: int
+    variable_to_factor: dict
+    factor_to_variable: dict
+    beliefs: dict[str, float]
+    activation: dict[str, float]
+    evidence: dict[str, float]
+    working_memory: dict[str, dict]
+    trace: list[ActivationEvent]
+```
+
+Один immutable `FactorGraph` допускает несколько независимых `BPState`.
+`BeliefPropagation.step` не сбрасывает сообщения.
 
 ## 5. Ignition → Working Memory
 
 ```python
 class WorkingMemory:
-    def sync(self, excited: Iterable[str]) -> None: ...
+    def sync(self, activation: Mapping[str, float], *, tick: int, threshold: float) -> None: ...
     def contents(self) -> frozenset[str]: ...
+    def entries(self) -> tuple[WorkingMemoryEntry, ...]: ...
 ```
 
-WM = `{ e | x_e > t }`. Выход ниже порога удаляет из WM.
+WM = `{ e | x_e >= t }`. Entry хранит activation, `entered_at` и
+supporting factor UIDs. Выход ниже порога удаляет entry из WM.
 
 ## 6. AnswerBuilder
 
@@ -124,6 +148,43 @@ def collect(ah: AHStore, tau: int) -> GCReport:
     # orphan: все w in/out == 0 ИЛИ компонент без связи с S
     # skip: created_at_tau + TTL > tau
 ```
+
+## 8. Open relation semantics
+
+```python
+normalized = RelationNormalizer(registry, strategies).normalize(
+    raw_relation,
+    context,
+)
+
+registry.register_relation(relation)
+registry.get_relation(canonical_label)
+registry.find_similar_relations(embedding)
+registry.list_relations()
+```
+
+`FactCandidate.predicate` remains a legacy canonical fallback.
+`raw_relation` is never overwritten; `canonical_relation` is stored
+separately.
+
+```python
+message = ActivationEngine(function, parameter_generator).propagate(
+    message,
+    factor,
+    source,
+    target,
+)
+```
+
+Activation behavior is selected by FactorParameters and
+RelationProperties, not by relation-label branches.
+
+```python
+next_state = StateEngine(rules).apply(state, event)
+```
+
+State transitions are deterministic configured operations. The LLM
+cannot mutate State or FactorGraph directly.
 
 ## Запреты
 

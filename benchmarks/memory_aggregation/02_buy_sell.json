@@ -1,0 +1,14 @@
+{
+  "name": "02_buy_sell",
+  "input": "Отец купил BMW. Потом отец продал BMW.",
+  "expected_events": [
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "BMW"},
+    {"relation": "SELL", "subject": "FATHER", "object": "BMW"}
+  ],
+  "expected_relations": ["PURCHASE", "SELL"],
+  "expected_state": {
+    "owns": {"FATHER": {"BMW": false}},
+    "last_purchase": {"FATHER": "BMW"},
+    "purchase_history": {"FATHER": ["BMW"]}
+  }
+}

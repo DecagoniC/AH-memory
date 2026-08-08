@@ -27,13 +27,15 @@ SYSTEM_PROMPT = """Ты модуль восприятия АГ-памяти.
 - Верни ровно один JSON-объект. Без markdown, без текста вокруг, без комментариев.
 - Имена ВСЕХ ключей — только латиница и ТОЧНО как в примере ниже. Кириллические ключи запрещены
   (нельзя: кандидаты, роли, уверенность, сырой_спан, семантические_токены и любые переводы).
-- Значения predicate и имён ролей — только из списков ниже (латиница UPPER_SNAKE / как указано).
+- Имена ролей — из списка ниже. Отношение может быть произвольным и должно сохранять формулировку текста.
 
 Точный каркас (копируй ключи буквально):
 {
   "kind": "fact",
   "candidates": [
     {
+      "raw_relation": "зовут",
+      "canonical_relation": "IS",
       "predicate": "IS",
       "roles": {"SUBJECT": "Я", "OBJECT": "СЕРГЕЙ"},
       "raw_span": "меня зовут сергей",
@@ -43,8 +45,15 @@ SYSTEM_PROMPT = """Ты модуль восприятия АГ-памяти.
   "seed_tokens": ["Я", "СЕРГЕЙ"]
 }
 
-Закрытый список predicate (другое имя → пропусти факт):
-IS | LIVE_IN | BE_BORN | HAVE | RUN | BE_COLORED | CREATE | CAUSE_EVENT | USE | MOVE
+raw_relation ОБЯЗАТЕЛЕН для каждого факта: точный глагол/отношение из исходного текста.
+canonical_relation: выбери известный canonical label, если уверен, иначе null.
+Начальный, но НЕ закрытый словарь canonical relation:
+IS | LIVE_IN | BE_BORN | HAVE | RUN | BE_COLORED | CREATE | CAUSE | USE | MOVE |
+PURCHASE | SELL | BORROW | RECEIVE | FOLLOW | BEFORE | AFTER | DURING | IS_A |
+LOCATED_IN | PART_OF | WORKS_FOR | OWNS.
+predicate оставь как legacy-копию canonical_relation; если canonical_relation=null,
+используй UPPER_SNAKE транслитерацию/обобщение raw_relation. Не пропускай факт
+только потому, что отношения нет в словаре.
 
 Закрытый список ключей roles:
 SUBJECT | OBJECT | LOCATION | TIME | CAUSE | TOOL | MATERIAL | PURPOSE | HOW-TO
@@ -205,15 +214,32 @@ class GigaChatPerception:
         data = _parse_json(raw)
         cands = [
             FactCandidate(
-                predicate=str(c.get("predicate", "")).upper(),
+                predicate=str(
+                    c.get("canonical_relation")
+                    or c.get("predicate")
+                    or c.get("raw_relation")
+                    or c.get("relation", "")
+                ).upper(),
                 roles={str(k).upper(): slug_uid(str(v)) for k, v in (c.get("roles") or {}).items()},
                 raw_span=c.get("raw_span"),
                 confidence=float(c.get("confidence", 0.8)),
+                raw_relation=str(
+                    c.get("raw_relation")
+                    or c.get("relation")
+                    or c.get("predicate", "")
+                ),
+                canonical_relation=c.get("canonical_relation"),
             )
             for c in data.get("candidates", [])
-            if isinstance(c, dict) and c.get("predicate")
+            if isinstance(c, dict)
+            and (c.get("predicate") or c.get("raw_relation") or c.get("relation"))
         ]
-        gated = gate_candidates(text, cands, require_grounding=self.require_grounding)
+        gated = gate_candidates(
+            text,
+            cands,
+            require_grounding=self.require_grounding,
+            allow_open_relations=True,
+        )
         kind = data.get("kind", "fact")
         if kind not in {"fact", "question", "message"}:
             kind = "fact"

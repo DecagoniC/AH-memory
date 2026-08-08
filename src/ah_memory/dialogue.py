@@ -1,7 +1,8 @@
 """LLM dialogue: answer from existing AH graph, then ingest both turns."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import json
+from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from ah_memory.config import GigaChatConfig
@@ -35,6 +36,10 @@ def _tick_dict(t: TickTrace) -> dict:
         "weight_updates": t.weight_updates,
         "stats": t.z_stats,
         "chains": t.chains,
+        "activation_top": t.activation_top,
+        "events": [asdict(event) for event in t.events],
+        "convergence": t.convergence,
+        "timings_ms": t.timings_ms,
     }
 
 
@@ -68,6 +73,7 @@ class TurnResult:
     system_prompt: str = ""
     activation: dict = field(default_factory=dict)
     graph_build_json: dict = field(default_factory=dict)
+    full_trace: dict = field(default_factory=dict)
 
 
 class DialogueAgent:
@@ -121,10 +127,20 @@ class DialogueAgent:
         graph_hint = ask.answer if ask.answer and ask.answer != "неизвестно" else ""
 
         if self.client is not None:
-            reply, system_prompt = self._llm_reply(user_text, mem, graph_hint)
+            reply, system_prompt = self._llm_reply(
+                user_text,
+                mem,
+                graph_hint,
+                ask.full_trace,
+            )
             backend = f"{self.provider}+ah"
         else:
-            reply, system_prompt = self._fallback_reply(user_text, mem, graph_hint)
+            reply, system_prompt = self._fallback_reply(
+                user_text,
+                mem,
+                graph_hint,
+                ask.full_trace,
+            )
             backend = "rules+ah"
 
         # 2) После ответа — запись реплик в граф
@@ -161,6 +177,11 @@ class DialogueAgent:
                 "assistant_skipped": asst_rep.skipped,
             },
         }
+        full_trace = self.agent._full_trace(
+            ign.traces[i_ask:],
+            trace,
+            answer=reply,
+        )
         activation = {
             "turn": self._turn,
             "threshold_t": self.agent.hp.threshold_t,
@@ -183,6 +204,7 @@ class DialogueAgent:
             },
             "final_wm": wm,
             "memory_brief": mem,
+            "full_trace": full_trace,
         }
         self.last_activation = activation
         self.last_graph_build_json = graph_build_json
@@ -197,9 +219,15 @@ class DialogueAgent:
             system_prompt=system_prompt,
             activation=activation,
             graph_build_json=graph_build_json,
+            full_trace=full_trace,
         )
 
-    def _compose_system_blocks(self, mem: str, graph_hint: str) -> list[str]:
+    def _compose_system_blocks(
+        self,
+        mem: str,
+        graph_hint: str,
+        prepared_context: dict | None = None,
+    ) -> list[str]:
         blocks = [DIALOGUE_SYSTEM]
         if mem or graph_hint:
             ctx_parts = ["[Контекст из АГ-памяти — учитывай по возможности, не цитируй как отчёт]"]
@@ -208,10 +236,37 @@ class DialogueAgent:
             if graph_hint:
                 ctx_parts.append(f"Активировано: {graph_hint}")
             blocks.append("\n".join(ctx_parts))
+        if prepared_context:
+            deterministic = {
+                "activated_nodes": prepared_context.get("activated_nodes", []),
+                "activated_factors": prepared_context.get("activated_factors", []),
+                "relations": prepared_context.get("relations", []),
+                "events": prepared_context.get("events", []),
+                "state": prepared_context.get("state", {}),
+                "state_transitions": prepared_context.get(
+                    "state_transitions",
+                    [],
+                )[-24:],
+                "final_evidence": prepared_context.get("final_evidence", []),
+            }
+            blocks.append(
+                "[Детерминированно подготовленная рабочая память]\n"
+                + json.dumps(deterministic, ensure_ascii=False)
+            )
         return blocks
 
-    def _llm_reply(self, user_text: str, mem: str, graph_hint: str) -> tuple[str, str]:
-        sys_blocks = self._compose_system_blocks(mem, graph_hint)
+    def _llm_reply(
+        self,
+        user_text: str,
+        mem: str,
+        graph_hint: str,
+        prepared_context: dict | None = None,
+    ) -> tuple[str, str]:
+        sys_blocks = self._compose_system_blocks(
+            mem,
+            graph_hint,
+            prepared_context,
+        )
         system_content = "\n\n".join(sys_blocks)
         messages: list[dict[str, str]] = [
             {"role": "system", "content": system_content},
@@ -220,8 +275,18 @@ class DialogueAgent:
         reply = self.client.chat(messages, json_mode=False).strip()
         return reply, system_content
 
-    def _fallback_reply(self, user_text: str, mem: str, graph_hint: str) -> tuple[str, str]:
-        sys_blocks = self._compose_system_blocks(mem, graph_hint)
+    def _fallback_reply(
+        self,
+        user_text: str,
+        mem: str,
+        graph_hint: str,
+        prepared_context: dict | None = None,
+    ) -> tuple[str, str]:
+        sys_blocks = self._compose_system_blocks(
+            mem,
+            graph_hint,
+            prepared_context,
+        )
         prompt_view = "\n\n──── system ────\n\n".join(sys_blocks)
         prompt_view += "\n\n──── mode ────\n\nrules fallback (LLM недоступен)"
         if graph_hint and graph_hint != "неизвестно":

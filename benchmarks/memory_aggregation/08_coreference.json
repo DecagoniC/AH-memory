@@ -1,0 +1,15 @@
+{
+  "name": "08_coreference",
+  "input": "Отец купил BMW. Потом он купил Audi. Затем он продал BMW.",
+  "expected_events": [
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "BMW"},
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "AUDI"},
+    {"relation": "SELL", "subject": "FATHER", "object": "BMW"}
+  ],
+  "expected_relations": ["PURCHASE", "SELL"],
+  "expected_state": {
+    "owns": {"FATHER": {"BMW": false, "AUDI": true}},
+    "last_purchase": {"FATHER": "AUDI"},
+    "purchase_history": {"FATHER": ["BMW", "AUDI"]}
+  }
+}

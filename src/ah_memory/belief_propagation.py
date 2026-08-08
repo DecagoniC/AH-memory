@@ -1,16 +1,30 @@
-"""Damped loopy belief propagation on AH factor graph."""
+"""Persistent damped message passing on an AH factor graph."""
 from __future__ import annotations
 
 import math
+import time
 from dataclasses import dataclass, field
-from itertools import product
-from ah_memory.factor_graph import (
-    Factor,
-    FactorGraph,
-    FactorKind,
-    role_beta_weight,
+from typing import Mapping
+
+from ah_memory.activation import (
+    ActivationFunction,
+    ActivationParameters,
+    LinearDecayActivation,
 )
-from ah_memory.types import LinkId
+from ah_memory.competition import (
+    CompetitionFunction,
+    CompetitionParameters,
+    NoCompetition,
+)
+from ah_memory.factor_graph import FactorGraph, FactorKind
+from ah_memory.potentials import (
+    FactorPotential,
+    Message,
+    PotentialParameters,
+    default_potential_registry,
+    evaluation_mode_for,
+    normalize,
+)
 
 
 def _norm2(m0: float, m1: float) -> tuple[float, float]:
@@ -28,12 +42,48 @@ def _damp(
     return _norm2(m0, m1)
 
 
+def _logit(value: float) -> float:
+    bounded = min(1.0 - 1e-12, max(1e-12, value))
+    return math.log(bounded / (1.0 - bounded))
+
+
 @dataclass
 class BPResult:
     beliefs: dict[str, float]  # b_v(1)
     trace_factors: list[str]
     rounds: int
     max_belief: float = 0.0
+    state: "BPState | None" = None
+
+
+@dataclass(frozen=True)
+class ActivationEvent:
+    tick: int
+    source_uid: str
+    factor_uid: str
+    target_uid: str
+    message_value: float
+    contribution: float
+    evaluation_mode: str = "closed_form"
+
+
+@dataclass
+class BPState:
+    tick: int
+    variable_to_factor: dict[tuple[str, str], Message]
+    factor_to_variable: dict[tuple[str, str], Message]
+    beliefs: dict[str, float]
+    activation: dict[str, float]
+    evidence: dict[str, float]
+    working_memory: dict[str, dict] = field(default_factory=dict)
+    trace: list[ActivationEvent] = field(default_factory=list)
+    activation_history: list[dict[str, float]] = field(default_factory=list)
+    belief_history: list[dict[str, float]] = field(default_factory=list)
+    message_history: list[dict[tuple[str, str], Message]] = field(default_factory=list)
+    working_memory_history: list[dict[str, dict]] = field(default_factory=list)
+    graph_signature: tuple = field(default_factory=tuple)
+    timings_ms: dict[str, float] = field(default_factory=dict)
+    factor_evaluation_modes: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
@@ -46,184 +96,308 @@ class BeliefPropagation:
     damp: float = 0.4
     rounds: int = 2
     trace_eps: float = 1e-3
-    max_arity: int = 6
+    max_arity: int | None = None  # compatibility only; never truncates
+    potential_parameters: PotentialParameters = field(default_factory=PotentialParameters)
+    activation_function: ActivationFunction = field(default_factory=LinearDecayActivation)
+    activation_parameters: ActivationParameters = field(default_factory=ActivationParameters)
+    competition: CompetitionFunction = field(default_factory=NoCompetition)
+    competition_parameters: CompetitionParameters = field(default_factory=CompetitionParameters)
+    potentials: Mapping[str, FactorPotential] = field(
+        default_factory=default_potential_registry
+    )
+    working_memory_threshold: float = 0.7
+    history_retention: int = 100
+    trace_retention: int = 1000
+    contribution_mode: str = "delta"
 
     def run(self, graph: FactorGraph) -> BPResult:
+        """Compatibility wrapper: initialize once and execute configured rounds."""
         if not graph.variables:
             return BPResult(beliefs={}, trace_factors=[], rounds=0)
-
-        # messages: (src, dst) where one is factor fid, other is var
-        # store as key ("v2f", v, fid) and ("f2v", fid, v)
-        v2f: dict[tuple[str, str], tuple[float, float]] = {}
-        f2v: dict[tuple[str, str], tuple[float, float]] = {}
-
-        for f in graph.factors:
-            for v in f.variables:
-                v2f[(v, f.fid)] = (0.5, 0.5)
-                f2v[(f.fid, v)] = (0.5, 0.5)
-
-        factors_by_id = {f.fid: f for f in graph.factors}
-        prev_beliefs = {v: 0.5 for v in graph.variables}
-
+        state = self.initialize(graph)
         for _ in range(max(1, self.rounds)):
-            # variable -> factor
-            new_v2f: dict[tuple[str, str], tuple[float, float]] = {}
-            for v in graph.variables:
-                for fid in graph.var_factors.get(v, []):
-                    m0 = m1 = 1.0
-                    for fid2 in graph.var_factors.get(v, []):
-                        if fid2 == fid:
-                            continue
-                        a0, a1 = f2v[(fid2, v)]
-                        m0 *= a0
-                        m1 *= a1
-                    new_v2f[(v, fid)] = _damp(v2f[(v, fid)], _norm2(m0, m1), self.damp)
-            v2f = new_v2f
-
-            # factor -> variable
-            new_f2v: dict[tuple[str, str], tuple[float, float]] = {}
-            for f in graph.factors:
-                for v in f.variables:
-                    msg = self._factor_to_var(f, v, v2f)
-                    new_f2v[(f.fid, v)] = _damp(f2v[(f.fid, v)], msg, self.damp)
-            f2v = new_f2v
-
-            beliefs = self._beliefs(graph, f2v)
-            prev_beliefs = beliefs
-
-        beliefs = self._beliefs(graph, f2v)
-        trace = self._trace_factors(graph, beliefs, factors_by_id)
+            state = self.step(graph, state)
+        trace = self._trace_from_events(state.trace)
         return BPResult(
-            beliefs=beliefs,
+            beliefs=state.beliefs,
             trace_factors=trace,
             rounds=self.rounds,
-            max_belief=max(beliefs.values()) if beliefs else 0.0,
+            max_belief=max(state.beliefs.values()) if state.beliefs else 0.0,
+            state=state,
         )
 
-    def _beliefs(
-        self, graph: FactorGraph, f2v: dict[tuple[str, str], tuple[float, float]]
-    ) -> dict[str, float]:
-        out: dict[str, float] = {}
-        for v in graph.variables:
-            m0 = m1 = 1.0
-            for fid in graph.var_factors.get(v, []):
-                a0, a1 = f2v[(fid, v)]
-                m0 *= a0
-                m1 *= a1
-            _, p1 = _norm2(m0, m1)
-            out[v] = p1
-        return out
-
-    def _factor_to_var(
-        self,
-        f: Factor,
-        v: str,
-        v2f: dict[tuple[str, str], tuple[float, float]],
-    ) -> tuple[float, float]:
-        others = [u for u in f.variables if u != v]
-        if len(others) > self.max_arity - 1:
-            others = others[: self.max_arity - 1]
-
-        acc0 = acc1 = 0.0
-        # configurations of others
-        if not others:
-            # unary
-            for xv in (0, 1):
-                pot = self._potential(f, {v: xv})
-                if xv == 0:
-                    acc0 += pot
-                else:
-                    acc1 += pot
-            return _norm2(acc0, acc1)
-
-        for conf in product((0, 1), repeat=len(others)):
-            assign = {u: conf[i] for i, u in enumerate(others)}
-            # product of incoming messages
-            msg_prod = 1.0
-            for u in others:
-                m0, m1 = v2f[(u, f.fid)]
-                msg_prod *= m0 if assign[u] == 0 else m1
-            for xv in (0, 1):
-                assign[v] = xv
-                pot = self._potential(f, assign)
-                if xv == 0:
-                    acc0 += pot * msg_prod
-                else:
-                    acc1 += pot * msg_prod
-        return _norm2(acc0, acc1)
-
-    def _potential(self, f: Factor, assign: dict[str, int]) -> float:
-        if f.kind is FactorKind.OBS:
-            x = assign.get(f.variables[0], 0)
-            return math.exp(f.lambda_obs) if x == 1 else 1.0
-
-        if f.kind is FactorKind.PRIOR:
-            x = assign.get(f.variables[0], 0)
-            return f.epsilon if x == 1 else 1.0
-
-        if f.kind is FactorKind.PAIR:
-            if len(f.variables) < 2:
-                return 1.0
-            e1, e2 = f.variables[0], f.variables[1]
-            x1, x2 = assign.get(e1, 0), assign.get(e2, 0)
-            return self._pair_potential(f.link_id, f.w, x1, x2)
-
-        if f.kind is FactorKind.HYPER:
-            xs = [assign.get(u, 0) for u in f.variables]
-            alpha = self.kappa * max(0.0, min(1.0, f.w))
-            prod = 1
-            for x in xs:
-                prod *= x
-            # role-aware betas
-            beta_term = 0.0
-            if f.roles:
-                inv = {u: r for r, u in f.roles.items()}
-                for u, x in zip(f.variables, xs):
-                    role = inv.get(u, "")
-                    beta_term += role_beta_weight(role) * alpha * x
-            else:
-                beta_term = 0.15 * alpha * sum(xs)
-            return math.exp(alpha * prod + beta_term)
-
-        return 1.0
-
-    def _pair_potential(self, link_id: str, w: float, x1: int, x2: int) -> float:
-        w = max(0.0, min(1.0, w))
-        if link_id == LinkId.IS_A.value:
-            g = self.gamma_isa * w
-            # e1=child, e2=parent; penalize child=1,parent=0
-            if x1 == 1 and x2 == 0:
-                return math.exp(-g)
-            if x1 == 1 and x2 == 1:
-                return math.exp(g)
-            return 1.0
-        if link_id == LinkId.FOLLOW.value:
-            g = self.gamma_follow * w
-            return math.exp(g * x1 * x2)
-        if link_id == LinkId.ASSOC.value:
-            g = self.gamma_assoc * w
-            return math.exp(g * x1 * x2)
-        g = self.gamma_default * w
-        return math.exp(g * x1 * x2)
-
-    def _trace_factors(
+    def initialize(
         self,
         graph: FactorGraph,
-        beliefs: dict[str, float],
-        factors_by_id: dict[str, Factor],
-    ) -> list[str]:
-        """Factors whose member beliefs suggest contribution to WM coalition."""
-        scored: list[tuple[float, str]] = []
-        for f in graph.factors:
-            if f.kind in {FactorKind.PRIOR, FactorKind.OBS}:
-                continue
-            if not f.variables:
-                continue
-            bs = [beliefs.get(v, 0.0) for v in f.variables]
-            score = sum(bs) / len(bs)
-            if f.kind is FactorKind.HYPER:
-                score *= 1.0 + f.w
-            if score > self.trace_eps:
-                scored.append((score, f.fid))
-        scored.sort(reverse=True)
-        return [fid for _, fid in scored[:40]]
+        evidence: Mapping[str, float] | None = None,
+    ) -> BPState:
+        v2f: dict[tuple[str, str], Message] = {}
+        f2v: dict[tuple[str, str], Message] = {}
+        for factor in graph.factors:
+            for variable in factor.variables:
+                v2f[(variable, factor.fid)] = (0.5, 0.5)
+                f2v[(factor.fid, variable)] = (0.5, 0.5)
+        beliefs = {uid: 0.5 for uid in graph.variables}
+        activation = {uid: 0.0 for uid in graph.variables}
+        return BPState(
+            tick=0,
+            variable_to_factor=v2f,
+            factor_to_variable=f2v,
+            beliefs=beliefs,
+            activation=activation,
+            evidence={
+                uid: max(0.0, float(value))
+                for uid, value in (evidence or {}).items()
+                if uid in beliefs
+            },
+            activation_history=[dict(activation)],
+            belief_history=[dict(beliefs)],
+            message_history=[dict(f2v)],
+            working_memory_history=[{}],
+            graph_signature=graph.structural_signature,
+        )
+
+    def step(
+        self,
+        graph: FactorGraph,
+        state: BPState,
+        evidence: Mapping[str, float] | None = None,
+        parameters: PotentialParameters | None = None,
+    ) -> BPState:
+        """Advance one synchronous round using messages from the previous state."""
+        started = time.perf_counter()
+        state = self._reconcile(graph, state)
+        evidence_now = dict(state.evidence)
+        if evidence is not None:
+            evidence_now = {
+                uid: max(0.0, float(value))
+                for uid, value in evidence.items()
+                if uid in graph.var_factors
+            }
+        potential_parameters = parameters or self.potential_parameters
+
+        new_v2f: dict[tuple[str, str], Message] = {}
+        for variable in graph.variables:
+            local = self._evidence_likelihood(evidence_now.get(variable, 0.0))
+            for fid in graph.var_factors.get(variable, ()):
+                m0, m1 = local
+                for other_fid in graph.var_factors.get(variable, ()):
+                    if other_fid == fid:
+                        continue
+                    incoming = state.factor_to_variable[(other_fid, variable)]
+                    m0 *= incoming[0]
+                    m1 *= incoming[1]
+                proposed = normalize((m0, m1))
+                new_v2f[(variable, fid)] = _damp(
+                    state.variable_to_factor[(variable, fid)],
+                    proposed,
+                    self.damp,
+                )
+
+        new_f2v: dict[tuple[str, str], Message] = {}
+        events: list[ActivationEvent] = []
+        evaluation_modes: dict[str, str] = {}
+        next_tick = state.tick + 1
+        for factor in graph.factors:
+            evaluation_modes[factor.fid] = evaluation_mode_for(
+                factor,
+                potential_parameters,
+            )
+            potential = self.potentials.get(
+                factor.potential_key or factor.kind.value,
+                self.potentials["pair"],
+            )
+            incoming = {
+                uid: new_v2f[(uid, factor.fid)]
+                for uid in factor.variables
+            }
+            for target in factor.variables:
+                proposed = potential.message_to(
+                    factor,
+                    target,
+                    incoming,
+                    potential_parameters,
+                )
+                old = state.factor_to_variable[(factor.fid, target)]
+                message = _damp(old, proposed, self.damp)
+                new_f2v[(factor.fid, target)] = message
+                contribution = self._contribution(message[1], old[1])
+                if abs(contribution) > self.trace_eps:
+                    events.append(
+                        ActivationEvent(
+                            tick=next_tick,
+                            source_uid=self._event_source(factor.variables, target, incoming),
+                            factor_uid=factor.fid,
+                            target_uid=target,
+                            message_value=message[1],
+                            contribution=contribution,
+                            evaluation_mode=evaluation_modes[factor.fid],
+                        )
+                    )
+
+        bp_finished = time.perf_counter()
+        beliefs = self._beliefs_from_messages(graph, new_f2v, evidence_now)
+        signals = self._incoming_signals(graph, new_f2v)
+        activation = {
+            uid: self.activation_function(
+                state.activation.get(uid, 0.0),
+                signals.get(uid, 0.0),
+                1.0 - math.exp(-evidence_now.get(uid, 0.0)),
+                self.activation_parameters,
+            )
+            for uid in graph.variables
+        }
+        activation = self.competition.apply(
+            activation,
+            graph,
+            self.competition_parameters,
+        )
+        support: dict[str, list[str]] = {}
+        for event in events:
+            if event.contribution > 0.0:
+                support.setdefault(event.target_uid, []).append(event.factor_uid)
+        working_memory = {
+            uid: {
+                "uid": uid,
+                "activation": value,
+                "entered_at": state.working_memory.get(uid, {}).get(
+                    "entered_at",
+                    next_tick,
+                ),
+                "support": support.get(uid, []),
+            }
+            for uid, value in activation.items()
+            if value >= self.working_memory_threshold
+        }
+        activation_finished = time.perf_counter()
+        return BPState(
+            tick=next_tick,
+            variable_to_factor=new_v2f,
+            factor_to_variable=new_f2v,
+            beliefs=beliefs,
+            activation=activation,
+            evidence=evidence_now,
+            working_memory=working_memory,
+            trace=(state.trace + events)[-max(1, self.trace_retention) :],
+            activation_history=(
+                state.activation_history + [dict(activation)]
+            )[-max(1, self.history_retention) :],
+            belief_history=(
+                state.belief_history + [dict(beliefs)]
+            )[-max(1, self.history_retention) :],
+            message_history=(
+                state.message_history + [dict(new_f2v)]
+            )[-max(1, self.history_retention) :],
+            working_memory_history=(
+                state.working_memory_history
+                + [{uid: dict(entry) for uid, entry in working_memory.items()}]
+            )[-max(1, self.history_retention) :],
+            graph_signature=graph.structural_signature,
+            timings_ms={
+                "bp_step": (bp_finished - started) * 1000.0,
+                "activation_update": (activation_finished - bp_finished) * 1000.0,
+                "total_tick": (activation_finished - started) * 1000.0,
+            },
+            factor_evaluation_modes=evaluation_modes,
+        )
+
+    @staticmethod
+    def _evidence_likelihood(value: float) -> Message:
+        return normalize((1.0, math.exp(min(50.0, max(0.0, value)))))
+
+    def _beliefs_from_messages(
+        self,
+        graph: FactorGraph,
+        factor_to_variable: Mapping[tuple[str, str], Message],
+        evidence: Mapping[str, float],
+    ) -> dict[str, float]:
+        beliefs: dict[str, float] = {}
+        for variable in graph.variables:
+            m0, m1 = self._evidence_likelihood(evidence.get(variable, 0.0))
+            for fid in graph.var_factors.get(variable, ()):
+                incoming = factor_to_variable[(fid, variable)]
+                m0 *= incoming[0]
+                m1 *= incoming[1]
+            beliefs[variable] = normalize((m0, m1))[1]
+        return beliefs
+
+    @staticmethod
+    def _incoming_signals(
+        graph: FactorGraph,
+        factor_to_variable: Mapping[tuple[str, str], Message],
+    ) -> dict[str, float]:
+        signals: dict[str, float] = {}
+        for variable in graph.variables:
+            positive = [
+                max(0.0, 2.0 * factor_to_variable[(fid, variable)][1] - 1.0)
+                for fid in graph.var_factors.get(variable, ())
+                if graph.factors_by_id[fid].kind
+                not in {FactorKind.PRIOR, FactorKind.OBS}
+            ]
+            signals[variable] = sum(positive)
+        return signals
+
+    def _reconcile(self, graph: FactorGraph, state: BPState) -> BPState:
+        if state.graph_signature == graph.structural_signature:
+            return state
+        fresh = self.initialize(graph, state.evidence)
+        for uid in graph.variables:
+            fresh.beliefs[uid] = state.beliefs.get(uid, fresh.beliefs[uid])
+            fresh.activation[uid] = state.activation.get(uid, 0.0)
+        for key in fresh.variable_to_factor:
+            fresh.variable_to_factor[key] = state.variable_to_factor.get(
+                key,
+                fresh.variable_to_factor[key],
+            )
+        for key in fresh.factor_to_variable:
+            fresh.factor_to_variable[key] = state.factor_to_variable.get(
+                key,
+                fresh.factor_to_variable[key],
+            )
+        fresh.tick = state.tick
+        fresh.trace = list(state.trace)
+        fresh.activation_history = list(state.activation_history)
+        fresh.belief_history = list(state.belief_history)
+        fresh.message_history = list(state.message_history)
+        fresh.working_memory = {
+            uid: dict(entry)
+            for uid, entry in state.working_memory.items()
+            if uid in graph.var_factors
+        }
+        fresh.working_memory_history = list(state.working_memory_history)
+        fresh.factor_evaluation_modes = dict(state.factor_evaluation_modes)
+        return fresh
+
+    @staticmethod
+    def _event_source(
+        variables: tuple[str, ...] | list[str],
+        target: str,
+        incoming: Mapping[str, Message],
+    ) -> str:
+        others = [uid for uid in variables if uid != target]
+        if not others:
+            return target
+        return max(others, key=lambda uid: incoming.get(uid, (0.5, 0.5))[1])
+
+    @staticmethod
+    def _trace_from_events(events: list[ActivationEvent]) -> list[str]:
+        scores: dict[str, float] = {}
+        for event in events:
+            scores[event.factor_uid] = scores.get(event.factor_uid, 0.0) + abs(
+                event.contribution
+            )
+        return [
+            uid
+            for uid, _ in sorted(
+                scores.items(),
+                key=lambda item: item[1],
+                reverse=True,
+            )[:40]
+        ]
+
+    def _contribution(self, current: float, previous: float) -> float:
+        if self.contribution_mode == "delta":
+            return current - previous
+        if self.contribution_mode == "counterfactual_logit":
+            return _logit(current) - _logit(previous)
+        raise ValueError(f"unknown contribution_mode: {self.contribution_mode}")

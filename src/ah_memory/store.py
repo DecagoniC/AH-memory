@@ -3,6 +3,12 @@ from __future__ import annotations
 
 from typing import Any, Iterable
 
+from ah_memory.relation_registry import (
+    RelationRegistry,
+    default_relation_registry,
+)
+from ah_memory.relations import Event, Relation
+from ah_memory.state_engine import State
 from ah_memory.types import (
     AH,
     AbstractSymbol,
@@ -31,12 +37,25 @@ class AHStore:
         self.ah = ah or AH()
         self._ref_seq = 0
         self._uid_seq = 0
+        self.relations: RelationRegistry = default_relation_registry()
+        self.semantic_factors: dict[str, Any] = {}
+        self.events: dict[str, Event] = {}
+        self.state = State()
+        self.state_transitions: list[dict[str, Any]] = []
 
     def clear(self) -> None:
         """Wipe all AH sets (in-place)."""
         self.ah = AH()
         self._ref_seq = 0
         self._uid_seq = 0
+        self.relations = default_relation_registry()
+        self.semantic_factors = {}
+        self.events = {}
+        self.state = State()
+        self.state_transitions = []
+
+    def _touch_structure(self) -> None:
+        self.ah.revision += 1
 
     def new_uid(self, prefix: str) -> str:
         self._uid_seq += 1
@@ -59,6 +78,7 @@ class AHStore:
             raise AHError(f"R modalities intersect for {s.uid}")
         s.created_tau = self.ah.tau
         self.ah.S[s.uid] = s
+        self._touch_structure()
         return s
 
     def edit_abstract_symbol(self, uid: str, s: AbstractSymbol) -> AbstractSymbol:
@@ -82,6 +102,7 @@ class AHStore:
             e.created_tau = self.ah.tau  # type: ignore[attr-defined]
         self._check_property_unique(e)
         bucket[uid] = e
+        self._touch_structure()
         return e
 
     def edit_element(self, section: Section, uid: str, e: HyperElement) -> HyperElement:
@@ -92,6 +113,7 @@ class AHStore:
             raise AHError("editElement: UID mismatch")
         self._check_property_unique(e)
         bucket[uid] = e
+        self._touch_structure()
         return e
 
     def add_property(self, uid: str, prop: Property, *, meta: bool = False) -> HyperElement:
@@ -121,7 +143,52 @@ class AHStore:
         if link.uid in self.ah.L:
             raise AHError(f"link already exists: {link.uid}")
         self.ah.L[link.uid] = link
+        self._touch_structure()
         return link
+
+    def register_relation(self, relation: Relation) -> Relation:
+        return self.relations.register_relation(relation)
+
+    def get_relation(self, canonical_label: str) -> Relation | None:
+        return self.relations.get_relation(canonical_label)
+
+    def list_relations(self) -> tuple[Relation, ...]:
+        return self.relations.list_relations()
+
+    def find_similar_relations(
+        self,
+        embedding: Iterable[float],
+        *,
+        limit: int = 5,
+        min_similarity: float = -1.0,
+    ) -> list[tuple[Relation, float]]:
+        return self.relations.find_similar_relations(
+            tuple(embedding),
+            limit=limit,
+            min_similarity=min_similarity,
+        )
+
+    def add_semantic_factor(self, factor: Any) -> Any:
+        uid = str(getattr(factor, "uid", getattr(factor, "fid", "")))
+        if not uid:
+            raise AHError("semantic factor must have uid")
+        if uid in self.semantic_factors:
+            return self.semantic_factors[uid]
+        self.semantic_factors[uid] = factor
+        self._touch_structure()
+        return factor
+
+    def list_semantic_factors(self) -> tuple[Any, ...]:
+        return tuple(self.semantic_factors.values())
+
+    def add_event(self, event: Event) -> Event:
+        if event.uid in self.events:
+            return self.events[event.uid]
+        self.events[event.uid] = event
+        return event
+
+    def list_events(self) -> tuple[Event, ...]:
+        return tuple(self.events.values())
 
     def get_abstract_symbol(self, uid: str) -> AbstractSymbol:
         try:
@@ -288,20 +355,29 @@ class AHStore:
         for bucket in (self.ah.C, self.ah.P, self.ah.H):
             if uid in bucket:
                 del bucket[uid]
+                self._touch_structure()
                 return True
         if uid in self.ah.S:
             del self.ah.S[uid]
+            self._touch_structure()
             return True
         return False
 
     def remove_link(self, uid: str) -> bool:
         if uid in self.ah.L:
             del self.ah.L[uid]
+            self._touch_structure()
             return True
         return False
 
     def graph_size(self) -> int:
-        return len(self.ah.C) + len(self.ah.P) + len(self.ah.H) + len(self.ah.L)
+        return (
+            len(self.ah.C)
+            + len(self.ah.P)
+            + len(self.ah.H)
+            + len(self.ah.L)
+            + len(self.semantic_factors)
+        )
 
     def get_x(self, uid: str) -> float:
         if uid in self.ah.S:

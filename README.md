@@ -12,9 +12,24 @@
 
 Документы: [DOMAIN](docs/DOMAIN.md) · [INTERFACES](docs/INTERFACES.md) · [HYPERPARAMS](docs/HYPERPARAMS.md)
 
+## Сравнение АГ vs БЯМ+RAG (M4)
+
+Ключ DeepSeek — в `.env` (`DEEPSEEK_API_KEY=...`).
+
+```bash
+# полный gold-бенчмарк + LLM RAG
+python scripts/compare_ah_vs_rag.py --m4
+
+# один вопрос
+python scripts/compare_ah_vs_rag.py -q "Кто такой заяц?"
+```
+
+В веб-UI: кнопки **Сравнить** и **M4 бенчмарк** (`POST /api/compare`, `/api/compare/m4`).
+
+
 ## Веб-интерфейс
 
-1. Вставь ключ в [`config.yaml`](config.yaml) (`deepseek.api_key`) или в `.env` как `DEEPSEEK_API_KEY=...`
+1. Ключ в `.env` как `DEEPSEEK_API_KEY=...` (не коммить в git)
 2. Установка и запуск:
 
 ```bash
@@ -39,4 +54,6 @@ python -c "from ah_memory.corpus import build_encyclopedia; st,c=build_encyclope
 - `gc` — сборка мусора с TTL
 - `dsl` — интерпретатор запросов
 - `agent` — цикл ingest/ask/step_message
+- `baselines.vanilla_rag` — БЯМ + TF-IDF RAG (контрольный агент M4)
+- `compare` — side-by-side АГ vs RAG + прогон M4
 - `corpus` — энциклопедия N≥1000, \|S\|≥150, ≥15k слов

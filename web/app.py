@@ -1,4 +1,4 @@
-"""FastAPI web UI: chat + graph dump."""
+"""FastAPI web UI: chat + graph dump + live AH vs RAG compare."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -10,6 +10,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from ah_memory.agent import Agent
+from ah_memory.baselines.vanilla_rag import VanillaRAG
+from ah_memory.compare import CompareEngine
 from ah_memory.config import load_config
 from ah_memory.corpus import build_encyclopedia
 from ah_memory.deepseek import HybridPerception
@@ -21,7 +23,7 @@ from ah_memory.store import AHStore
 
 STATIC = Path(__file__).parent / "static"
 cfg = load_config()
-app = FastAPI(title="AH Memory", version="0.3.0")
+app = FastAPI(title="AH Memory", version="0.4.2")
 
 
 def _make_perception() -> Any:
@@ -43,7 +45,6 @@ def _store_for_preload(mode: str) -> AHStore:
 
 
 def _build_core() -> Agent:
-    # never silently fall through to rabbit
     mode = cfg.agent.preload if cfg.agent.preload in {"empty", "rabbit", "encyclopedia"} else "empty"
     return Agent(store=_store_for_preload(mode), perception=_make_perception())
 
@@ -53,12 +54,24 @@ def _build_dialogue(core: Agent) -> DialogueAgent:
     return DialogueAgent(core, deepseek=ds)
 
 
+def _build_compare(core: Agent) -> CompareEngine:
+    """Сравнение на том же живом агенте, что и чат (корпус = диалог + факты)."""
+    ds = cfg.deepseek if (cfg.agent.use_llm and cfg.deepseek.configured) else None
+    return CompareEngine(core, ticks=cfg.agent.ticks, deepseek=ds)
+
+
 agent = _build_core()
 dialogue = _build_dialogue(agent)
+comparer = _build_compare(agent)
 
 
 class ChatIn(BaseModel):
     message: str = Field(min_length=1)
+    ticks: int | None = None
+
+
+class CompareIn(BaseModel):
+    question: str = Field(min_length=1)
     ticks: int | None = None
 
 
@@ -76,18 +89,23 @@ class ChatOut(BaseModel):
 
 @app.get("/")
 def index() -> FileResponse:
-    return FileResponse(STATIC / "index.html")
+    return FileResponse(
+        STATIC / "index.html",
+        headers={"Cache-Control": "no-store, max-age=0"},
+    )
 
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
     return {
         "ok": True,
-        "version": "0.3.1-no-bootstrap",
+        "version": "0.4.2-live-compare",
         "llm_configured": cfg.deepseek.configured,
         "use_llm": cfg.agent.use_llm,
         "model": cfg.deepseek.model if cfg.deepseek.configured else None,
         "preload": cfg.agent.preload,
+        "rag_backend": comparer.rag.backend,
+        "corpus_chars": len(comparer.rag.corpus),
         "tau": agent.store.ah.tau,
         "history": len(dialogue.history),
         "graph_size": len(agent.store.ah.S) + len(agent.store.ah.L) + len(agent.store.find_hypernodes()),
@@ -115,6 +133,9 @@ def chat(body: ChatIn) -> ChatOut:
     ticks = body.ticks or cfg.agent.ticks
     try:
         turn = dialogue.talk(text, ticks=ticks)
+        # держим RAG-корпус в синхроне с диалогом
+        comparer.bind_history(dialogue.history)
+        comparer.rebuild_rag()
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(502, f"dialogue failed: {exc}") from exc
 
@@ -131,10 +152,56 @@ def chat(body: ChatIn) -> ChatOut:
     )
 
 
+@app.post("/api/compare")
+def compare(body: CompareIn) -> dict[str, Any]:
+    """Произвольный запрос пользователя: живая АГ vs RAG по тому же диалогу/графу."""
+    q = body.question.strip()
+    if not q:
+        raise HTTPException(400, "empty question")
+    ticks = body.ticks or cfg.agent.ticks
+    try:
+        comparer.bind_history(dialogue.history)
+        turn = comparer.ask(q, ticks=ticks)
+        # факты, записанные compare, уже в agent; обновим history-корпус без дублирования chat
+        comparer.rebuild_rag()
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(502, f"compare failed: {exc}") from exc
+    return turn.as_dict()
+
+
+@app.post("/api/compare/m4")
+def compare_m4() -> dict[str, Any]:
+    """Эталонный gold M4 (заяц) — отдельный бенчмарк, не UI-диалог."""
+    try:
+        report = comparer.run_m4()
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(502, f"m4 failed: {exc}") from exc
+    return {
+        "summary": report.as_dict(),
+        "rag_backend": "llm+tfidf (rabbit gold)",
+        "note": "M4 — контрольный корпус «заяц». Кнопка Сравнить использует ваш живой диалог.",
+        "items": [
+            {
+                "q": i.question,
+                "ah": i.ah_answer,
+                "rag": i.rag_answer,
+                "ah_correct": i.ah_correct,
+                "rag_correct": i.rag_correct,
+                "ah_trace_complete": i.ah_trace_complete,
+                "ah_hall": i.ah_hallucinated,
+                "rag_hall": i.rag_hallucinated,
+                "ah_explain": round(i.ah_explain, 4),
+                "trace": i.ah_trace[:16],
+            }
+            for i in report.items
+        ],
+    }
+
+
 @app.post("/api/reset")
 def reset(preload: str = "empty") -> dict[str, Any]:
-    """Always rebuild agent; default preload=empty wipes the graph."""
-    global agent, dialogue, cfg
+    """Пересборка агента; по умолчанию empty — чистый граф под ваши запросы."""
+    global agent, dialogue, comparer, cfg
     cfg = load_config()
     mode = (preload or "empty").strip().lower()
     if mode not in {"empty", "rabbit", "encyclopedia"}:
@@ -146,8 +213,18 @@ def reset(preload: str = "empty") -> dict[str, Any]:
         deepseek=cfg.deepseek if (cfg.agent.use_llm and cfg.deepseek.configured) else None,
     )
     dialogue.reset_history()
+    comparer = _build_compare(agent)
+    comparer.clear()
+
     stats = dump_graph(agent.store)["stats"]
-    return {"ok": True, "preload": mode, "version": "0.3.1-no-bootstrap", "stats": stats}
+    return {
+        "ok": True,
+        "preload": mode,
+        "version": "0.4.2-live-compare",
+        "rag_backend": comparer.rag.backend,
+        "corpus_chars": len(comparer.rag.corpus),
+        "stats": stats,
+    }
 
 
 app.mount("/static", StaticFiles(directory=str(STATIC)), name="static")
@@ -170,7 +247,6 @@ def _pids_listening_on(port: int) -> list[int]:
         for line in r.stdout.splitlines():
             if "LISTENING" not in line.upper() or needle not in line:
                 continue
-            # match ...:8000 only as local port end
             parts = line.split()
             if len(parts) < 4:
                 continue
@@ -205,7 +281,6 @@ def _pids_listening_on(port: int) -> list[int]:
 
 
 def _free_port(port: int) -> None:
-    """Stop foreign listeners on port so restart does not hit WinError 10048."""
     import os
     import signal
     import sys
@@ -229,7 +304,6 @@ def _free_port(port: int) -> None:
                 os.kill(pid, signal.SIGTERM)
         except OSError as exc:
             print(f"[ah-web] could not stop {pid}: {exc}")
-    # brief wait for TIME_WAIT / handle release
     for _ in range(20):
         left = [p for p in _pids_listening_on(port) if p != me]
         if not left:

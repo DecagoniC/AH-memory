@@ -156,6 +156,11 @@
       min-height: 44px;
     }
     button.secondary { background: #334155; color: var(--text); }
+    button.compare-btn {
+      background: var(--accent2);
+      color: #1a1408;
+      min-width: 110px;
+    }
     button:disabled { opacity: .5; cursor: wait; }
     #network {
       flex: 1;
@@ -193,6 +198,10 @@
         <div class="composer">
           <textarea id="input" placeholder="Факт или вопрос… Например: Кто такой заяц?"></textarea>
           <button id="send">Отправить</button>
+          <button type="button" class="compare-btn" id="compare" title="АГ vs БЯМ+RAG — введи вопрос или сравни последний">Сравнить</button>
+        </div>
+        <div class="toolbar" style="border-top:1px solid var(--line); border-bottom:none;">
+          <button class="secondary" id="runM4">M4 бенчмарк</button>
         </div>
       </section>
       <section class="graph-wrap">
@@ -213,11 +222,25 @@
     const log = document.getElementById("log");
     const input = document.getElementById("input");
     const sendBtn = document.getElementById("send");
+    const compareBtn = document.getElementById("compare");
+    const m4Btn = document.getElementById("runM4");
     let network = null;
     let highlight = new Set();
     let graphMode = "hyper";
     let lastHyperedges = [];
+    let lastQuestion = "";
 
+    function setBusy(busy) {
+      if (sendBtn) sendBtn.disabled = busy;
+      if (compareBtn) compareBtn.disabled = busy;
+      if (m4Btn) m4Btn.disabled = busy;
+    }
+
+    function resolveQuestion() {
+      const typed = input.value.trim();
+      if (typed) return typed;
+      return lastQuestion.trim();
+    }
     function addMsg(role, text, tag, systemPrompt) {
       const el = document.createElement("div");
       el.className = "msg " + role;
@@ -257,8 +280,12 @@
       const r = await fetch("/api/health");
       const j = await r.json();
       const llm = j.llm_configured ? `DeepSeek:${j.model}` : "rules-only (нет ключа)";
+      const ver = j.version || "?";
       document.getElementById("health").textContent =
-        `${j.version || "?"} · ${llm} · preload=${j.preload} · |S|=${j["|S|"] ?? "?"} · τ=${j.tau}`;
+        `${ver} · ${llm} · RAG=${j.rag_backend || "?"} · corpus=${j.corpus_chars ?? "?"} · preload=${j.preload} · |S|=${j["|S|"] ?? "?"} · τ=${j.tau}`;
+      if (!String(ver).includes("live-compare")) {
+        addMsg("bot", "Сервер старый (нет live-compare). Останови ah-web и запусти снова: ah-web", "error");
+      }
     }
 
     function labelFont(color = "#ffffff", size = 12) {
@@ -486,9 +513,10 @@
     async function send() {
       const message = input.value.trim();
       if (!message) return;
+      lastQuestion = message;
       addMsg("user", message);
       input.value = "";
-      sendBtn.disabled = true;
+      setBusy(true);
       try {
         const r = await fetch("/api/chat", {
           method: "POST",
@@ -509,7 +537,7 @@
       } catch (e) {
         addMsg("bot", String(e), "error");
       } finally {
-        sendBtn.disabled = false;
+        setBusy(false);
         input.focus();
       }
     }
@@ -518,6 +546,77 @@
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
     });
+
+    compareBtn.addEventListener("click", async () => {
+      const question = resolveQuestion();
+      if (!question) {
+        addMsg("bot", "Введи вопрос в поле ввода (например: «Кто такой заяц?»), затем нажми Сравнить.", "hint");
+        input.focus();
+        return;
+      }
+      lastQuestion = question;
+      addMsg("user", question, "compare");
+      input.value = "";
+      setBusy(true);
+      try {
+        const r = await fetch("/api/compare", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question }),
+          cache: "no-store",
+        });
+        let j;
+        try { j = await r.json(); } catch (_) { j = { detail: await r.text() }; }
+        if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : (j.detail || r.statusText || "compare error"));
+        const ragBits = (j.rag_chunks || []).slice(0, 2).map((c, i) => `[${i+1}] ${c}`).join("\n");
+        const preview = j.notes?.corpus_preview || "";
+        if (preview.toLowerCase().includes("заяц") && !question.toLowerCase().includes("заяц")) {
+          addMsg("bot", "ВНИМАНИЕ: в RAG-корпусе всё ещё «заяц». Нажми Сброс и перезапусти ah-web (нужна версия 0.4.2-live-compare).", "error");
+        }
+        addMsg(
+          "bot",
+          `АГ-память:\n${j.ah_answer}\n\nБЯМ+RAG:\n${j.rag_answer}`,
+          `compare · ${j.notes?.mode || "?"} · ah=${j.ah_source} · rag=${j.rag_source} · corpus=${j.notes?.corpus_chars ?? "?"}`,
+          (preview ? `corpus:\n${preview}\n\n` : "") + (ragBits ? `chunks:\n${ragBits}` : "chunks: (пусто)")
+        );
+        highlight = new Set(j.ah_trace_uids || []);
+        await loadHealth();
+        await loadGraph();
+      } catch (e) {
+        addMsg("bot", String(e), "error");
+      } finally {
+        setBusy(false);
+        input.focus();
+      }
+    });
+
+    m4Btn.addEventListener("click", async () => {
+      addMsg("bot", "Запуск M4 (АГ vs БЯМ+RAG)…", "m4");
+      setBusy(true);
+      try {
+        const r = await fetch("/api/compare/m4", { method: "POST", cache: "no-store" });
+        let j;
+        try { j = await r.json(); } catch (_) { j = { detail: await r.text() }; }
+        if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : (j.detail || "m4 error"));
+        const s = j.summary || {};
+        const lines = (j.items || []).map(
+          (it) => `• ${it.q}\n  AH: ${it.ah}\n  RAG: ${it.rag}\n  Δexplain+=${it.ah_explain} hall AH/RAG=${it.ah_hall}/${it.rag_hall}`
+        ).join("\n\n");
+        addMsg(
+          "bot",
+          `Δ_explain=${s.delta_explainability}  Δ_hall=${s.delta_hallucination}\n` +
+          `Explain AH/RAG=${s.ExplainScore_AH}/${s.ExplainScore_VanillaRAG}\n` +
+          `Hall AH/RAG=${s.Hallucination_AH}/${s.Hallucination_VanillaRAG}\n` +
+          `hypothesis_ok=${s.hypothesis_ok}\n\n${lines}`,
+          `m4 · ${j.rag_backend}`
+        );
+      } catch (e) {
+        addMsg("bot", String(e), "error");
+      } finally {
+        setBusy(false);
+      }
+    });
+
     document.getElementById("refresh").addEventListener("click", loadGraph);
     document.getElementById("modeHyper").addEventListener("click", () => { graphMode = "hyper"; loadGraph(); });
     document.getElementById("modeAll").addEventListener("click", () => { graphMode = "all"; loadGraph(); });
@@ -541,8 +640,9 @@
         const gs = j.stats?.graph_size ?? -1;
         if (gs !== 0) throw new Error(`граф не очищен: graph_size=${gs}`);
         highlight = new Set();
+        lastQuestion = "";
         log.innerHTML = "";
-        addMsg("bot", "Граф опустошён (S=0, L=0).", "system");
+        addMsg("bot", "Граф и RAG очищены. Пиши свои факты/вопросы → Сравнить.", "system");
         await loadHealth();
         await loadGraph();
       } catch (e) {
@@ -551,7 +651,7 @@
     });
 
     (async () => {
-      addMsg("bot", "Готов к диалогу. Каждая твоя реплика и ответ модели пишутся в АГ-память.", "system");
+      addMsg("bot", "Свои факты/вопросы → Отправить или Сравнить (живой граф + RAG по диалогу, не «заяц»).", "system");
       await loadHealth();
       await loadGraph();
     })();

@@ -81,7 +81,10 @@ class Agent:
                 if uid not in trace_uids:
                     trace_uids.append(uid)
 
-        answer = self._compose_answer(question, perc.seed_tokens, trace_uids)
+        answer, support = self._compose_answer(question, perc.seed_tokens, trace_uids)
+        for uid in support:
+            if uid not in trace_uids:
+                trace_uids.append(uid)
         collect(self.store, self.hp)
         return AgentReply(answer=answer, trace_uids=trace_uids, traces=traces, source="graph")
 
@@ -99,20 +102,60 @@ class Agent:
             source="graph",
         )
 
-    def _compose_answer(self, question: str, seeds: list[str], trace: list[str]) -> str:
+    def _compose_answer(
+        self, question: str, seeds: list[str], trace: list[str]
+    ) -> tuple[str, list[str]]:
         q = question.lower()
         subjects = self._resolve_subjects(seeds + trace)
+        support: list[str] = []
         if "кто" in q or "что" in q:
             for subj in subjects:
                 ans = self.dsl.execute(f"answer_who({subj})").value
                 if ans != "неизвестно":
-                    return str(ans)
-        if "где" in q:
+                    support.extend([subj, *trace[:4]])
+                    return str(ans), support
+        if any(w in q for w in ("сколько", "когда родился", "на луне")):
+            return "неизвестно", []
+        if "где" in q or "обита" in q:
             for subj in subjects:
-                for n in self.store.find_roles("SUBJECT", subj):
+                for n in self.store.find_roles(Role.SUBJECT, subj):
                     loc = n.fillers.get(Role.LOCATION)
                     if loc:
-                        return f"location:{loc.target_uid}"
+                        support.extend([subj, n.uid, loc.target_uid])
+                        return f"location:{loc.target_uid}", support
+        if "цвет" in q or "шерст" in q:
+            for n in self.store.find_hypernodes():
+                try:
+                    pred = self.store.get_template(n.template.target_uid).predicate.target_uid
+                except Exception:
+                    continue
+                if pred != "BE_COLORED":
+                    continue
+                obj = n.fillers.get(Role.OBJECT)
+                time_r = n.fillers.get(Role.TIME)
+                if not obj:
+                    continue
+                if "зим" in q and time_r and "WINTER" not in time_r.target_uid.upper():
+                    continue
+                if "лет" in q and time_r and "SUMMER" not in time_r.target_uid.upper():
+                    continue
+                support.extend([n.uid, obj.target_uid] + ([time_r.target_uid] if time_r else []))
+                return f"color:{obj.target_uid}", support
+        if "почему" in q or "быстр" in q:
+            for subj in subjects:
+                for n in self.store.find_roles(Role.SUBJECT, subj):
+                    obj = n.fillers.get(Role.OBJECT)
+                    cause = n.fillers.get(Role.CAUSE)
+                    try:
+                        pred = self.store.get_template(n.template.target_uid).predicate.target_uid
+                    except Exception:
+                        pred = ""
+                    if pred == "HAVE" and obj and "LEG" in obj.target_uid.upper():
+                        support.extend([subj, n.uid, obj.target_uid])
+                        return f"cause:{obj.target_uid}", support
+                    if cause:
+                        support.extend([subj, n.uid, cause.target_uid])
+                        return f"cause:{cause.target_uid}", support
         labels: list[str] = []
         for uid in trace:
             try:
@@ -122,11 +165,12 @@ class Agent:
             for p in m.Pr:
                 if p.name == "label":
                     labels.append(p.value)
+                    support.append(uid)
         if labels:
-            return " ".join(labels[:8])
+            return " ".join(labels[:8]), support
         if trace:
-            return "activated:" + ",".join(trace[:12])
-        return "неизвестно"
+            return "activated:" + ",".join(trace[:12]), list(trace[:12])
+        return "неизвестно", []
 
     def _resolve_subjects(self, tokens: list[str]) -> list[str]:
         out: list[str] = []

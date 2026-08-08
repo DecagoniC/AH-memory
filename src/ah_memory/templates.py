@@ -19,6 +19,7 @@ TEMPLATES: list[tuple[str, str, list[Role]]] = [
     ("T_CREATE", "CREATE", CREATE_ROLES),
     ("T_IS", "IS", [Role.SUBJECT, Role.OBJECT]),
     ("T_LIVE_IN", "LIVE_IN", [Role.SUBJECT, Role.LOCATION]),
+    ("T_BE_BORN", "BE_BORN", [Role.SUBJECT, Role.LOCATION]),
     ("T_HAVE", "HAVE", [Role.SUBJECT, Role.OBJECT]),
     ("T_RUN", "RUN", [Role.SUBJECT, Role.HOW_TO, Role.CAUSE]),
     ("T_COLOR", "BE_COLORED", [Role.SUBJECT, Role.OBJECT, Role.TIME]),

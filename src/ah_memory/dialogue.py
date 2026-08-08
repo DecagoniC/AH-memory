@@ -1,23 +1,26 @@
-"""LLM dialogue: both user and assistant turns are ingested into AH."""
+"""LLM dialogue: answer from existing AH graph, then ingest both turns."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any
 
-from ah_memory.config import DeepSeekConfig
-from ah_memory.deepseek import DeepSeekClient
+from ah_memory.config import GigaChatConfig
+from ah_memory.gigachat_llm import GigaChatClient
 from ah_memory.ignition import TickTrace
 from ah_memory.store import AHStore
-from ah_memory.transform import IngestReport
-from ah_memory.types import AssocLink, ElementList, Hyperlink, LinkId, Property, Section
+from ah_memory.types import Hyperlink, Section
 
 
 DIALOGUE_SYSTEM = """Ты обычный полезный собеседник. Отвечай по-русски ясно и по делу.
 
-У тебя есть фоновый контекст «АГ-память» — извлечённые ранее факты из диалога.
-Используй их молча, если они помогают ответу. Если контекст пуст или нерелевантен —
-просто отвечай из своих знаний, без оговорок про «память», «базу», UID и «не хватает данных».
-Не спрашивай пользователя «записать ли факт в память».
-Не используй JSON. Не перечисляй внутренние идентификаторы."""
+Контекст «АГ-память» / «Активировано» (если есть ниже) — приоритетный источник для личных фактов о пользователе
+и связей из этой сессии (имя, родные, учёба, места, задачи). Если там есть релевантное — используй.
+
+На обычные вопросы (общие знания, пояснения, small talk, бытовые советы) отвечай как обычный ассистент:
+не отмалчивайся и не требуй наличия АГ-памяти.
+
+Не выдумывай личные факты о пользователе, которых нет в контексте АГ-памяти.
+Не упоминай внутреннюю память, UID, JSON и не спрашивай, записать ли что-то в память."""
 
 
 def _tick_dict(t: TickTrace) -> dict:
@@ -31,7 +34,26 @@ def _tick_dict(t: TickTrace) -> dict:
         "trace_factors": t.trace_factors,
         "weight_updates": t.weight_updates,
         "stats": t.z_stats,
+        "chains": t.chains,
     }
+
+
+def _collect_chains(*tick_groups: list[dict], limit: int = 24) -> list[str]:
+    """Dedup human chains across ticks (prefer longer / later)."""
+    seen: set[str] = set()
+    out: list[str] = []
+    for ticks in tick_groups:
+        for t in ticks or []:
+            for line in t.get("chains") or []:
+                # normalize by node UIDs roughly: keep first occurrence of same end target
+                key = line
+                if key in seen:
+                    continue
+                seen.add(key)
+                out.append(line)
+                if len(out) >= limit:
+                    return out
+    return out
 
 
 @dataclass
@@ -41,7 +63,7 @@ class TurnResult:
     assistant_facts: list[str] = field(default_factory=list)
     trace_uids: list[str] = field(default_factory=list)
     wm: list[str] = field(default_factory=list)
-    backend: str = "deepseek"
+    backend: str = "gigachat"
     history_len: int = 0
     system_prompt: str = ""
     activation: dict = field(default_factory=dict)
@@ -49,14 +71,29 @@ class TurnResult:
 
 
 class DialogueAgent:
-    """Wraps Agent: chat with LLM + ingest both sides into AH."""
+    """Wraps Agent: answer from AH, then ingest both turns."""
 
-    def __init__(self, agent, deepseek: DeepSeekConfig | None = None) -> None:
+    def __init__(
+        self,
+        agent,
+        *,
+        chat_client: Any = None,
+        provider: str = "rules",
+        gigachat: GigaChatConfig | None = None,
+    ) -> None:
         self.agent = agent
-        self.cfg = deepseek
-        self.client = DeepSeekClient(deepseek) if deepseek and deepseek.configured else None
+        # backward compat: gigachat=...
+        if chat_client is not None:
+            self.client = chat_client
+            self.provider = provider
+        elif gigachat is not None and gigachat.configured:
+            self.client = GigaChatClient(gigachat)
+            self.provider = "gigachat"
+        else:
+            self.client = None
+            self.provider = "rules"
+        self.cfg = gigachat
         self.history: list[dict[str, str]] = []
-        self._ep_prev: str | None = None
         self._turn = 0
         self.last_activation: dict = {}
         self.last_graph_build_json: dict = {}
@@ -67,7 +104,6 @@ class DialogueAgent:
 
     def reset_history(self) -> None:
         self.history.clear()
-        self._ep_prev = None
         self._turn = 0
         self.last_activation = {}
         self.last_graph_build_json = {}
@@ -77,26 +113,28 @@ class DialogueAgent:
         self._turn += 1
         ign = self.agent.ignition
 
-        i0 = len(ign.traces)
-        user_rep = self.agent.ingest(user_text, section=Section.H)
-        user_ticks = [_tick_dict(t) for t in ign.traces[i0:]]
-        self._record_episode("USER", user_text, user_rep)
-
+        # 1) Ответ LLM по текущему графу (ещё без фактов из этой реплики)
         mem = self._memory_context(user_text)
+        i_ask = len(ign.traces)
         ask = self.agent.ask(user_text, ticks=ticks)
+        ask_ticks = [_tick_dict(t) for t in ign.traces[i_ask:]]
         graph_hint = ask.answer if ask.answer and ask.answer != "неизвестно" else ""
 
         if self.client is not None:
             reply, system_prompt = self._llm_reply(user_text, mem, graph_hint)
-            backend = "deepseek+ah"
+            backend = f"{self.provider}+ah"
         else:
             reply, system_prompt = self._fallback_reply(user_text, mem, graph_hint)
             backend = "rules+ah"
 
+        # 2) После ответа — запись реплик в граф
+        i0 = len(ign.traces)
+        user_rep = self.agent.ingest(user_text, section=Section.H)
+        user_ticks = [_tick_dict(t) for t in ign.traces[i0:]]
+
         i1 = len(ign.traces)
         asst_rep = self.agent.ingest(reply, section=Section.H, source="assistant")
         asst_ticks = [_tick_dict(t) for t in ign.traces[i1:]]
-        self._record_episode("ASSISTANT", reply, asst_rep)
 
         self.history.append({"role": "user", "content": user_text})
         self.history.append({"role": "assistant", "content": reply})
@@ -126,16 +164,17 @@ class DialogueAgent:
         activation = {
             "turn": self._turn,
             "threshold_t": self.agent.hp.threshold_t,
+            "chains": _collect_chains(ask_ticks, user_ticks, asst_ticks),
+            "ask": {
+                "graph_hint": graph_hint,
+                "seed_uids": ask.seed_uids[:24],
+                "ticks": ask_ticks,
+            },
             "user_ingest": {
                 "created_n": user_rep.created_n,
                 "seeds": user_rep.seed_uids[:24],
                 "skipped": user_rep.skipped[:12],
                 "ticks": user_ticks,
-            },
-            "ask": {
-                "graph_hint": graph_hint,
-                "seed_uids": ask.seed_uids[:24],
-                "ticks": [_tick_dict(t) for t in ask.traces],
             },
             "assistant_ingest": {
                 "created_n": asst_rep.created_n,
@@ -173,14 +212,13 @@ class DialogueAgent:
 
     def _llm_reply(self, user_text: str, mem: str, graph_hint: str) -> tuple[str, str]:
         sys_blocks = self._compose_system_blocks(mem, graph_hint)
+        system_content = "\n\n".join(sys_blocks)
         messages: list[dict[str, str]] = [
-            {"role": "system", "content": b} for b in sys_blocks
+            {"role": "system", "content": system_content},
+            {"role": "user", "content": user_text},
         ]
-        messages.extend(self.history[-12:])
-        messages.append({"role": "user", "content": user_text})
         reply = self.client.chat(messages, json_mode=False).strip()
-        prompt_view = "\n\n──── system ────\n\n".join(sys_blocks)
-        return reply, prompt_view
+        return reply, system_content
 
     def _fallback_reply(self, user_text: str, mem: str, graph_hint: str) -> tuple[str, str]:
         sys_blocks = self._compose_system_blocks(mem, graph_hint)
@@ -219,6 +257,8 @@ class DialogueAgent:
             return f"{subj} — {roles['OBJECT']}"
         if pred == "LIVE_IN" and "LOCATION" in roles:
             return f"{subj} обитает в {roles['LOCATION']}"
+        if pred == "BE_BORN" and "LOCATION" in roles:
+            return f"{subj} родился(ась) в {roles['LOCATION']}"
         if pred == "HAVE" and "OBJECT" in roles:
             return f"у {subj} есть {roles['OBJECT']}"
         if pred == "CREATE" and "OBJECT" in roles:
@@ -267,52 +307,8 @@ class DialogueAgent:
             line = self._fmt_fact(n)
             if not line or line in seen:
                 continue
-            low = line.lower()
-            if low.startswith(("чтобы —", "точная —", "этом —", "нет —")):
-                continue
-            if any(low.endswith(f" — {w}") for w in ("all", "you", "need", "self", "attention")):
-                continue
             seen.add(line)
             lines.append(f"• {line}")
             if len(lines) >= max_facts:
                 break
         return "\n".join(lines)
-
-    def _record_episode(self, speaker: str, text: str, report: IngestReport) -> None:
-        """Episode links to extracted N + m seeds (not the raw utterance blob)."""
-        store = self.store
-        ep_uid = store.new_uid(f"EP_{speaker}")
-        item_uids: list[str] = []
-        for u in report.created_n:
-            if u not in item_uids:
-                item_uids.append(u)
-        for u in report.seed_uids:
-            if u.startswith("M_") and u not in item_uids:
-                item_uids.append(u)
-        items = [store.m_ref(u) for u in item_uids[:12]]
-        short = text.strip().replace("\n", " ")
-        if len(short) > 48:
-            short = short[:45] + "…"
-        store.add_element(
-            Section.H,
-            ElementList(
-                uid=ep_uid,
-                items=items,
-                Pr=[
-                    Property(name="label", value=f"{speaker}:{short}"),
-                    Property(name="speaker", value=speaker),
-                ],
-                Mt=[Property(name="kind", value="Episode")],
-            ),
-        )
-        if self._ep_prev is not None:
-            store.add_link(
-                AssocLink(
-                    uid=store.new_uid("L_FOLLOW"),
-                    id=LinkId.FOLLOW.value,
-                    w=0.8,
-                    e1=store.m_ref(self._ep_prev),
-                    e2=store.m_ref(ep_uid),
-                )
-            )
-        self._ep_prev = ep_uid

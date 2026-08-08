@@ -15,21 +15,35 @@ from ah_memory.types import Role, Section
 
 def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
     """Keep only confident structural facts from chat replies (drop greetings / fluff)."""
+    from ah_memory.morph import is_nounish, sanitize_roles, seeds_from_roles
+
     kept: list[FactCandidate] = []
     for c in perc.candidates:
         if c.confidence < 0.85:
             continue
-        if c.predicate not in {"IS", "LIVE_IN", "HAVE", "USE", "CREATE", "CAUSE_EVENT", "BE_COLORED"}:
+        if c.predicate not in {
+            "IS",
+            "LIVE_IN",
+            "BE_BORN",
+            "HAVE",
+            "USE",
+            "CREATE",
+            "CAUSE_EVENT",
+            "BE_COLORED",
+        }:
             continue
-        obj = (c.roles.get("OBJECT") or "").upper()
-        # skip evaluative fluff: «МИФИ — серьёзно», greetings
-        if obj in {"СЕРЬЁЗНЫЙ", "СЕРЬЕЗНЫЙ", "ОТЛИЧНЫЙ", "ХОРОШИЙ", "ИЗВЕСТНЫЙ", "ПРИВЕТ"}:
+        roles = sanitize_roles(c.roles)
+        if roles is None:
             continue
-        if obj.endswith("_СЕРЬЁЗНЫЙ") or obj.endswith("_СЕРЬЕЗНЫЙ"):
+        # OBJECT/LOCATION must stay nounish (evaluative adjectives already rejected in sanitize)
+        for role in ("OBJECT", "LOCATION"):
+            val = roles.get(role)
+            if val and not any(is_nounish(p, allow_pronoun=False) for p in val.lower().split("_")):
+                roles = None
+                break
+        if roles is None:
             continue
-        kept.append(c)
-    from ah_memory.morph import seeds_from_roles
-
+        kept.append(FactCandidate(c.predicate, roles, c.raw_span, c.confidence))
     seeds = seeds_from_roles(kept)
     kind = perc.kind
     if not kept:

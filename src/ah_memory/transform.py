@@ -14,6 +14,7 @@ PRED_TO_TEMPLATE = {
     "CREATE": "T_CREATE",
     "IS": "T_IS",
     "LIVE_IN": "T_LIVE_IN",
+    "BE_BORN": "T_BE_BORN",
     "HAVE": "T_HAVE",
     "RUN": "T_RUN",
     "BE_COLORED": "T_COLOR",
@@ -86,6 +87,7 @@ class Transform:
             raise ValueError("SUBJECT required")
         if Role.OBJECT in slot_roles and Role.OBJECT not in fillers and pred not in {
             "LIVE_IN",
+            "BE_BORN",
             "RUN",
             "MOVE",
         }:

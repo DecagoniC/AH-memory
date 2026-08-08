@@ -14,7 +14,8 @@
 
 ## Веб-интерфейс
 
-1. Вставь ключ в [`config.yaml`](config.yaml) (`deepseek.api_key`) или в `.env` как `DEEPSEEK_API_KEY=...`
+1. Вставь ключ авторизации GigaChat в [`config.yaml`](config.yaml) (`gigachat.credentials`) или в `.env`:
+   `GIGACHAT_CREDENTIALS=...` (алиас: `GIGACHAT_API_KEY`). Scope: `GIGACHAT_SCOPE=GIGACHAT_API_PERS`.
 2. Установка и запуск:
 
 ```bash

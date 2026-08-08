@@ -12,9 +12,11 @@ from ah_memory.perception import (
 
 
 def test_lemma_cases_merge() -> None:
+    # Geox / regular inflection via pymorphy (no per-word overrides)
     assert lemma("москве") == "москва"
     assert lemma("брата") == "брат"
     assert lemma("преподавателем") == "преподаватель"
+    # Short opaque / surname: general proper-tag + Fixd / low-score Name heuristics
     assert lemma("мифи") == "мифи"
     assert lemma("душкина") == "душкин"
     assert slug_uid("скульптурной лепкой") == "СКУЛЬПТУРНЫЙ_ЛЕПКА" or "ЛЕПКА" in slug_uid(

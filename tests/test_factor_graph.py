@@ -84,6 +84,10 @@ def test_ignition_bp_sets_x_and_wm() -> None:
     assert store.get_x("M_HARE") > 0.3
     assert tr.z_stats.get("n_factors", 0) > 0
     assert isinstance(tr.trace_factors, list)
+    assert tr.chains, "expected human activation chains"
+    blob = " | ".join(tr.chains)
+    assert "M_HARE" in blob or "HARE" in blob
+    assert "→" in blob or "seed" in blob
 
 
 def test_dog_ignition_still_propagates() -> None:

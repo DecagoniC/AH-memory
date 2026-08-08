@@ -1,12 +1,23 @@
 # AH Memory — локальный конфиг
-# Вставь ключ DeepSeek ниже (или задай DEEPSEEK_API_KEY в .env)
+# Ключи: .env (GIGACHAT_* / DEEPSEEK_API_KEY) или поля ниже
+
+llm_provider: gigachat  # gigachat | deepseek
+
+gigachat:
+  credentials: "PASTE_GIGACHAT_CREDENTIALS_HERE"
+  scope: "GIGACHAT_API_B2B"
+  base_url: "https://gigachat.devices.sberbank.ru/api/v1"
+  auth_url: "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
+  model: "GigaChat-2-Pro"
+  timeout_sec: 60
+  temperature: 0.1
+  verify_ssl: false
 
 deepseek:
   api_key: "PASTE_DEEPSEEK_API_KEY_HERE"
   base_url: "https://api.deepseek.com"
   model: "deepseek-chat"
   timeout_sec: 60
-  # temperature для экстракции фактов
   temperature: 0.1
 
 web:
@@ -15,7 +26,7 @@ web:
 
 agent:
   use_llm: true
-  # если LLM недоступен — SeedPerception (только затравки, без фактов)
   fallback_rules: true
   ticks: 6
   preload: "empty"  # rabbit | encyclopedia | empty
+  llm_provider: gigachat

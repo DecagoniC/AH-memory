@@ -49,7 +49,47 @@
       letter-spacing: .02em;
       margin: 0;
     }
-    header .meta { color: var(--muted); font-size: .85rem; }
+    header .meta { color: var(--muted); font-size: .85rem; flex: 1; min-width: 160px; }
+    .llm-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+    .llm-switch .label {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+    }
+    .llm-switch .seg {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #121920;
+    }
+    .llm-switch .seg button {
+      min-height: 36px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .llm-switch .seg button + button { border-left: 1px solid var(--line); }
+    .llm-switch .seg button.active {
+      background: var(--accent);
+      color: #06120e;
+      outline: none;
+    }
+    .llm-switch .seg button:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
     .main {
       display: grid;
       grid-template-columns: 1fr;
@@ -123,7 +163,7 @@
       font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
       white-space: pre-wrap;
       word-break: break-word;
-      max-height: 220px;
+      max-height: min(70vh, 900px);
       overflow: auto;
     }
     .prompt-panel.show { display: block; }
@@ -162,6 +202,18 @@
     }
     #traceView .muted { color: var(--muted); }
     #traceView .empty { color: var(--muted); padding: 12px 0; }
+    #traceView ol.chains {
+      margin: 4px 0 8px 1.1rem;
+      padding: 0;
+    }
+    #traceView .chain-line {
+      margin: 3px 0;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: .72rem;
+      color: #d7e6f7;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
     .composer {
       display: flex;
       gap: 8px;
@@ -192,12 +244,46 @@
     }
     button.secondary { background: #334155; color: var(--text); }
     button:disabled { opacity: .5; cursor: wait; }
-    #network {
+    #network, #networkTrace {
       flex: 1;
       min-height: 320px;
       background:
         linear-gradient(180deg, rgba(255,255,255,.04), transparent),
         #151c26;
+    }
+    #networkTrace { display: none; }
+    .graph-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--line);
+      padding: 0 8px;
+    }
+    .graph-tabs button {
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      min-height: 40px;
+      padding: 8px 14px;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .graph-tabs button.active {
+      color: var(--accent2);
+      border-bottom-color: var(--accent2);
+      outline: none;
+    }
+    #traceGraphEmpty {
+      display: none;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: .9rem;
+      padding: 24px;
+      text-align: center;
     }
     .toolbar {
       display: flex;
@@ -247,13 +333,20 @@
     <header>
       <h1>AH Memory</h1>
       <span class="meta" id="health">загрузка…</span>
+      <div class="llm-switch" title="Провайдер LLM для восприятия и диалога">
+        <span class="label">LLM</span>
+        <div class="seg">
+          <button type="button" id="llmGiga" data-provider="gigachat">GigaChat</button>
+          <button type="button" id="llmDeep" data-provider="deepseek">DeepSeek</button>
+        </div>
+      </div>
     </header>
     <div class="main">
       <section class="chat">
         <div class="pane-title">Диалог с агентом</div>
         <div id="log"></div>
         <div class="composer">
-          <textarea id="input" placeholder="Факт или вопрос… Например: Кто такой заяц?"></textarea>
+          <textarea id="input" placeholder="Факт или вопрос…"></textarea>
           <button id="send">Отправить</button>
         </div>
       </section>
@@ -264,7 +357,11 @@
       </section>
       <section class="graph-wrap">
         <div class="pane-title">Дамп графа АГ-памяти</div>
-        <div class="toolbar">
+        <div class="graph-tabs">
+          <button type="button" class="active" id="tabGraph">Граф</button>
+          <button type="button" id="tabTraceGraph">Трассировка (w)</button>
+        </div>
+        <div class="toolbar" id="graphToolbar">
           <button class="secondary" id="refresh">Обновить</button>
           <button class="secondary" id="modeHyper">Гиперрёбра</button>
           <button class="secondary" id="modeAll">Все связи</button>
@@ -293,7 +390,12 @@
           </div>
           <div class="legend-note">Гиперребро N — n-арный факт: жёлтый хаб + цветные роли + пунктирный mesh между всеми актантами одной микротемы. ASSOC-mesh также пишется в L.</div>
         </div>
+        <div class="legend" id="traceGraphLegend" style="display:none">
+          Подграф активации: рёбра подписаны типом и силой <code>w</code>. Источник — seeds / WM / цепочки последнего хода.
+        </div>
         <div id="network"></div>
+        <div id="networkTrace"></div>
+        <div id="traceGraphEmpty">Нет данных активации — отправь сообщение, затем открой эту вкладку.</div>
       </section>
     </div>
   </div>
@@ -303,10 +405,14 @@
     const sendBtn = document.getElementById("send");
     const traceView = document.getElementById("traceView");
     let network = null;
+    let networkTrace = null;
     let highlight = new Set();
     let graphMode = "hyper";
+    let graphPane = "graph"; // graph | trace
     let lastHyperedges = [];
+    let lastComponents = []; // [{ idx, ids }]
     let lastActivation = null;
+    let lastGraphData = null;
 
     function esc(s) {
       return String(s ?? "").replace(/[&<>"']/g, (c) => ({
@@ -338,6 +444,13 @@
       ).join(" · ");
     }
 
+    function renderChains(chains) {
+      if (!chains || !chains.length) return '<div class="muted">цепочек нет</div>';
+      return `<ol class="chains">${chains.map((c) =>
+        `<li class="chain-line">${esc(c)}</li>`
+      ).join("")}</ol>`;
+    }
+
     function renderTicks(ticks) {
       if (!ticks || !ticks.length) return '<div class="muted">тиков нет</div>';
       return ticks.map((t) => `
@@ -345,6 +458,7 @@
           <div><span class="tau">τ=${esc(t.tau)}</span>
             <span class="muted"> · vars=${esc(t.stats?.n_vars ?? "?")} factors=${esc(t.stats?.n_factors ?? "?")} BP=${esc(t.stats?.bp_rounds ?? "?")} HebbΔ=${esc(t.weight_updates ?? 0)}</span>
           </div>
+          <div><span class="muted">цепочки:</span> ${renderChains(t.chains)}</div>
           <div><span class="muted">seeds:</span> ${fmtList(t.seeds, 10)}</div>
           <div><span class="muted">evidence:</span> ${fmtEvidence(t.evidence)}</div>
           <div><span class="muted">beliefs top:</span> ${fmtBeliefs(t.beliefs_top)}</div>
@@ -366,7 +480,9 @@
         <div class="phase">
           <h3>Ход #${esc(act.turn)} · порог t=${esc(act.threshold_t)}</h3>
           <div><span class="muted">итог WM:</span> ${fmtList(act.final_wm, 16)}</div>
-          ${act.memory_brief ? `<div class="muted" style="margin-top:4px;white-space:pre-wrap">${esc(act.memory_brief)}</div>` : ""}
+          <div style="margin-top:8px"><strong>Цепочки активации</strong></div>
+          ${renderChains(act.chains)}
+          ${act.memory_brief ? `<div class="muted" style="margin-top:8px;white-space:pre-wrap">${esc(act.memory_brief)}</div>` : ""}
         </div>
         <div class="phase">
           <h3>1. Ingest пользователя</h3>
@@ -468,9 +584,31 @@
     async function loadHealth() {
       const r = await fetch("/api/health");
       const j = await r.json();
-      const llm = j.llm_configured ? `DeepSeek:${j.model}` : "rules-only (нет ключа)";
+      const llm = j.llm_configured
+        ? `${j.llm_provider}:${j.model}`
+        : `${j.llm_provider || "?"} (нет ключа)`;
       document.getElementById("health").textContent =
         `${j.version || "?"} · ${llm} · preload=${j.preload} · |S|=${j["|S|"] ?? "?"} · τ=${j.tau}`;
+      const gigaBtn = document.getElementById("llmGiga");
+      const deepBtn = document.getElementById("llmDeep");
+      const prov = j.providers || {};
+      gigaBtn.disabled = !(prov.gigachat && prov.gigachat.configured);
+      deepBtn.disabled = !(prov.deepseek && prov.deepseek.configured);
+      gigaBtn.classList.toggle("active", j.llm_provider === "gigachat");
+      deepBtn.classList.toggle("active", j.llm_provider === "deepseek");
+      gigaBtn.title = prov.gigachat?.model || "GigaChat";
+      deepBtn.title = prov.deepseek?.model || "DeepSeek";
+    }
+
+    async function setLlmProvider(provider) {
+      const r = await fetch("/api/llm-provider", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.detail || "switch failed");
+      await loadHealth();
     }
 
     function labelFont(color = "#ffffff", size = 12) {
@@ -581,9 +719,10 @@
       }
       if (e.kind === "binary") {
         const isIsa = e.label === "IS-A";
+        const directed = e.label === "IS-A" || e.label === "FOLLOW";
         return {
           id: e.id, from: e.from, to: e.to, label: e.label, title: e.title,
-          arrows: "to",
+          arrows: directed ? "to" : { to: false, from: false, middle: false },
           width: isIsa ? 2.5 : 2,
           dashes: !!e.dashes,
           color: {
@@ -645,14 +784,300 @@
       }
     }
 
+    function drawComponentFrames(ctx) {
+      if (!network || !lastComponents.length) return;
+      const positions = network.getPositions();
+      for (const c of lastComponents) {
+        const pts = c.ids.map((id) => positions[id]).filter(Boolean);
+        if (!pts.length) continue;
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        for (const p of pts) {
+          if (p.x < minX) minX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y > maxY) maxY = p.y;
+        }
+        const pad = c.isolated ? 18 : 46;
+        ctx.save();
+        ctx.setLineDash(c.isolated ? [3, 5] : [12, 10]);
+        ctx.strokeStyle = c.isolated ? "rgba(120,140,160,0.35)" : "rgba(154, 200, 255, 0.55)";
+        ctx.lineWidth = c.isolated ? 1.2 : 2;
+        ctx.strokeRect(minX - pad, minY - pad, maxX - minX + 2 * pad, maxY - minY + 2 * pad);
+        ctx.setLineDash([]);
+        const label = c.isolated
+          ? `изолированные ×${c.ids.length}`
+          : `CC${c.idx} · ${c.ids.length} узлов`;
+        ctx.font = "bold 12px Segoe UI";
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#05080c";
+        ctx.strokeText(label, minX - pad, minY - pad - 6);
+        ctx.fillStyle = c.isolated ? "#8aa0b4" : "#9ec5ff";
+        ctx.fillText(label, minX - pad, minY - pad - 6);
+        ctx.restore();
+      }
+    }
+
+    function computeComponents(rawNodes, rawEdges, hyperedges) {
+      const idSet = new Set(rawNodes.map((n) => n.id));
+      const adj = new Map();
+      idSet.forEach((id) => adj.set(id, []));
+      const link = (a, b) => {
+        if (!idSet.has(a) || !idSet.has(b) || a === b) return;
+        adj.get(a).push(b);
+        adj.get(b).push(a);
+      };
+      for (const e of rawEdges || []) link(e.from, e.to);
+      for (const he of hyperedges || []) {
+        const members = [he.hub, ...(he.members || [])].filter(Boolean);
+        for (let i = 0; i < members.length; i++) {
+          for (let j = i + 1; j < members.length; j++) link(members[i], members[j]);
+        }
+      }
+      const seen = new Set();
+      const comps = [];
+      for (const id of idSet) {
+        if (seen.has(id)) continue;
+        const stack = [id];
+        seen.add(id);
+        const comp = [];
+        while (stack.length) {
+          const u = stack.pop();
+          comp.push(u);
+          for (const v of adj.get(u) || []) {
+            if (!seen.has(v)) {
+              seen.add(v);
+              stack.push(v);
+            }
+          }
+        }
+        comps.push(comp);
+      }
+      comps.sort((a, b) => b.length - a.length || String(a[0]).localeCompare(String(b[0])));
+      return comps;
+    }
+
+    function layoutByComponents(rawNodes, comps) {
+      const byId = new Map(rawNodes.map((n) => [n.id, n]));
+      const clusters = comps.filter((c) => c.length >= 2);
+      const singles = comps.filter((c) => c.length === 1).map((c) => c[0]);
+      const COL_GAP = 720;
+      const ROW_GAP = 620;
+      const cols = Math.max(1, Math.ceil(Math.sqrt(Math.max(clusters.length, 1))));
+
+      lastComponents = [];
+      clusters.forEach((comp, ci) => {
+        const col = ci % cols;
+        const row = Math.floor(ci / cols);
+        const ox = col * COL_GAP;
+        const oy = row * ROW_GAP;
+        const n = comp.length;
+        const R = 55 + Math.sqrt(n) * 40;
+        const ordered = comp.slice().sort();
+        ordered.forEach((id, i) => {
+          const node = byId.get(id);
+          if (!node) return;
+          const ang = (2 * Math.PI * i) / n - Math.PI / 2;
+          node.x = ox + R * Math.cos(ang);
+          node.y = oy + R * Math.sin(ang);
+          node.component = ci + 1;
+          if (node.title && !String(node.title).includes("\nCC")) {
+            node.title = `${node.title}\nCC${ci + 1}`;
+          }
+        });
+        lastComponents.push({ idx: ci + 1, ids: ordered.slice(), isolated: false });
+      });
+
+      const singlesRow =
+        (clusters.length ? Math.ceil(clusters.length / cols) : 0) * ROW_GAP + 160;
+      const SINGLE_COLS = 14;
+      singles.forEach((id, i) => {
+        const node = byId.get(id);
+        if (!node) return;
+        const col = i % SINGLE_COLS;
+        const row = Math.floor(i / SINGLE_COLS);
+        node.x = col * 100 - 120;
+        node.y = singlesRow + row * 78;
+        node.component = 0;
+      });
+      if (singles.length) {
+        lastComponents.push({ idx: 0, ids: singles.slice(), isolated: true });
+      }
+      return { clusters: clusters.length, singles: singles.length };
+    }
+
     function wipeNetwork() {
       lastHyperedges = [];
+      lastComponents = [];
       if (network) {
         try { network.destroy(); } catch (_) { /* ignore */ }
         network = null;
       }
+      if (networkTrace) {
+        try { networkTrace.destroy(); } catch (_) { /* ignore */ }
+        networkTrace = null;
+      }
       const container = document.getElementById("network");
+      const traceEl = document.getElementById("networkTrace");
+      if (container) container.innerHTML = "";
+      if (traceEl) traceEl.innerHTML = "";
+    }
+
+    function collectFocusUids(act) {
+      const focus = new Set(highlight);
+      if (!act) return focus;
+      for (const u of act.final_wm || []) focus.add(u);
+      for (const u of (act.user_ingest && act.user_ingest.seeds) || []) focus.add(u);
+      for (const u of (act.ask && act.ask.seed_uids) || []) focus.add(u);
+      for (const u of (act.assistant_ingest && act.assistant_ingest.seeds) || []) focus.add(u);
+      const ticks = [
+        ...((act.user_ingest && act.user_ingest.ticks) || []),
+        ...((act.ask && act.ask.ticks) || []),
+        ...((act.assistant_ingest && act.assistant_ingest.ticks) || []),
+      ];
+      for (const t of ticks) {
+        for (const u of t.wm || []) focus.add(u);
+        for (const u of t.activated || []) focus.add(u);
+        for (const u of t.seeds || []) focus.add(u);
+        for (const u of Object.keys(t.beliefs_top || {})) focus.add(u);
+        for (const u of Object.keys(t.evidence || {})) focus.add(u);
+      }
+      for (const line of act.chains || []) {
+        const re = /[A-Za-zА-Яа-яЁё0-9_]+/g;
+        let m;
+        while ((m = re.exec(line))) {
+          const tok = m[0];
+          if (tok.length >= 2 && /[A-ZА-Я]/.test(tok) && tok !== "seed") focus.add(tok);
+        }
+      }
+      return focus;
+    }
+
+    function weightLabel(e) {
+      const w = e.w != null ? Number(e.w) : null;
+      const kind =
+        e.kind === "binary" ? (e.label || "L")
+        : e.kind === "hyper_incidence" ? (e.label || "role")
+        : e.kind === "hyper_mesh" ? "mesh"
+        : (e.label || e.kind || "");
+      if (w == null || Number.isNaN(w)) return String(kind);
+      return `${kind}\nw=${w.toFixed(2)}`;
+    }
+
+    function edgeStyleWeighted(e) {
+      const base = edgeStyle(e);
+      const w = e.w != null ? Number(e.w) : 0.5;
+      return {
+        ...base,
+        label: weightLabel(e),
+        width: Math.max(1.5, 1 + w * 4),
+        font: labelFont("#ffe8a0", 11),
+        color: {
+          ...(base.color || {}),
+          color: e.kind === "binary"
+            ? (e.label === "IS-A" ? "#9ad0ff" : "#c5d0de")
+            : (base.color && base.color.color) || "#ffe566",
+          opacity: 0.95,
+        },
+      };
+    }
+
+    function setGraphPane(pane) {
+      graphPane = pane;
+      const isGraph = pane === "graph";
+      document.getElementById("tabGraph").classList.toggle("active", isGraph);
+      document.getElementById("tabTraceGraph").classList.toggle("active", !isGraph);
+      document.getElementById("graphToolbar").style.display = isGraph ? "flex" : "none";
+      document.getElementById("legend").style.display = isGraph ? "block" : "none";
+      document.getElementById("traceGraphLegend").style.display = isGraph ? "none" : "block";
+      document.getElementById("network").style.display = isGraph ? "block" : "none";
+      document.getElementById("networkTrace").style.display = isGraph ? "none" : "block";
+      document.getElementById("traceGraphEmpty").style.display = "none";
+      if (!isGraph) {
+        renderTraceGraph();
+      } else if (!network) {
+        loadGraph();
+      } else {
+        try { network.fit({ animation: false }); } catch (_) {}
+      }
+    }
+
+    function renderTraceGraph() {
+      const empty = document.getElementById("traceGraphEmpty");
+      const container = document.getElementById("networkTrace");
+      if (networkTrace) {
+        try { networkTrace.destroy(); } catch (_) {}
+        networkTrace = null;
+      }
       container.innerHTML = "";
+
+      const data = lastGraphData;
+      const focus = collectFocusUids(lastActivation);
+      if (!data || !data.nodes || !focus.size) {
+        empty.style.display = "flex";
+        container.style.display = "none";
+        return;
+      }
+      empty.style.display = "none";
+      container.style.display = "block";
+
+      // include hubs of hyperedges that touch focus
+      for (const he of data.hyperedges || []) {
+        if (focus.has(he.id) || (he.members || []).some((m) => focus.has(m))) {
+          focus.add(he.id);
+          for (const m of he.members || []) focus.add(m);
+        }
+      }
+
+      const nodesRaw = data.nodes.filter((n) => focus.has(n.id));
+      const nodeIds = new Set(nodesRaw.map((n) => n.id));
+      const edgesRaw = (data.edges || []).filter(
+        (e) => nodeIds.has(e.from) && nodeIds.has(e.to)
+      );
+      if (!nodesRaw.length) {
+        empty.style.display = "flex";
+        container.style.display = "none";
+        return;
+      }
+
+      // circle layout for readability
+      const n = nodesRaw.length;
+      const R = 80 + Math.sqrt(n) * 48;
+      nodesRaw.forEach((node, i) => {
+        const ang = (2 * Math.PI * i) / n - Math.PI / 2;
+        node.x = R * Math.cos(ang);
+        node.y = R * Math.sin(ang);
+      });
+
+      const nodes = new vis.DataSet(nodesRaw.map(nodeStyle));
+      const edges = new vis.DataSet(edgesRaw.map(edgeStyleWeighted));
+      networkTrace = new vis.Network(
+        container,
+        { nodes, edges },
+        {
+          layout: { improvedLayout: false, randomSeed: 7 },
+          physics: {
+            enabled: true,
+            solver: "forceAtlas2Based",
+            forceAtlas2Based: {
+              gravitationalConstant: -40,
+              centralGravity: 0.01,
+              springLength: 130,
+              springConstant: 0.08,
+              avoidOverlap: 1,
+            },
+            stabilization: { enabled: true, iterations: 80, fit: true },
+          },
+          edges: {
+            font: { size: 11, multi: true, strokeWidth: 3, strokeColor: "#05080c" },
+            selectionWidth: 2,
+          },
+          interaction: { hover: true, tooltipDelay: 60 },
+        }
+      );
+      networkTrace.once("stabilizationIterationsDone", () => {
+        networkTrace.setOptions({ physics: { enabled: false } });
+        networkTrace.fit({ animation: false });
+      });
     }
 
     async function loadGraph() {
@@ -665,33 +1090,53 @@
       const container = document.getElementById("network");
       const h = document.getElementById("health");
       const base = h.textContent.split(" · |S|=")[0];
-      h.textContent = `${base} · |S|=${data.stats.S} N=${data.stats.hyperedges} graph=${data.stats.graph_size}`;
       document.getElementById("modeHyper").classList.toggle("active", graphMode === "hyper");
       document.getElementById("modeAll").classList.toggle("active", graphMode === "all");
 
       if (!data.nodes.length && !data.edges.length) {
+        lastGraphData = { nodes: [], edges: [], hyperedges: [], stats: data.stats };
+        h.textContent = `${base} · |S|=${data.stats.S} N=${data.stats.hyperedges} graph=${data.stats.graph_size}`;
         container.innerHTML =
           '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#8aa0b4;font-size:0.95rem;">граф пуст</div>';
+        if (graphPane === "trace") renderTraceGraph();
+        return;
+      }
+
+      const comps = computeComponents(data.nodes, data.edges, data.hyperedges);
+      const ccMeta = layoutByComponents(data.nodes, comps);
+      lastGraphData = {
+        nodes: data.nodes.map((n) => ({ ...n })),
+        edges: (data.edges || []).map((e) => ({ ...e })),
+        hyperedges: data.hyperedges || [],
+        stats: data.stats,
+      };
+      h.textContent =
+        `${base} · |S|=${data.stats.S} N=${data.stats.hyperedges} graph=${data.stats.graph_size}` +
+        ` · CC=${ccMeta.clusters}` +
+        (ccMeta.singles ? ` +${ccMeta.singles} iso` : "");
+
+      if (graphPane === "trace") {
+        renderTraceGraph();
         return;
       }
 
       const nodes = new vis.DataSet(data.nodes.map(nodeStyle));
       const edges = new vis.DataSet(data.edges.map(edgeStyle));
       const options = {
-        layout: { improvedLayout: true, randomSeed: 42 },
+        layout: { improvedLayout: false, randomSeed: 42 },
         physics: {
           enabled: true,
           solver: "forceAtlas2Based",
           forceAtlas2Based: {
-            gravitationalConstant: -55,
-            centralGravity: 0.004,
-            springLength: 140,
-            springConstant: 0.05,
+            gravitationalConstant: -48,
+            centralGravity: 0.0008,
+            springLength: 110,
+            springConstant: 0.06,
             avoidOverlap: 1,
           },
-          stabilization: { enabled: true, iterations: 140, fit: true },
-          minVelocity: 1.5,
-          maxVelocity: 40,
+          stabilization: { enabled: true, iterations: 120, fit: true },
+          minVelocity: 2.5,
+          maxVelocity: 35,
         },
         nodes: {
           font: labelFont("#ffffff", 12),
@@ -705,7 +1150,10 @@
         interaction: { hover: true, tooltipDelay: 60, multiselect: true },
       };
       network = new vis.Network(container, { nodes, edges }, options);
-      network.on("afterDrawing", (ctx) => drawHyperHulls(ctx));
+      network.on("afterDrawing", (ctx) => {
+        drawComponentFrames(ctx);
+        drawHyperHulls(ctx);
+      });
       network.once("stabilizationIterationsDone", () => {
         network.setOptions({ physics: { enabled: false } });
         network.fit({ animation: false });
@@ -737,6 +1185,7 @@
         highlight = new Set(j.trace_uids || []);
         await loadHealth();
         await loadGraph();
+        if (graphPane === "trace") renderTraceGraph();
       } catch (e) {
         addMsg("bot", String(e), "error");
       } finally {
@@ -752,6 +1201,8 @@
     document.getElementById("refresh").addEventListener("click", loadGraph);
     document.getElementById("modeHyper").addEventListener("click", () => { graphMode = "hyper"; loadGraph(); });
     document.getElementById("modeAll").addEventListener("click", () => { graphMode = "all"; loadGraph(); });
+    document.getElementById("tabGraph").addEventListener("click", () => setGraphPane("graph"));
+    document.getElementById("tabTraceGraph").addEventListener("click", () => setGraphPane("trace"));
     document.getElementById("dump").addEventListener("click", async () => {
       const r = await fetch("/api/dump");
       const blob = await r.blob();
@@ -774,13 +1225,24 @@
         highlight = new Set();
         log.innerHTML = "";
         lastActivation = null;
+        lastGraphData = null;
         renderActivation(null);
         addMsg("bot", "Граф опустошён (S=0, L=0).", "system");
         await loadHealth();
         await loadGraph();
+        if (graphPane === "trace") renderTraceGraph();
       } catch (e) {
         addMsg("bot", String(e), "error");
       }
+    });
+
+    document.getElementById("llmGiga").addEventListener("click", async () => {
+      try { await setLlmProvider("gigachat"); }
+      catch (e) { addMsg("bot", String(e), "error"); }
+    });
+    document.getElementById("llmDeep").addEventListener("click", async () => {
+      try { await setLlmProvider("deepseek"); }
+      catch (e) { addMsg("bot", String(e), "error"); }
     });
 
     (async () => {

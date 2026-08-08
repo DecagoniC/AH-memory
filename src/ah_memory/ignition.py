@@ -3,9 +3,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from ah_memory.activation_explain import build_activation_chains
 from ah_memory.belief_propagation import BeliefPropagation
 from ah_memory.factor_graph import build_factor_graph, is_variable
 from ah_memory.hyperparams import HyperParams
+
+
 @dataclass(frozen=True)
 class ActivationSeed:
     uid: str
@@ -23,6 +26,7 @@ class TickTrace:
     beliefs_top: dict[str, float] = field(default_factory=dict)
     evidence: dict[str, float] = field(default_factory=dict)
     seeds_applied: list[str] = field(default_factory=list)
+    chains: list[str] = field(default_factory=list)
 
 
 class WorkingMemory:
@@ -146,6 +150,14 @@ class IgnitionEngine:
             k: round(v, 4)
             for k, v in sorted(self._evidence.items(), key=lambda kv: -kv[1])[:24]
         }
+        chains = build_activation_chains(
+            store,
+            graph,
+            result.beliefs,
+            seeds=seeds_applied,
+            evidence=evidence_snap,
+            threshold=hp.threshold_t,
+        )
         trace = TickTrace(
             tau=ah.tau,
             activated=sorted(activated),
@@ -161,6 +173,7 @@ class IgnitionEngine:
             beliefs_top={k: round(v, 4) for k, v in top.items()},
             evidence=evidence_snap,
             seeds_applied=seeds_applied,
+            chains=chains,
         )
         self.traces.append(trace)
         return trace

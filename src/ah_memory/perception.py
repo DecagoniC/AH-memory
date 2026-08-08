@@ -62,6 +62,7 @@ PREDICATES = {
     "CREATE",
     "IS",
     "LIVE_IN",
+    "BE_BORN",
     "HAVE",
     "RUN",
     "BE_COLORED",
@@ -76,6 +77,11 @@ PRED_ALIASES = {
     "WORK_AT": "LIVE_IN",
     "WORK": "LIVE_IN",
     "LOCATED_IN": "LIVE_IN",
+    "BORN": "BE_BORN",
+    "BORN_IN": "BE_BORN",
+    "BIRTH": "BE_BORN",
+    "ORIGIN": "BE_BORN",
+    "FROM": "BE_BORN",
     "OWN": "HAVE",
     "NAME": "IS",
 }
@@ -138,6 +144,16 @@ def _roles_grounded(roles: dict[str, str], text_lemmas: set[str], raw: str) -> b
     return True
 
 
+def _normalize_place_roles(pred: str, roles: dict[str, str]) -> dict[str, str]:
+    """LIVE_IN / BE_BORN: place goes to LOCATION, not OBJECT."""
+    if pred not in {"LIVE_IN", "BE_BORN"}:
+        return roles
+    if "LOCATION" not in roles and "OBJECT" in roles:
+        roles = dict(roles)
+        roles["LOCATION"] = roles.pop("OBJECT")
+    return roles
+
+
 def _finalize_candidates(cands: list[FactCandidate]) -> list[FactCandidate]:
     out: list[FactCandidate] = []
     seen: set[tuple[str, tuple[tuple[str, str], ...]]] = set()
@@ -146,7 +162,10 @@ def _finalize_candidates(cands: list[FactCandidate]) -> list[FactCandidate]:
         roles = sanitize_roles(dict(c.roles))
         if roles is None:
             continue
+        roles = _normalize_place_roles(pred, roles)
         if any(uid_too_wide(v) for v in roles.values()):
+            continue
+        if pred in {"LIVE_IN", "BE_BORN"} and "LOCATION" not in roles:
             continue
         key = (pred, tuple(sorted(roles.items())))
         if key in seen:

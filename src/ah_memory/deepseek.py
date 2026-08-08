@@ -1,13 +1,13 @@
-"""DeepSeek OpenAI-compatible client + HybridPerception (LLM → gate; offline seeds)."""
+"""DeepSeek OpenAI-compatible client + HybridPerception."""
 from __future__ import annotations
 
 import json
-import re
 from typing import Any
 
 import httpx
 
 from ah_memory.config import DeepSeekConfig
+from ah_memory.gigachat_llm import SYSTEM_PROMPT, _parse_json
 from ah_memory.morph import seeds_from_roles, slug_uid
 from ah_memory.perception import (
     FactCandidate,
@@ -15,33 +15,9 @@ from ah_memory.perception import (
     SeedPerception,
     _is_question,
     _norm,
-    gate_candidates,
     content_entity_uids,
+    gate_candidates,
 )
-
-SYSTEM_PROMPT = """Ты модуль восприятия АГ-памяти.
-Извлеки только явные утверждения. Не добавляй сущности вне текста.
-JSON:
-{
-  "kind": "fact" | "question" | "message",
-  "candidates": [
-    {
-      "predicate": "IS|LIVE_IN|HAVE|RUN|BE_COLORED|CREATE|CAUSE_EVENT|USE|MOVE",
-      "roles": {"SUBJECT":"UID", "OBJECT":"UID", ...},
-      "raw_span": "фрагмент",
-      "confidence": 0.0-1.0
-    }
-  ],
-  "seed_tokens": ["UID", ...]
-}
-UID — лемма в UPPER_SNAKE (им. падеж), кириллица ок: СКУЛЬПТУРНАЯ_ЛЕПКА, МОСКВА, ДУШКИН.
-SUBJECT/OBJECT/LOCATION — только сущности: существительные, имена, названия. НЕ глаголы (занимаюсь), НЕ союзы (если, когда, чтобы), НЕ вводные.
-Один факт = одна микротема: заполняй ВСЕ уместные роли сразу (SUBJECT+OBJECT+LOCATION+TIME+…), не дроби на пары, если это одно утверждение.
-«Я занимаюсь лепкой» → USE(SUBJECT=Я, OBJECT=СКУЛЬПТУРНАЯ_ЛЕПКА) или HAVE, не IS(ЗАНИМАЮСЬ,…).
-«Работаю с Душкиным в МИФИ» → USE/LIVE_IN с SUBJECT, OBJECT/LOCATION в одном candidate.
-«Если понадобится…» — не факт (candidates=[]).
-Роли: SUBJECT OBJECT LOCATION TIME CAUSE TOOL MATERIAL PURPOSE HOW-TO.
-Верни только JSON."""
 
 
 class DeepSeekClient:
@@ -49,21 +25,30 @@ class DeepSeekClient:
         self.cfg = cfg
 
     def chat(self, messages: list[dict[str, str]], *, json_mode: bool = True) -> str:
-        url = self.cfg.base_url.rstrip("/") + "/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {self.cfg.api_key}",
-            "Content-Type": "application/json",
-        }
         payload: dict[str, Any] = {
             "model": self.cfg.model,
             "messages": messages,
-            "temperature": self.cfg.temperature if json_mode else min(0.7, self.cfg.temperature + 0.4),
+            "temperature": self.cfg.temperature,
+            "stream": False,
         }
         if json_mode:
             payload["response_format"] = {"type": "json_object"}
         with httpx.Client(timeout=self.cfg.timeout_sec) as client:
-            r = client.post(url, headers=headers, json=payload)
-            r.raise_for_status()
+            r = client.post(
+                self.cfg.base_url.rstrip("/") + "/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.cfg.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+            )
+            if r.status_code >= 400:
+                detail = (r.text or r.reason_phrase or "")[:500]
+                raise httpx.HTTPStatusError(
+                    f"DeepSeek chat failed ({r.status_code}): {detail}",
+                    request=r.request,
+                    response=r,
+                )
             data = r.json()
         return data["choices"][0]["message"]["content"]
 
@@ -93,7 +78,7 @@ class DeepSeekPerception:
                 confidence=float(c.get("confidence", 0.8)),
             )
             for c in data.get("candidates", [])
-            if c.get("predicate")
+            if isinstance(c, dict) and c.get("predicate")
         ]
         gated = gate_candidates(text, cands, require_grounding=self.require_grounding)
         kind = data.get("kind", "fact")
@@ -123,8 +108,8 @@ class DeepSeekPerception:
         )
 
 
-class HybridPerception:
-    """LLM → morph gate; offline / error → SeedPerception (seeds only, no facts)."""
+class DeepSeekHybridPerception:
+    """LLM → morph gate; offline / error → SeedPerception."""
 
     def __init__(self, cfg: DeepSeekConfig, fallback: bool = True) -> None:
         self.cfg = cfg
@@ -162,14 +147,3 @@ class HybridPerception:
                 "llm_candidates": len(llm.candidates),
             },
         )
-
-
-def _parse_json(raw: str) -> dict[str, Any]:
-    raw = raw.strip()
-    try:
-        return json.loads(raw)
-    except json.JSONDecodeError:
-        m = re.search(r"\{.*\}", raw, re.DOTALL)
-        if not m:
-            raise
-        return json.loads(m.group(0))

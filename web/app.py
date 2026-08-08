@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -10,11 +10,12 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from ah_memory.agent import Agent
-from ah_memory.config import load_config
+from ah_memory.config import LlmProvider, load_config
 from ah_memory.corpus import build_encyclopedia
-from ah_memory.deepseek import HybridPerception
+from ah_memory.deepseek import DeepSeekClient, DeepSeekHybridPerception
 from ah_memory.dialogue import DialogueAgent
 from ah_memory.examples.rabbit import build_rabbit_memory
+from ah_memory.gigachat_llm import GigaChatClient, HybridPerception
 from ah_memory.graph_export import dump_ah_json, dump_graph
 from ah_memory.perception import SeedPerception
 from ah_memory.store import AHStore
@@ -23,11 +24,38 @@ STATIC = Path(__file__).parent / "static"
 cfg = load_config()
 app = FastAPI(title="AH Memory", version="0.3.0")
 
+# runtime provider (UI can switch without restart)
+llm_provider: LlmProvider = cfg.agent.llm_provider
 
-def _make_perception() -> Any:
-    if cfg.agent.use_llm and cfg.deepseek.configured:
-        return HybridPerception(cfg.deepseek, fallback=cfg.agent.fallback_rules)
+
+def _provider_ready(provider: LlmProvider) -> bool:
+    if not cfg.agent.use_llm:
+        return False
+    if provider == "deepseek":
+        return cfg.deepseek.configured
+    return cfg.gigachat.configured
+
+
+def _make_perception(provider: LlmProvider | None = None) -> Any:
+    p = provider or llm_provider
+    if not cfg.agent.use_llm:
+        return SeedPerception()
+    if p == "deepseek" and cfg.deepseek.configured:
+        return DeepSeekHybridPerception(cfg.deepseek, fallback=cfg.agent.fallback_rules)
+    if p == "gigachat" and cfg.gigachat.configured:
+        return HybridPerception(cfg.gigachat, fallback=cfg.agent.fallback_rules)
     return SeedPerception()
+
+
+def _make_chat_client(provider: LlmProvider | None = None) -> tuple[Any | None, str]:
+    p = provider or llm_provider
+    if not cfg.agent.use_llm:
+        return None, "rules"
+    if p == "deepseek" and cfg.deepseek.configured:
+        return DeepSeekClient(cfg.deepseek), "deepseek"
+    if p == "gigachat" and cfg.gigachat.configured:
+        return GigaChatClient(cfg.gigachat), "gigachat"
+    return None, "rules"
 
 
 def _store_for_preload(mode: str) -> AHStore:
@@ -43,14 +71,30 @@ def _store_for_preload(mode: str) -> AHStore:
 
 
 def _build_core() -> Agent:
-    # never silently fall through to rabbit
     mode = cfg.agent.preload if cfg.agent.preload in {"empty", "rabbit", "encyclopedia"} else "empty"
     return Agent(store=_store_for_preload(mode), perception=_make_perception())
 
 
 def _build_dialogue(core: Agent) -> DialogueAgent:
-    ds = cfg.deepseek if (cfg.agent.use_llm and cfg.deepseek.configured) else None
-    return DialogueAgent(core, deepseek=ds)
+    client, name = _make_chat_client()
+    return DialogueAgent(core, chat_client=client, provider=name)
+
+
+def _apply_llm_provider(provider: LlmProvider) -> None:
+    """Swap perception + dialogue client; keep current AH store/graph."""
+    global agent, dialogue, llm_provider
+    llm_provider = provider
+    agent.perception = _make_perception(provider)
+    hist = list(dialogue.history)
+    turn = dialogue._turn
+    last_act = dialogue.last_activation
+    last_gb = dialogue.last_graph_build_json
+    client, name = _make_chat_client(provider)
+    dialogue = DialogueAgent(agent, chat_client=client, provider=name)
+    dialogue.history = hist
+    dialogue._turn = turn
+    dialogue.last_activation = last_act
+    dialogue.last_graph_build_json = last_gb
 
 
 agent = _build_core()
@@ -76,6 +120,10 @@ class ChatOut(BaseModel):
     graph_build_json: dict[str, Any] = Field(default_factory=dict)
 
 
+class ProviderIn(BaseModel):
+    provider: Literal["gigachat", "deepseek"]
+
+
 @app.get("/")
 def index() -> FileResponse:
     return FileResponse(STATIC / "index.html")
@@ -83,18 +131,46 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, Any]:
+    model = None
+    ready = _provider_ready(llm_provider)
+    if llm_provider == "deepseek" and cfg.deepseek.configured:
+        model = cfg.deepseek.model
+    elif llm_provider == "gigachat" and cfg.gigachat.configured:
+        model = cfg.gigachat.model
     return {
         "ok": True,
-        "version": "0.3.1-no-bootstrap",
-        "llm_configured": cfg.deepseek.configured,
+        "version": "0.3.2-llm-switch",
+        "llm_provider": llm_provider,
+        "llm_configured": ready,
         "use_llm": cfg.agent.use_llm,
-        "model": cfg.deepseek.model if cfg.deepseek.configured else None,
+        "model": model if ready else None,
+        "providers": {
+            "gigachat": {
+                "configured": cfg.gigachat.configured,
+                "model": cfg.gigachat.model if cfg.gigachat.configured else None,
+            },
+            "deepseek": {
+                "configured": cfg.deepseek.configured,
+                "model": cfg.deepseek.model if cfg.deepseek.configured else None,
+            },
+        },
         "preload": cfg.agent.preload,
         "tau": agent.store.ah.tau,
         "history": len(dialogue.history),
         "graph_size": len(agent.store.ah.S) + len(agent.store.ah.L) + len(agent.store.find_hypernodes()),
         "|S|": len(agent.store.ah.S),
     }
+
+
+@app.post("/api/llm-provider")
+def set_llm_provider(body: ProviderIn) -> dict[str, Any]:
+    if not _provider_ready(body.provider):
+        raise HTTPException(
+            400,
+            f"provider '{body.provider}' not configured (check API key / credentials)",
+        )
+    _apply_llm_provider(body.provider)
+    return health()
 
 
 @app.get("/api/graph")
@@ -131,6 +207,7 @@ def last_trace() -> dict[str, Any]:
                 "trace_factors": t.trace_factors,
                 "weight_updates": t.weight_updates,
                 "stats": t.z_stats,
+                "chains": t.chains,
             }
             for t in agent.ignition.traces[-12:]
         ],
@@ -166,20 +243,24 @@ def chat(body: ChatIn) -> ChatOut:
 @app.post("/api/reset")
 def reset(preload: str = "empty") -> dict[str, Any]:
     """Always rebuild agent; default preload=empty wipes the graph."""
-    global agent, dialogue, cfg
+    global agent, dialogue, cfg, llm_provider
     cfg = load_config()
+    llm_provider = cfg.agent.llm_provider
     mode = (preload or "empty").strip().lower()
     if mode not in {"empty", "rabbit", "encyclopedia"}:
         mode = "empty"
 
     agent = Agent(store=_store_for_preload(mode), perception=_make_perception())
-    dialogue = DialogueAgent(
-        agent,
-        deepseek=cfg.deepseek if (cfg.agent.use_llm and cfg.deepseek.configured) else None,
-    )
+    dialogue = _build_dialogue(agent)
     dialogue.reset_history()
     stats = dump_graph(agent.store)["stats"]
-    return {"ok": True, "preload": mode, "version": "0.3.1-no-bootstrap", "stats": stats}
+    return {
+        "ok": True,
+        "preload": mode,
+        "version": "0.3.2-llm-switch",
+        "llm_provider": llm_provider,
+        "stats": stats,
+    }
 
 
 app.mount("/static", StaticFiles(directory=str(STATIC)), name="static")
@@ -202,7 +283,6 @@ def _pids_listening_on(port: int) -> list[int]:
         for line in r.stdout.splitlines():
             if "LISTENING" not in line.upper() or needle not in line:
                 continue
-            # match ...:8000 only as local port end
             parts = line.split()
             if len(parts) < 4:
                 continue
@@ -261,7 +341,6 @@ def _free_port(port: int) -> None:
                 os.kill(pid, signal.SIGTERM)
         except OSError as exc:
             print(f"[ah-web] could not stop {pid}: {exc}")
-    # brief wait for TIME_WAIT / handle release
     for _ in range(20):
         left = [p for p in _pids_listening_on(port) if p != me]
         if not left:

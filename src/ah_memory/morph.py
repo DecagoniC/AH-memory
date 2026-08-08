@@ -26,22 +26,6 @@ STOP = {
     "who", "what", "when", "where", "why", "how", "can", "may", "if", "then",
 }
 
-# surface forms pymorphy mangles (acronyms / surnames)
-LEMMA_OVERRIDE = {
-    "мифи": "мифи",
-    "нияу": "нияу",
-    "душкин": "душкин",
-    "душкина": "душкин",
-    "душкину": "душкин",
-    "душкиным": "душкин",
-    "душкине": "душкин",
-    "сергей": "сергей",
-    "максим": "максим",
-    "москве": "москва",
-    "москвы": "москва",
-    "москву": "москва",
-}
-
 # max tokens in a role UID (mega-subjects from whole-clause match)
 MAX_UID_PARTS = 4
 
@@ -49,6 +33,16 @@ _NON_ENTITY_POS = frozenset({
     "VERB", "INFN", "GRND", "PRTF", "PRTS", "ADVB", "CONJ", "PREP", "PRCL",
     "INTJ", "PRED", "COMP",
 })
+
+# Prefer these grammemes over accidental common-noun parses (no per-lexeme lists).
+_PROPER_RANK = {
+    "Surn": 0,
+    "Geox": 1,
+    "Orgn": 2,
+    "Patr": 3,
+    "Name": 4,
+    "Trad": 5,
+}
 
 
 def _get_morph() -> Any:
@@ -69,16 +63,50 @@ def _parse(word: str) -> Any:
     return _get_morph().parse(_norm(word))[0]
 
 
+def _proper_rank(parse: Any) -> int:
+    tag = str(parse.tag)
+    best = 10
+    for g, r in _PROPER_RANK.items():
+        if g in tag and r < best:
+            best = r
+    return best
+
+
+@lru_cache(maxsize=8192)
 def lemma(word: str) -> str:
+    """Lemma via pymorphy; prefer proper-name parses; no domain word lists."""
     w = _norm(word)
     if not w:
         return ""
-    if w in LEMMA_OVERRIDE:
-        return LEMMA_OVERRIDE[w]
     if w.isdigit() or re.fullmatch(r"[a-z0-9_\-]+", w):
-        # keep latin/digits stable (UIDs, years)
         return w
-    return _parse(w).normal_form.replace("ё", "е")
+    parses = _get_morph().parse(w)
+    proper = [p for p in parses if _proper_rank(p) < 10]
+    best = min(proper, key=lambda p: (_proper_rank(p), -p.score)) if proper else parses[0]
+    tag = str(best.tag)
+    if "Fixd" in tag or "Abbr" in tag:
+        return w
+    nf = best.normal_form.replace("ё", "е")
+    # Short opaque tokens: morph invents soft-sign stems (e.g. acronyms).
+    if (
+        len(w) <= 6
+        and "ь" in nf
+        and "ь" not in w
+        and "Surn" not in tag
+        and "Geox" not in tag
+        and "Orgn" not in tag
+    ):
+        return w
+    # Low-confidence Name rewrite of a short token → keep surface.
+    if (
+        len(w) <= 5
+        and nf != w
+        and "Name" in tag
+        and "Surn" not in tag
+        and best.score < 0.4
+    ):
+        return w
+    return nf
 
 
 def pos_of(word: str) -> str | None:
@@ -104,7 +132,7 @@ def is_entity_token(word: str, *, allow_pronoun: bool = False) -> bool:
         return False
     if w.isdigit():
         return True
-    # latin tokens: keep for demo UIDs (HARE), reject long unknown latin junk lightly
+    # latin / digit tokens stay as-is (stable UIDs)
     if re.fullmatch(r"[a-z0-9_\-]+", w):
         return True
     p = _parse(w)

@@ -1,0 +1,22 @@
+{
+  "name": "10_long_chain",
+  "input": "Отец купил A1. Потом купил A2. Потом продал A1. Потом купил A3. Потом продал A2. Потом купил A4. Потом купил A5. Потом продал A3. Потом продал A4. Потом купил A6.",
+  "expected_events": [
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "A1"},
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "A2"},
+    {"relation": "SELL", "subject": "FATHER", "object": "A1"},
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "A3"},
+    {"relation": "SELL", "subject": "FATHER", "object": "A2"},
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "A4"},
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "A5"},
+    {"relation": "SELL", "subject": "FATHER", "object": "A3"},
+    {"relation": "SELL", "subject": "FATHER", "object": "A4"},
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "A6"}
+  ],
+  "expected_relations": ["PURCHASE", "SELL"],
+  "expected_state": {
+    "owns": {"FATHER": {"A1": false, "A2": false, "A3": false, "A4": false, "A5": true, "A6": true}},
+    "last_purchase": {"FATHER": "A6"},
+    "purchase_history": {"FATHER": ["A1", "A2", "A3", "A4", "A5", "A6"]}
+  }
+}

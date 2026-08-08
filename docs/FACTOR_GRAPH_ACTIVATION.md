@@ -2,8 +2,32 @@
 
 Документ фиксирует формализацию наложения фактор-графов (теория вероятностей / graphical models) на ассоциативно-гетерархическую память (АГ-память, монография Душкина) и замены тактового механизма фокуса активации (§8) на вероятностный message passing.
 
-Статус: **спецификация v1** — реализовано в `factor_graph.py`, `belief_propagation.py`, `IgnitionEngine` (BP).  
+Статус: **экспериментальная реализация v2** — persistent `BPState`,
+pluggable potentials и continuous activation.
 Связанные документы: [DOMAIN.md](DOMAIN.md), [INTERFACES.md](INTERFACES.md), [HYPERPARAMS.md](HYPERPARAMS.md).
+
+## Архитектурное уточнение v2
+
+```text
+AH Memory → immutable FactorGraph → BPState → Activation → WM → Trace
+```
+
+`BPState` хранит `m(v→f)`, `m(f→v)`, beliefs, activation, evidence и
+истории. `BeliefPropagation.step(graph, state)` использует сообщения
+предыдущего такта. Топология не зависит от evidence и кешируется.
+
+Factor potential и activation dynamics разделены:
+
+```text
+m(f→v) = Potential_f(incoming messages, θ_f)
+z_v = Σ_f contribution(f→v)
+x_v^{t+1} = G(x_v^t, z_v^t, e_v^t, θ)
+```
+
+Exact n-ary evaluation перечисляет все `2^(arity-1)` конфигураций и
+никогда не обрезает аргументы. Для больших факторов `approximate`
+выбирается явно; `auto` использует порог `exact_max_arity` и сохраняет
+режим в конфигурации эксперимента.
 
 ---
 

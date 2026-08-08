@@ -72,15 +72,32 @@ class DeepSeekPerception:
         data = _parse_json(raw)
         cands = [
             FactCandidate(
-                predicate=str(c.get("predicate", "")).upper(),
+                predicate=str(
+                    c.get("canonical_relation")
+                    or c.get("predicate")
+                    or c.get("raw_relation")
+                    or c.get("relation", "")
+                ).upper(),
                 roles={str(k).upper(): slug_uid(str(v)) for k, v in (c.get("roles") or {}).items()},
                 raw_span=c.get("raw_span"),
                 confidence=float(c.get("confidence", 0.8)),
+                raw_relation=str(
+                    c.get("raw_relation")
+                    or c.get("relation")
+                    or c.get("predicate", "")
+                ),
+                canonical_relation=c.get("canonical_relation"),
             )
             for c in data.get("candidates", [])
-            if isinstance(c, dict) and c.get("predicate")
+            if isinstance(c, dict)
+            and (c.get("predicate") or c.get("raw_relation") or c.get("relation"))
         ]
-        gated = gate_candidates(text, cands, require_grounding=self.require_grounding)
+        gated = gate_candidates(
+            text,
+            cands,
+            require_grounding=self.require_grounding,
+            allow_open_relations=True,
+        )
         kind = data.get("kind", "fact")
         if kind not in {"fact", "question", "message"}:
             kind = "fact"

@@ -1,0 +1,4605 @@
+[
+  {
+    "mode": "fixed",
+    "aggregate": {
+      "activation_precision": 0.2647200564419532,
+      "activation_recall": 0.8,
+      "event_extraction_accuracy": 0.9,
+      "mrr": 0.5533333333333333,
+      "path_accuracy": 0.8666666666666666,
+      "propagation_latency": 0.8,
+      "recall_at_k": 0.4,
+      "relation_normalization_accuracy": 0.9,
+      "retrieval_accuracy": 0.4,
+      "state_accuracy": 0.9333333333333333,
+      "latency_ms": 0.9959799877833575
+    },
+    "scenarios": [
+      {
+        "scenario": "01_simple_purchase",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.437480687173545,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": true,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.1875
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.82171875,
+              "M_BMW": 0.3375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.7606406250000001,
+              "M_BMW": 0.45782226562500006
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.7131904541015626,
+              "M_BMW": 0.5546601562500001
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_BMW"
+          ]
+        },
+        "latency_ms": 1.0599999804981053
+      },
+      {
+        "scenario": "02_buy_sell",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.0,
+          "activation_precision": 0.0,
+          "activation_recall": 0.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 0.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.856875,
+              "M_BMW": 0.675
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.8555625,
+              "M_BMW": 0.9288281250000001
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.886109765625,
+              "M_BMW": 1.0
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.6633999873884022
+      },
+      {
+        "scenario": "03_multiple_assets",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.3333333333333333,
+          "activation_precision": 0.17020719699394596,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "OPEL",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "OPEL",
+            "OWNS:FATHER:AUDI": false,
+            "OWNS:FATHER:OPEL": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "AUDI",
+              "OPEL"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003",
+            "E_00004",
+            "E_00005"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI",
+            "M_OPEL"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003",
+            "SF::E_00004",
+            "SF::E_00005"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_AUDI": 0.0,
+              "M_OPEL": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.375,
+              "M_AUDI": 0.375,
+              "M_OPEL": 0.1875
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.91546875,
+              "M_BMW": 0.675,
+              "M_AUDI": 0.675,
+              "M_OPEL": 0.3375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.9508007812500001,
+              "M_AUDI": 0.9508007812500001,
+              "M_OPEL": 0.47540039062500006
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 1.0,
+              "M_AUDI": 1.0,
+              "M_OPEL": 0.6153603515625001
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI",
+            "M_OPEL"
+          ]
+        },
+        "latency_ms": 1.167299982625991
+      },
+      {
+        "scenario": "04_temporal_sequence",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.5,
+          "activation_precision": 0.23168452781767493,
+          "activation_recall": 1.0,
+          "path_accuracy": 0.6666666666666666,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "AUDI",
+            "OWNS:FATHER:AUDI": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "AUDI"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_AUDI": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.375,
+              "M_AUDI": 0.1875
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.86859375,
+              "M_BMW": 0.675,
+              "M_AUDI": 0.3375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.8872031250000001,
+              "M_BMW": 0.9332226562500001,
+              "M_AUDI": 0.46661132812500006
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.9442988525390625,
+              "M_BMW": 1.0,
+              "M_AUDI": 0.5863007812500001
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER",
+            "M_AUDI"
+          ]
+        },
+        "latency_ms": 1.5504999901168048
+      },
+      {
+        "scenario": "05_parallel_ownership",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.437480687173545,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купила",
+            "canonical_relation": "PURCHASE",
+            "subject": "MOTHER",
+            "object": "AUDI",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": true,
+            "LAST_PURCHASE:FATHER": "BMW",
+            "OWNS:MOTHER:AUDI": true,
+            "LAST_PURCHASE:MOTHER": "AUDI"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ],
+            "PURCHASE_HISTORY:MOTHER": [
+              "AUDI"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_MOTHER",
+            "M_AUDI"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_MOTHER": 1.0,
+              "M_AUDI": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.1875,
+              "M_MOTHER": 0.9,
+              "M_AUDI": 0.1875
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.82171875,
+              "M_BMW": 0.3375,
+              "M_MOTHER": 0.82171875,
+              "M_AUDI": 0.3375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.7606406250000001,
+              "M_BMW": 0.45782226562500006,
+              "M_MOTHER": 0.7606406250000001,
+              "M_AUDI": 0.45782226562500006
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.7131904541015626,
+              "M_BMW": 0.5546601562500001,
+              "M_MOTHER": 0.7131904541015626,
+              "M_AUDI": 0.5546601562500001
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_MOTHER",
+            "M_BMW",
+            "M_AUDI"
+          ]
+        },
+        "latency_ms": 1.1689999955706298
+      },
+      {
+        "scenario": "06_conflicting_facts",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.5,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": true,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.5625
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.91546875,
+              "M_BMW": 1.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 1.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 1.0
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_BMW"
+          ]
+        },
+        "latency_ms": 0.7962000090628862
+      },
+      {
+        "scenario": "07_synonyms",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 0.0,
+          "event_extraction_accuracy": 0.0,
+          "state_accuracy": 0.3333333333333333,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.0,
+          "activation_precision": 0.0,
+          "activation_recall": 0.0,
+          "path_accuracy": 0.0,
+          "propagation_latency": 0.0
+        },
+        "events": [
+          {
+            "raw_relation": "приобрёл",
+            "canonical_relation": "ПРИОБРЁЛ",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "реализовал",
+            "canonical_relation": "РЕАЛИЗОВАЛ",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {},
+          "history": {},
+          "applied_events": [
+            "E_00001",
+            "E_00002"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.856875,
+              "M_BMW": 0.675
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.8555625,
+              "M_BMW": 0.9288281250000001
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.886109765625,
+              "M_BMW": 1.0
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_ПРИОБРЕЛ",
+              "raw_label": "приобрёл",
+              "canonical_label": "ПРИОБРЕЛ",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": false
+              },
+              "metadata": {
+                "normalization_confidence": 1.0,
+                "normalization_strategy": "parser_new_relation",
+                "created_by_normalizer": true
+              }
+            },
+            {
+              "uid": "REL_РЕАЛИЗОВАЛ",
+              "raw_label": "реализовал",
+              "canonical_label": "РЕАЛИЗОВАЛ",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": false
+              },
+              "metadata": {
+                "normalization_confidence": 1.0,
+                "normalization_strategy": "parser_new_relation",
+                "created_by_normalizer": true
+              }
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.6874999962747097
+      },
+      {
+        "scenario": "08_coreference",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.5,
+          "activation_precision": 0.23168452781767493,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "AUDI",
+            "OWNS:FATHER:AUDI": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "AUDI"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_AUDI": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.375,
+              "M_AUDI": 0.1875
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.86859375,
+              "M_BMW": 0.675,
+              "M_AUDI": 0.3375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.8872031250000001,
+              "M_BMW": 0.9332226562500001,
+              "M_AUDI": 0.46661132812500006
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.9442988525390625,
+              "M_BMW": 1.0,
+              "M_AUDI": 0.5863007812500001
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER",
+            "M_AUDI"
+          ]
+        },
+        "latency_ms": 0.770699989516288
+      },
+      {
+        "scenario": "09_noise",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.437480687173545,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "OPEL",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:OPEL": true,
+            "LAST_PURCHASE:FATHER": "OPEL"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "OPEL"
+            ]
+          },
+          "applied_events": [
+            "E_00001"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_OPEL"
+          ],
+          "activated_factors": [
+            "SF::E_00001"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 1.0,
+              "M_OPEL": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.9,
+              "M_OPEL": 0.1875
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.82171875,
+              "M_OPEL": 0.3375
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.7606406250000001,
+              "M_OPEL": 0.45782226562500006
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.7131904541015626,
+              "M_OPEL": 0.5546601562500001
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_OPEL"
+          ]
+        },
+        "latency_ms": 0.5107999895699322
+      },
+      {
+        "scenario": "10_long_chain",
+        "mode": "fixed",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.2,
+          "activation_precision": 0.20118225026960104,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A1",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A2",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A1",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A3",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A2",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A4",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A5",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A3",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A4",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A6",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:A1": false,
+            "LAST_PURCHASE:FATHER": "A6",
+            "OWNS:FATHER:A2": false,
+            "OWNS:FATHER:A3": false,
+            "OWNS:FATHER:A4": false,
+            "OWNS:FATHER:A5": true,
+            "OWNS:FATHER:A6": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "A1",
+              "A2",
+              "A3",
+              "A4",
+              "A5",
+              "A6"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003",
+            "E_00004",
+            "E_00005",
+            "E_00006",
+            "E_00007",
+            "E_00008",
+            "E_00009",
+            "E_00010"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_A1",
+            "M_A2",
+            "M_A3",
+            "M_A4",
+            "M_A5",
+            "M_A6"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003",
+            "SF::E_00004",
+            "SF::E_00005",
+            "SF::E_00006",
+            "SF::E_00007",
+            "SF::E_00008",
+            "SF::E_00009",
+            "SF::E_00010"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 1.0,
+              "M_A1": 0.0,
+              "M_A2": 0.0,
+              "M_A3": 0.0,
+              "M_A4": 0.0,
+              "M_A5": 0.0,
+              "M_A6": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 0.9,
+              "M_A1": 0.375,
+              "M_A2": 0.375,
+              "M_A3": 0.375,
+              "M_A4": 0.375,
+              "M_A5": 0.1875,
+              "M_A6": 0.1875
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 1.0,
+              "M_A1": 0.675,
+              "M_A2": 0.675,
+              "M_A3": 0.675,
+              "M_A4": 0.675,
+              "M_A5": 0.3375,
+              "M_A6": 0.3375
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 1.0,
+              "M_A1": 0.9825,
+              "M_A2": 0.9825,
+              "M_A3": 0.9825,
+              "M_A4": 0.9825,
+              "M_A5": 0.49125,
+              "M_A6": 0.49125
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 1.0,
+              "M_A1": 1.0,
+              "M_A2": 1.0,
+              "M_A3": 1.0,
+              "M_A4": 1.0,
+              "M_A5": 0.6296250000000001,
+              "M_A6": 0.6296250000000001
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_A1",
+            "M_A2",
+            "M_A3",
+            "M_A4",
+            "M_A5",
+            "M_A6"
+          ]
+        },
+        "latency_ms": 1.5843999572098255
+      }
+    ]
+  },
+  {
+    "mode": "normalized",
+    "aggregate": {
+      "activation_precision": 0.338043762499491,
+      "activation_recall": 0.8,
+      "event_extraction_accuracy": 1.0,
+      "mrr": 0.5533333333333333,
+      "path_accuracy": 0.9666666666666666,
+      "propagation_latency": 0.8,
+      "recall_at_k": 0.4,
+      "relation_normalization_accuracy": 1.0,
+      "retrieval_accuracy": 0.4,
+      "state_accuracy": 1.0,
+      "latency_ms": 0.7653099950402975
+    },
+    "scenarios": [
+      {
+        "scenario": "01_simple_purchase",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.5524191905702333,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": true,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.285
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.8142750000000001,
+              "M_BMW": 0.513
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.7405425000000001,
+              "M_BMW": 0.693768375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.6768947756250001,
+              "M_BMW": 0.83544615
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.5313000292517245
+      },
+      {
+        "scenario": "02_buy_sell",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.0,
+          "activation_precision": 0.0,
+          "activation_recall": 0.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 0.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.57
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.8271000000000001,
+              "M_BMW": 1.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.7743900000000001,
+              "M_BMW": 1.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.7269510000000001,
+              "M_BMW": 1.0
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.6340999971143901
+      },
+      {
+        "scenario": "03_multiple_assets",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.3333333333333333,
+          "activation_precision": 0.23587150127598194,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "OPEL",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "OPEL",
+            "OWNS:FATHER:AUDI": false,
+            "OWNS:FATHER:OPEL": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "AUDI",
+              "OPEL"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003",
+            "E_00004",
+            "E_00005"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI",
+            "M_OPEL"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003",
+            "SF::E_00004",
+            "SF::E_00005"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_AUDI": 0.0,
+              "M_OPEL": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.57,
+              "M_AUDI": 0.57,
+              "M_OPEL": 0.285
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.8484750000000001,
+              "M_BMW": 1.0,
+              "M_AUDI": 1.0,
+              "M_OPEL": 0.513
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.8313225000000001,
+              "M_BMW": 1.0,
+              "M_AUDI": 1.0,
+              "M_OPEL": 0.703515375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.8187429806250001,
+              "M_BMW": 1.0,
+              "M_AUDI": 1.0,
+              "M_OPEL": 0.87009075
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_AUDI",
+            "M_OPEL",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.9177000029012561
+      },
+      {
+        "scenario": "04_temporal_sequence",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.5,
+          "activation_precision": 0.32791379115687624,
+          "activation_recall": 1.0,
+          "path_accuracy": 0.6666666666666666,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "AUDI",
+            "OWNS:FATHER:AUDI": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "AUDI"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_AUDI": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.57,
+              "M_AUDI": 0.285
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.8313750000000001,
+              "M_BMW": 1.0,
+              "M_AUDI": 0.513
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.7859325000000001,
+              "M_BMW": 1.0,
+              "M_AUDI": 0.698641875
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.7478188781250001,
+              "M_BMW": 1.0,
+              "M_AUDI": 0.85276845
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_AUDI",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.6977999582886696
+      },
+      {
+        "scenario": "05_parallel_ownership",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.5524191905702333,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купила",
+            "canonical_relation": "PURCHASE",
+            "subject": "MOTHER",
+            "object": "AUDI",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": true,
+            "LAST_PURCHASE:FATHER": "BMW",
+            "OWNS:MOTHER:AUDI": true,
+            "LAST_PURCHASE:MOTHER": "AUDI"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ],
+            "PURCHASE_HISTORY:MOTHER": [
+              "AUDI"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_MOTHER",
+            "M_AUDI"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_MOTHER": 1.0,
+              "M_AUDI": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.285,
+              "M_MOTHER": 0.9,
+              "M_AUDI": 0.285
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.8142750000000001,
+              "M_BMW": 0.513,
+              "M_MOTHER": 0.8142750000000001,
+              "M_AUDI": 0.513
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.7405425000000001,
+              "M_BMW": 0.693768375,
+              "M_MOTHER": 0.7405425000000001,
+              "M_AUDI": 0.693768375
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.6768947756250001,
+              "M_BMW": 0.83544615,
+              "M_MOTHER": 0.6768947756250001,
+              "M_AUDI": 0.83544615
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_AUDI",
+            "M_FATHER",
+            "M_MOTHER"
+          ]
+        },
+        "latency_ms": 0.5981999565847218
+      },
+      {
+        "scenario": "06_conflicting_facts",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.5640906386479085,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": true,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.855
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.8484750000000001,
+              "M_BMW": 1.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.8086275,
+              "M_BMW": 1.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.7727647500000001,
+              "M_BMW": 1.0
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.7297000265680254
+      },
+      {
+        "scenario": "07_synonyms",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.0,
+          "activation_precision": 0.0,
+          "activation_recall": 0.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 0.0
+        },
+        "events": [
+          {
+            "raw_relation": "приобрёл",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "реализовал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.57
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.8271000000000001,
+              "M_BMW": 1.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.7743900000000001,
+              "M_BMW": 1.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.7269510000000001,
+              "M_BMW": 1.0
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.6046000053174794
+      },
+      {
+        "scenario": "08_coreference",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.5,
+          "activation_precision": 0.32791379115687624,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "AUDI",
+            "OWNS:FATHER:AUDI": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "AUDI"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_AUDI": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.9,
+              "M_BMW": 0.57,
+              "M_AUDI": 0.285
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.8313750000000001,
+              "M_BMW": 1.0,
+              "M_AUDI": 0.513
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.7859325000000001,
+              "M_BMW": 1.0,
+              "M_AUDI": 0.698641875
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.7478188781250001,
+              "M_BMW": 1.0,
+              "M_AUDI": 0.85276845
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_AUDI",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.7312999805435538
+      },
+      {
+        "scenario": "09_noise",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.5524191905702333,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "OPEL",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:OPEL": true,
+            "LAST_PURCHASE:FATHER": "OPEL"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "OPEL"
+            ]
+          },
+          "applied_events": [
+            "E_00001"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_OPEL"
+          ],
+          "activated_factors": [
+            "SF::E_00001"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 1.0,
+              "M_OPEL": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.9,
+              "M_OPEL": 0.285
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.8142750000000001,
+              "M_OPEL": 0.513
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.7405425000000001,
+              "M_OPEL": 0.693768375
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.6768947756250001,
+              "M_OPEL": 0.83544615
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_OPEL",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.514000013936311
+      },
+      {
+        "scenario": "10_long_chain",
+        "mode": "normalized",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.2,
+          "activation_precision": 0.26739033104656684,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A1",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A2",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A1",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A3",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A2",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A4",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A5",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A3",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A4",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A6",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:A1": false,
+            "LAST_PURCHASE:FATHER": "A6",
+            "OWNS:FATHER:A2": false,
+            "OWNS:FATHER:A3": false,
+            "OWNS:FATHER:A4": false,
+            "OWNS:FATHER:A5": true,
+            "OWNS:FATHER:A6": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "A1",
+              "A2",
+              "A3",
+              "A4",
+              "A5",
+              "A6"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003",
+            "E_00004",
+            "E_00005",
+            "E_00006",
+            "E_00007",
+            "E_00008",
+            "E_00009",
+            "E_00010"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_A1",
+            "M_A2",
+            "M_A3",
+            "M_A4",
+            "M_A5",
+            "M_A6"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003",
+            "SF::E_00004",
+            "SF::E_00005",
+            "SF::E_00006",
+            "SF::E_00007",
+            "SF::E_00008",
+            "SF::E_00009",
+            "SF::E_00010"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 1.0,
+              "M_A1": 0.0,
+              "M_A2": 0.0,
+              "M_A3": 0.0,
+              "M_A4": 0.0,
+              "M_A5": 0.0,
+              "M_A6": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 0.9,
+              "M_A1": 0.57,
+              "M_A2": 0.57,
+              "M_A3": 0.57,
+              "M_A4": 0.57,
+              "M_A5": 0.285,
+              "M_A6": 0.285
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 0.88695,
+              "M_A1": 1.0,
+              "M_A2": 1.0,
+              "M_A3": 1.0,
+              "M_A4": 1.0,
+              "M_A5": 0.513,
+              "M_A6": 0.513
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 0.9336450000000001,
+              "M_A1": 1.0,
+              "M_A2": 1.0,
+              "M_A3": 1.0,
+              "M_A4": 1.0,
+              "M_A5": 0.71448075,
+              "M_A6": 0.71448075
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 0.9817149225,
+              "M_A1": 1.0,
+              "M_A2": 1.0,
+              "M_A3": 1.0,
+              "M_A4": 1.0,
+              "M_A5": 0.9091215,
+              "M_A6": 0.9091215
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_A1",
+            "M_A2",
+            "M_A3",
+            "M_A4",
+            "M_FATHER",
+            "M_A5",
+            "M_A6"
+          ]
+        },
+        "latency_ms": 1.6943999798968434
+      }
+    ]
+  },
+  {
+    "mode": "learned",
+    "aggregate": {
+      "activation_precision": 0.3079383687341963,
+      "activation_recall": 0.8,
+      "event_extraction_accuracy": 1.0,
+      "mrr": 0.5533333333333333,
+      "path_accuracy": 0.9666666666666666,
+      "propagation_latency": 0.8,
+      "recall_at_k": 0.4,
+      "relation_normalization_accuracy": 1.0,
+      "retrieval_accuracy": 0.4,
+      "state_accuracy": 1.0,
+      "latency_ms": 1.2118699960410595
+    },
+    "scenarios": [
+      {
+        "scenario": "01_simple_purchase",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.49413089412461647,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": true,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.7088148896665738,
+              "M_BMW": 0.19963990661170453
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.5182155081340921,
+              "M_BMW": 0.2830154767560409
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.38971310959564565,
+              "M_BMW": 0.3040620795793931
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.3002940563281338,
+              "M_BMW": 0.29332601819388815
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_BMW"
+          ]
+        },
+        "latency_ms": 0.9536999859847128
+      },
+      {
+        "scenario": "02_buy_sell",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.0,
+          "activation_precision": 0.0,
+          "activation_recall": 0.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 0.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.6145774390762273,
+              "M_BMW": 0.353709643191379
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.422195118302724,
+              "M_BMW": 0.4347639333782476
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.3141563136961459,
+              "M_BMW": 0.41653058943030946
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.24546470715979624,
+              "M_BMW": 0.36711042057277377
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.8846999844536185
+      },
+      {
+        "scenario": "03_multiple_assets",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.3333333333333333,
+          "activation_precision": 0.19489583050254083,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "OPEL",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "OPEL",
+            "OWNS:FATHER:AUDI": false,
+            "OWNS:FATHER:OPEL": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "AUDI",
+              "OPEL"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003",
+            "E_00004",
+            "E_00005"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI",
+            "M_OPEL"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003",
+            "SF::E_00004",
+            "SF::E_00005"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_AUDI": 0.0,
+              "M_OPEL": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.5508490689650851,
+              "M_BMW": 0.353709643191379,
+              "M_AUDI": 0.353709643191379,
+              "M_OPEL": 0.19963990661170453
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.4082110364632163,
+              "M_BMW": 0.41222259432506736,
+              "M_AUDI": 0.41222259432506736,
+              "M_OPEL": 0.2514791950633544
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.3484604583274778,
+              "M_BMW": 0.3977308864038457,
+              "M_AUDI": 0.3977308864038457,
+              "M_OPEL": 0.25974741109965394
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.31255560785274494,
+              "M_BMW": 0.36769025398890987,
+              "M_AUDI": 0.36769025398890987,
+              "M_OPEL": 0.25367944589814884
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_AUDI",
+            "M_FATHER",
+            "M_OPEL"
+          ]
+        },
+        "latency_ms": 1.3102999655529857
+      },
+      {
+        "scenario": "04_temporal_sequence",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.5,
+          "activation_precision": 0.2883563122546039,
+          "activation_recall": 1.0,
+          "path_accuracy": 0.6666666666666666,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "AUDI",
+            "OWNS:FATHER:AUDI": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "AUDI"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_AUDI": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.5903405241404573,
+              "M_BMW": 0.353709643191379,
+              "M_AUDI": 0.19963990661170453
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.408788584444715,
+              "M_BMW": 0.42619110284425665,
+              "M_AUDI": 0.25936326548652605
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.31545360000137224,
+              "M_BMW": 0.40651990088774526,
+              "M_AUDI": 0.26545105923186807
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.2583616380197917,
+              "M_BMW": 0.3614169399210336,
+              "M_AUDI": 0.25113279050591164
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER",
+            "M_AUDI"
+          ]
+        },
+        "latency_ms": 0.9411000064574182
+      },
+      {
+        "scenario": "05_parallel_ownership",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.49413089412461647,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купила",
+            "canonical_relation": "PURCHASE",
+            "subject": "MOTHER",
+            "object": "AUDI",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": true,
+            "LAST_PURCHASE:FATHER": "BMW",
+            "OWNS:MOTHER:AUDI": true,
+            "LAST_PURCHASE:MOTHER": "AUDI"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ],
+            "PURCHASE_HISTORY:MOTHER": [
+              "AUDI"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_MOTHER",
+            "M_AUDI"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_MOTHER": 1.0,
+              "M_AUDI": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.7088148896665738,
+              "M_BMW": 0.19963990661170453,
+              "M_MOTHER": 0.7088148896665738,
+              "M_AUDI": 0.19963990661170453
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.5182155081340921,
+              "M_BMW": 0.2830154767560409,
+              "M_MOTHER": 0.5182155081340921,
+              "M_AUDI": 0.2830154767560409
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.38971310959564565,
+              "M_BMW": 0.3040620795793931,
+              "M_MOTHER": 0.38971310959564565,
+              "M_AUDI": 0.3040620795793931
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "MOTHER": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.3002940563281338,
+              "M_BMW": 0.29332601819388815,
+              "M_MOTHER": 0.3002940563281338,
+              "M_AUDI": 0.29332601819388815
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_MOTHER",
+            "M_BMW",
+            "M_AUDI"
+          ]
+        },
+        "latency_ms": 0.8259000023826957
+      },
+      {
+        "scenario": "06_conflicting_facts",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.6190491092504283,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": true,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.5903405241404573,
+              "M_BMW": 0.5533495498030835
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.46188742072703626,
+              "M_BMW": 0.6533293265272768
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.4065429568522329,
+              "M_BMW": 0.6412719733774576
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.371400234657398,
+              "M_BMW": 0.6035291950300312
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.902900006622076
+      },
+      {
+        "scenario": "07_synonyms",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.0,
+          "activation_precision": 0.0,
+          "activation_recall": 0.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 0.0
+        },
+        "events": [
+          {
+            "raw_relation": "приобрёл",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "реализовал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "BMW"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.6145774390762273,
+              "M_BMW": 0.353709643191379
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.422195118302724,
+              "M_BMW": 0.4347639333782476
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.3141563136961459,
+              "M_BMW": 0.41653058943030946
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "M_FATHER": 0.24546470715979624,
+              "M_BMW": 0.36711042057277377
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER"
+          ]
+        },
+        "latency_ms": 0.7200000109151006
+      },
+      {
+        "scenario": "08_coreference",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.5,
+          "activation_precision": 0.2883563122546039,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "AUDI",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "BMW",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:BMW": false,
+            "LAST_PURCHASE:FATHER": "AUDI",
+            "OWNS:FATHER:AUDI": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "BMW",
+              "AUDI"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_BMW",
+            "M_AUDI"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 1.0,
+              "M_BMW": 0.0,
+              "M_AUDI": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.5903405241404573,
+              "M_BMW": 0.353709643191379,
+              "M_AUDI": 0.19963990661170453
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.408788584444715,
+              "M_BMW": 0.42619110284425665,
+              "M_AUDI": 0.25936326548652605
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.31545360000137224,
+              "M_BMW": 0.40651990088774526,
+              "M_AUDI": 0.26545105923186807
+            },
+            {
+              "FATHER": 0.0,
+              "BMW": 0.0,
+              "AUDI": 0.0,
+              "M_FATHER": 0.2583616380197917,
+              "M_BMW": 0.3614169399210336,
+              "M_AUDI": 0.25113279050591164
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_BMW",
+            "M_FATHER",
+            "M_AUDI"
+          ]
+        },
+        "latency_ms": 0.9233999880962074
+      },
+      {
+        "scenario": "09_noise",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 1.0,
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "activation_precision": 0.49413089412461647,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "OPEL",
+            "temporal_after": false
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:OPEL": true,
+            "LAST_PURCHASE:FATHER": "OPEL"
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "OPEL"
+            ]
+          },
+          "applied_events": [
+            "E_00001"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_OPEL"
+          ],
+          "activated_factors": [
+            "SF::E_00001"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 1.0,
+              "M_OPEL": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.7088148896665738,
+              "M_OPEL": 0.19963990661170453
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.5182155081340921,
+              "M_OPEL": 0.2830154767560409
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.38971310959564565,
+              "M_OPEL": 0.3040620795793931
+            },
+            {
+              "FATHER": 0.0,
+              "OPEL": 0.0,
+              "M_FATHER": 0.3002940563281338,
+              "M_OPEL": 0.29332601819388815
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_OPEL"
+          ]
+        },
+        "latency_ms": 0.6037999992258847
+      },
+      {
+        "scenario": "10_long_chain",
+        "mode": "learned",
+        "metrics": {
+          "relation_normalization_accuracy": 1.0,
+          "event_extraction_accuracy": 1.0,
+          "state_accuracy": 1.0,
+          "retrieval_accuracy": 0.0,
+          "recall_at_k": 0.0,
+          "mrr": 0.2,
+          "activation_precision": 0.2063334407059363,
+          "activation_recall": 1.0,
+          "path_accuracy": 1.0,
+          "propagation_latency": 1.0
+        },
+        "events": [
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A1",
+            "temporal_after": false
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A2",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A1",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A3",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A2",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A4",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A5",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A3",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "продал",
+            "canonical_relation": "SELL",
+            "subject": "FATHER",
+            "object": "A4",
+            "temporal_after": true
+          },
+          {
+            "raw_relation": "купил",
+            "canonical_relation": "PURCHASE",
+            "subject": "FATHER",
+            "object": "A6",
+            "temporal_after": true
+          }
+        ],
+        "state": {
+          "values": {
+            "OWNS:FATHER:A1": false,
+            "LAST_PURCHASE:FATHER": "A6",
+            "OWNS:FATHER:A2": false,
+            "OWNS:FATHER:A3": false,
+            "OWNS:FATHER:A4": false,
+            "OWNS:FATHER:A5": true,
+            "OWNS:FATHER:A6": true
+          },
+          "history": {
+            "PURCHASE_HISTORY:FATHER": [
+              "A1",
+              "A2",
+              "A3",
+              "A4",
+              "A5",
+              "A6"
+            ]
+          },
+          "applied_events": [
+            "E_00001",
+            "E_00002",
+            "E_00003",
+            "E_00004",
+            "E_00005",
+            "E_00006",
+            "E_00007",
+            "E_00008",
+            "E_00009",
+            "E_00010"
+          ]
+        },
+        "trace": {
+          "activated_nodes": [
+            "M_FATHER",
+            "M_A1",
+            "M_A2",
+            "M_A3",
+            "M_A4",
+            "M_A5",
+            "M_A6"
+          ],
+          "activated_factors": [
+            "SF::E_00001",
+            "SF::E_00002",
+            "SF::E_00003",
+            "SF::E_00004",
+            "SF::E_00005",
+            "SF::E_00006",
+            "SF::E_00007",
+            "SF::E_00008",
+            "SF::E_00009",
+            "SF::E_00010"
+          ],
+          "timesteps": [
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 1.0,
+              "M_A1": 0.0,
+              "M_A2": 0.0,
+              "M_A3": 0.0,
+              "M_A4": 0.0,
+              "M_A5": 0.0,
+              "M_A6": 0.0
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 0.5191080752346384,
+              "M_A1": 0.353709643191379,
+              "M_A2": 0.353709643191379,
+              "M_A3": 0.353709643191379,
+              "M_A4": 0.353709643191379,
+              "M_A5": 0.19963990661170453,
+              "M_A6": 0.19963990661170453
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 0.4790258731408415,
+              "M_A1": 0.4009954987581313,
+              "M_A2": 0.4009954987581313,
+              "M_A3": 0.4009954987581313,
+              "M_A4": 0.4009954987581313,
+              "M_A5": 0.24514242603924535,
+              "M_A6": 0.24514242603924535
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 0.4892103666126324,
+              "M_A1": 0.41587885737595265,
+              "M_A2": 0.41587885737595265,
+              "M_A3": 0.41587885737595265,
+              "M_A4": 0.41587885737595265,
+              "M_A5": 0.26939328224403175,
+              "M_A6": 0.26939328224403175
+            },
+            {
+              "FATHER": 0.0,
+              "A1": 0.0,
+              "A2": 0.0,
+              "A3": 0.0,
+              "A4": 0.0,
+              "A5": 0.0,
+              "A6": 0.0,
+              "M_FATHER": 0.5058231580584557,
+              "M_A1": 0.4286281873521385,
+              "M_A2": 0.4286281873521385,
+              "M_A3": 0.4286281873521385,
+              "M_A4": 0.4286281873521385,
+              "M_A5": 0.2886158815347432,
+              "M_A6": 0.2886158815347432
+            }
+          ],
+          "relations": [
+            {
+              "uid": "REL_PURCHASE",
+              "raw_label": "PURCHASE",
+              "canonical_label": "PURCHASE",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            },
+            {
+              "uid": "REL_SELL",
+              "raw_label": "SELL",
+              "canonical_label": "SELL",
+              "embedding": null,
+              "arity": 2,
+              "properties": {
+                "directional": true,
+                "symmetric": false,
+                "transitive": false,
+                "temporal": false,
+                "causal": false,
+                "state_changing": true
+              },
+              "metadata": {}
+            }
+          ],
+          "messages": [],
+          "state_transitions": [],
+          "final_evidence": [
+            "M_FATHER",
+            "M_A1",
+            "M_A2",
+            "M_A3",
+            "M_A4",
+            "M_A5",
+            "M_A6"
+          ]
+        },
+        "latency_ms": 4.052900010719895
+      }
+    ]
+  }
+]

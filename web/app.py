@@ -1,6 +1,7 @@
 """FastAPI web UI: chat + graph dump + live AH vs RAG compare."""
 from __future__ import annotations
 
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Literal
 
@@ -17,14 +18,24 @@ from ah_memory.corpus import build_encyclopedia
 from ah_memory.deepseek import DeepSeekClient, DeepSeekHybridPerception
 from ah_memory.dialogue import DialogueAgent
 from ah_memory.examples.rabbit import build_rabbit_memory
+from ah_memory.factor_parameters import (
+    EmbeddingParameterGenerator,
+    FixedParameterGenerator,
+    RuleBasedParameterGenerator,
+)
 from ah_memory.gigachat_llm import GigaChatClient, HybridPerception
 from ah_memory.graph_export import dump_ah_json, dump_graph
 from ah_memory.perception import SeedPerception
+from ah_memory.relation_normalizer import (
+    EmbeddingNormalizer,
+    ExactNormalizer,
+    RelationNormalizer,
+)
 from ah_memory.store import AHStore
 
 STATIC = Path(__file__).parent / "static"
 cfg = load_config()
-app = FastAPI(title="AH Memory", version="0.4.2")
+app = FastAPI(title="AH Memory", version="0.4.4")
 
 # runtime provider (UI can switch without restart)
 llm_provider: LlmProvider = cfg.agent.llm_provider
@@ -72,9 +83,33 @@ def _store_for_preload(mode: str) -> AHStore:
     return store
 
 
-def _build_core() -> Agent:
-    mode = cfg.agent.preload if cfg.agent.preload in {"empty", "rabbit", "encyclopedia"} else "empty"
-    return Agent(store=_store_for_preload(mode), perception=_make_perception())
+def _build_core(preload: str | None = None) -> Agent:
+    requested = preload or cfg.agent.preload
+    mode = requested if requested in {"empty", "rabbit", "encyclopedia"} else "empty"
+    store = _store_for_preload(mode)
+    semantics_mode = cfg.open_semantics.normalization_mode.lower()
+    if semantics_mode == "learned":
+        strategies = (
+            ExactNormalizer(),
+            EmbeddingNormalizer(
+                similarity_threshold=cfg.open_semantics.embedding_similarity_threshold
+            ),
+        )
+        parameter_generator = EmbeddingParameterGenerator(
+            seed=cfg.open_semantics.parameter_seed
+        )
+    elif semantics_mode == "fixed":
+        strategies = (ExactNormalizer(),)
+        parameter_generator = FixedParameterGenerator()
+    else:
+        strategies = (ExactNormalizer(),)
+        parameter_generator = RuleBasedParameterGenerator()
+    return Agent(
+        store=store,
+        perception=_make_perception(),
+        relation_normalizer=RelationNormalizer(store.relations, strategies),
+        parameter_generator=parameter_generator,
+    )
 
 
 def _build_dialogue(core: Agent) -> DialogueAgent:
@@ -132,6 +167,7 @@ class ChatOut(BaseModel):
     system_prompt: str = ""
     activation: dict[str, Any] = Field(default_factory=dict)
     graph_build_json: dict[str, Any] = Field(default_factory=dict)
+    full_trace: dict[str, Any] = Field(default_factory=dict)
 
 
 class ProviderIn(BaseModel):
@@ -156,7 +192,7 @@ def health() -> dict[str, Any]:
         model = cfg.gigachat.model
     return {
         "ok": True,
-        "version": "0.4.3-merged",
+        "version": "0.4.4-merged",
         "llm_provider": llm_provider,
         "llm_configured": ready,
         "use_llm": cfg.agent.use_llm,
@@ -174,6 +210,7 @@ def health() -> dict[str, Any]:
         "preload": cfg.agent.preload,
         "rag_backend": comparer.rag.backend,
         "corpus_chars": len(comparer.rag.corpus),
+        "open_semantics_mode": cfg.open_semantics.normalization_mode,
         "tau": agent.store.ah.tau,
         "history": len(dialogue.history),
         "graph_size": len(agent.store.ah.S) + len(agent.store.ah.L) + len(agent.store.find_hypernodes()),
@@ -196,7 +233,12 @@ def set_llm_provider(body: ProviderIn) -> dict[str, Any]:
 def graph(limit: int | None = 400, mode: str = "hyper") -> dict[str, Any]:
     if mode not in {"hyper", "all"}:
         mode = "hyper"
-    return dump_graph(agent.store, limit_nodes=limit, mode=mode)
+    return dump_graph(
+        agent.store,
+        limit_nodes=limit,
+        mode=mode,
+        activation=agent.ignition.state.activation,
+    )
 
 
 @app.get("/api/dump")
@@ -215,6 +257,7 @@ def last_trace() -> dict[str, Any]:
         "wm": sorted(agent.ignition.wm.contents()),
         "activation": act,
         "graph_build_json": build,
+        "full_trace": act.get("full_trace", {}),
         "recent_ticks": [
             {
                 "tau": t.tau,
@@ -227,6 +270,10 @@ def last_trace() -> dict[str, Any]:
                 "weight_updates": t.weight_updates,
                 "stats": t.z_stats,
                 "chains": t.chains,
+                "activation_top": t.activation_top,
+                "events": [asdict(event) for event in t.events],
+                "convergence": t.convergence,
+                "timings_ms": t.timings_ms,
             }
             for t in agent.ignition.traces[-12:]
         ],
@@ -253,12 +300,17 @@ def chat(body: ChatIn) -> ChatOut:
         trace_uids=turn.trace_uids,
         wm=turn.wm,
         backend=turn.backend,
-        stats=dump_graph(agent.store, limit_nodes=1)["stats"],
+        stats=dump_graph(
+            agent.store,
+            limit_nodes=1,
+            activation=agent.ignition.state.activation,
+        )["stats"],
         user_facts=turn.user_facts,
         assistant_facts=turn.assistant_facts,
         system_prompt=turn.system_prompt,
         activation=turn.activation,
         graph_build_json=turn.graph_build_json,
+        full_trace=turn.full_trace,
     )
 
 
@@ -318,17 +370,20 @@ def reset(preload: str = "empty") -> dict[str, Any]:
     if mode not in {"empty", "rabbit", "encyclopedia"}:
         mode = "empty"
 
-    agent = Agent(store=_store_for_preload(mode), perception=_make_perception())
+    agent = _build_core(mode)
     dialogue = _build_dialogue(agent)
     dialogue.reset_history()
     comparer = _build_compare(agent)
     comparer.clear()
 
-    stats = dump_graph(agent.store)["stats"]
+    stats = dump_graph(
+        agent.store,
+        activation=agent.ignition.state.activation,
+    )["stats"]
     return {
         "ok": True,
         "preload": mode,
-        "version": "0.4.3-merged",
+        "version": "0.4.4-merged",
         "llm_provider": llm_provider,
         "rag_backend": comparer.rag.backend,
         "corpus_chars": len(comparer.rag.corpus),

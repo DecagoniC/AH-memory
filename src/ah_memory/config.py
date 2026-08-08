@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
+from ah_memory.experiment import ExperimentConfig
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CONFIG = ROOT / "config.yaml"
@@ -72,11 +73,22 @@ class AgentConfig:
 
 
 @dataclass(frozen=True)
+class OpenSemanticsConfig:
+    enabled: bool = True
+    normalization_mode: str = "normalized"
+    embedding_similarity_threshold: float = 0.55
+    parameter_seed: int = 42
+    trace_messages: bool = False
+
+
+@dataclass(frozen=True)
 class AppConfig:
     gigachat: GigaChatConfig
     deepseek: DeepSeekConfig
     web: WebConfig
     agent: AgentConfig
+    experiment: ExperimentConfig = ExperimentConfig()
+    open_semantics: OpenSemanticsConfig = OpenSemanticsConfig()
 
 
 def _deep_merge(base: dict[str, Any], over: dict[str, Any]) -> dict[str, Any]:
@@ -124,6 +136,7 @@ def load_config(path: Path | None = None) -> AppConfig:
     ds = raw.get("deepseek") or {}
     web = raw.get("web", {})
     ag = raw.get("agent", {})
+    semantics = raw.get("open_semantics", {})
 
     credentials = (
         os.environ.get("GIGACHAT_CREDENTIALS")
@@ -170,5 +183,17 @@ def load_config(path: Path | None = None) -> AppConfig:
             ticks=int(ag.get("ticks", 6)),
             preload=str(ag.get("preload", "empty")),
             llm_provider=provider,
+        ),
+        experiment=ExperimentConfig.from_mapping(raw.get("experiment") or {}),
+        open_semantics=OpenSemanticsConfig(
+            enabled=bool(semantics.get("enabled", True)),
+            normalization_mode=str(
+                semantics.get("normalization_mode", "normalized")
+            ),
+            embedding_similarity_threshold=float(
+                semantics.get("embedding_similarity_threshold", 0.55)
+            ),
+            parameter_seed=int(semantics.get("parameter_seed", 42)),
+            trace_messages=bool(semantics.get("trace_messages", False)),
         ),
     )

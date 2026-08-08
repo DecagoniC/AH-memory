@@ -22,7 +22,21 @@
 | ε_tr | `fg_trace_eps` | 1e-3 |
 | τ_H Hebb | `fg_hebb_tau` | 0.15 |
 
-Активация: `x_v := b_v(1)` после loopy BP. См. [FACTOR_GRAPH_ACTIVATION.md](FACTOR_GRAPH_ACTIVATION.md).
+Belief и activation теперь разделены. Сообщения BP формируют входной
+сигнал `z_v`, затем выбранная `ActivationFunction` обновляет
+`x_v^{t+1}=G(x_v^t,z_v^t,e_v^t)`.
+
+## ExperimentConfig
+
+| Группа | Основные параметры |
+|--------|---------------------|
+| activation | `type`, `alpha`, `beta`, `gamma`, `decay`, `eta` |
+| factors | `is_a_up/down`, `follow_forward/backward`, `association`, `bind`, `hypernode_mode` |
+| inference | `max_ticks`, `threshold`, `convergence_epsilon`, `factor_evaluation`, `exact_max_arity` |
+| competition | `enabled`, `type`, `strength`, `top_k` |
+
+Значения находятся в `config.yaml:experiment`. Они являются стартовыми
+точками grid search, а не утверждением о правильности модели.
 
 ## Вспомогательные функции (не в пятёрке, но фиксируются)
 

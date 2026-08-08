@@ -471,6 +471,13 @@
       ).join("")}</ol>`;
     }
 
+    function fmtEvents(events, limit = 8) {
+      if (!events || !events.length) return '<span class="muted">—</span>';
+      return events.slice(0, limit).map((event) =>
+        `<div class="chain">${esc(event.source_uid)} →[${esc(event.factor_uid)} · m=${Number(event.message_value || 0).toFixed(3)} · Δ=${Number(event.contribution || 0).toFixed(3)}]→ ${esc(event.target_uid)}</div>`
+      ).join("");
+    }
+
     function renderTicks(ticks) {
       if (!ticks || !ticks.length) return '<div class="muted">тиков нет</div>';
       return ticks.map((t) => `
@@ -482,8 +489,11 @@
           <div><span class="muted">seeds:</span> ${fmtList(t.seeds, 10)}</div>
           <div><span class="muted">evidence:</span> ${fmtEvidence(t.evidence)}</div>
           <div><span class="muted">beliefs top:</span> ${fmtBeliefs(t.beliefs_top)}</div>
+          <div><span class="muted">activation top:</span> ${fmtBeliefs(t.activation_top)}</div>
           <div><span class="muted">WM (x&gt;t):</span> ${fmtList(t.wm, 14)}</div>
           <div><span class="muted">факторы:</span> ${fmtList(t.trace_factors, 8)}</div>
+          <div><span class="muted">contribution trace:</span> ${fmtEvents(t.events)}</div>
+          <div><span class="muted">Δ convergence=${Number(t.convergence || 0).toFixed(4)} · BP=${Number(t.timings_ms?.bp_step || 0).toFixed(2)}ms · activation=${Number(t.timings_ms?.activation_update || 0).toFixed(2)}ms</span></div>
         </div>
       `).join("");
     }

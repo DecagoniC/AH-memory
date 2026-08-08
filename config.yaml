@@ -30,3 +30,44 @@ agent:
   ticks: 6
   preload: "empty"  # empty | rabbit | encyclopedia
   llm_provider: deepseek
+
+open_semantics:
+  enabled: true
+  normalization_mode: normalized  # fixed | normalized | learned
+  embedding_similarity_threshold: 0.55
+  parameter_seed: 42
+  trace_messages: false
+
+experiment:
+  random_seed: 42
+  history_retention: 100
+  activation:
+    type: linear  # linear | sigmoid | relu
+    alpha: 1.0
+    beta: 1.0
+    gamma: 1.0
+    decay: 0.1
+    eta: 0.5
+  factors:
+    is_a_up: 0.9
+    is_a_down: 0.2
+    follow_forward: 0.8
+    follow_backward: 0.1
+    association: 0.4
+    bind: 0.8
+    hypernode_strength: 0.6
+    hypernode_mode: soft_and  # and | soft_and | pairwise
+  inference:
+    max_ticks: 20
+    threshold: 0.7
+    convergence_epsilon: 0.001
+    damping: 0.4
+    evidence_decay: 0.5
+    factor_evaluation: auto  # exact | approximate | auto
+    exact_max_arity: 12
+    contribution_mode: delta  # delta | counterfactual_logit
+  competition:
+    enabled: false
+    type: none  # none | local | global | top_k
+    strength: 0.0
+    top_k: 10

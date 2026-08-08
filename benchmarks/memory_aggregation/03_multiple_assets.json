@@ -1,0 +1,17 @@
+{
+  "name": "03_multiple_assets",
+  "input": "Отец купил BMW. Потом продал BMW. Потом купил Audi. Потом продал Audi. Потом купил Opel.",
+  "expected_events": [
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "BMW"},
+    {"relation": "SELL", "subject": "FATHER", "object": "BMW"},
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "AUDI"},
+    {"relation": "SELL", "subject": "FATHER", "object": "AUDI"},
+    {"relation": "PURCHASE", "subject": "FATHER", "object": "OPEL"}
+  ],
+  "expected_relations": ["PURCHASE", "SELL"],
+  "expected_state": {
+    "owns": {"FATHER": {"BMW": false, "AUDI": false, "OPEL": true}},
+    "last_purchase": {"FATHER": "OPEL"},
+    "purchase_history": {"FATHER": ["BMW", "AUDI", "OPEL"]}
+  }
+}

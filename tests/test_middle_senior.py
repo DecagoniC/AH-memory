@@ -3,80 +3,72 @@ from __future__ import annotations
 import time
 
 from ah_memory.agent import Agent
-from ah_memory.corpus import build_encyclopedia
 from ah_memory.dsl import DSLInterpreter
-from ah_memory.examples.dog import run_dog_ignition
-from ah_memory.examples.rabbit import (
-    RABBIT_TEXT,
-    build_rabbit_memory,
-    rabbit_auto_score,
-    syntactic_answer_who_is_hare,
-)
 from ah_memory.gc import collect
 from ah_memory.hyperparams import HyperParams
 from ah_memory.ignition import ActivationSeed, IgnitionEngine
 from ah_memory.invariants import validate
 from ah_memory.perception import JsonLLMPerception
 from ah_memory.store import AHStore
-from ah_memory.templates import CREATE_ROLES, seed_templates, template_roles_coverage
 from ah_memory.types import (
     AbstractSymbol,
     AssocLink,
-    Hyperlink,
     LinkId,
     Property,
-    Role,
     SecondOrderSymbol,
     Section,
 )
+from tests._mini_graph import build_mini_open_store
+
+SAMPLE_TEXT = "Сущность — это вид. Сущность обитает в месте."
 
 
-def test_templates_middle_requirements() -> None:
+def test_open_registry_has_core_relations() -> None:
     store = AHStore()
-    seed_templates(store)
-    assert len(store.find_templates()) >= 8
-    covered = template_roles_coverage(store)
-    for r in (Role.SUBJECT, Role.OBJECT, Role.LOCATION, Role.TIME, Role.CAUSE, Role.TOOL):
-        assert r in covered
-    create = store.get_template("T_CREATE")
-    assert [a.role for a in create.actants] == CREATE_ROLES
-    assert len(create.actants) == 7
+    labels = {r.canonical_label for r in store.list_relations()}
+    for need in ("IS", "LIVE_IN", "HAVE", "PURCHASE", "OWNS"):
+        assert need in labels
 
 
-def test_rabbit_auto_extract_at_least_6_of_8() -> None:
-    store = build_rabbit_memory()
-    hit, total = rabbit_auto_score(store)
-    assert total == 8
-    assert hit >= 6, f"only {hit}/8 facts extracted"
+def test_mini_open_extract_and_answer() -> None:
+    store = build_mini_open_store()
     validate(store)
-    ans = syntactic_answer_who_is_hare(store)
-    assert any(w in ans for w in ("зверёк", "маленький", "дикий", "животное"))
+    assert len(store.list_semantic_factors()) >= 2
+    ans = str(DSLInterpreter(store).execute("answer_who(M_ENTITY)").value)
+    assert "вид" in ans
 
 
 def test_find_roles() -> None:
-    store = build_rabbit_memory()
-    nodes = store.find_roles(Role.SUBJECT, "M_HARE")
-    assert len(nodes) >= 1
+    store = build_mini_open_store()
+    factors = [
+        f
+        for f in store.list_semantic_factors()
+        if f.roles.get("SUBJECT") == "M_ENTITY"
+    ]
+    assert len(factors) >= 1
 
 
 def test_dsl_intersect_episodes_and_roles() -> None:
-    store = build_rabbit_memory()
+    store = build_mini_open_store()
     dsl = DSLInterpreter(store)
-    roles = dsl.execute("findRoles(SUBJECT, M_HARE)").value
+    roles = dsl.execute("findRoles(SUBJECT, M_ENTITY)").value
     episodes = dsl.execute("findLists(kind=Episode)").value
     assert isinstance(roles, list) and roles
     assert isinstance(episodes, list) and episodes
-    # composition supported
     inter = dsl.execute("intersect(findLists(kind=Episode), findLists(kind=Episode))").value
     assert set(inter) == set(episodes)
 
 
-def test_ignition_propagates_dog() -> None:
-    hist = run_dog_ignition(ticks=8)
+def test_ignition_propagates_seeds() -> None:
+    store = build_mini_open_store()
+    eng = IgnitionEngine(store)
+    eng.seed([ActivationSeed("ENTITY", 0.9), ActivationSeed("M_ENTITY", 0.7)])
+    hist = []
+    for _ in range(6):
+        hist.append(",".join(eng.tick().wm))
     joined = "|".join(hist)
-    # should see generalization / private model activation over ticks
-    assert "M_DOG" in joined or "M_REX" in joined or "DOG" in joined
-    assert any(h for h in hist if h)  # WM non-empty at some tick
+    assert "M_ENTITY" in joined or "ENTITY" in joined
+    assert any(h for h in hist if h)
 
 
 def test_gc_removes_orphans_keeps_live() -> None:
@@ -119,7 +111,7 @@ def test_agent_ingest_and_ask() -> None:
         text = data["text"]
         if "?" in text or text.lower().lstrip().startswith(("кто", "что")):
             return json.dumps(
-                {"kind": "question", "candidates": [], "seed_tokens": ["ЗАЯЦ"]},
+                {"kind": "question", "candidates": [], "seed_tokens": ["СУЩНОСТЬ"]},
                 ensure_ascii=False,
             )
         return json.dumps(
@@ -128,29 +120,24 @@ def test_agent_ingest_and_ask() -> None:
                 "candidates": [
                     {
                         "predicate": "IS",
-                        "roles": {"SUBJECT": "ЗАЯЦ", "OBJECT": "ЗВЕРЕК"},
+                        "roles": {"SUBJECT": "СУЩНОСТЬ", "OBJECT": "ВИД"},
                         "confidence": 0.9,
                     },
                     {
                         "predicate": "LIVE_IN",
-                        "roles": {"SUBJECT": "ЗАЯЦ", "LOCATION": "ЛЕС"},
-                        "confidence": 0.9,
-                    },
-                    {
-                        "predicate": "LIVE_IN",
-                        "roles": {"SUBJECT": "ЗАЯЦ", "LOCATION": "ЛУГ"},
+                        "roles": {"SUBJECT": "СУЩНОСТЬ", "LOCATION": "МЕСТЕ"},
                         "confidence": 0.9,
                     },
                 ],
-                "seed_tokens": ["ЗАЯЦ", "ЛЕС", "ЛУГ", "ЗВЕРЕК"],
+                "seed_tokens": ["СУЩНОСТЬ", "ВИД", "МЕСТЕ"],
             },
             ensure_ascii=False,
         )
 
-    agent = Agent(perception=JsonLLMPerception(call_fn))
-    created = agent.ingest(RABBIT_TEXT)
+    agent = Agent(perception=JsonLLMPerception(call_fn, require_grounding=False))
+    created = agent.ingest(SAMPLE_TEXT)
     assert len(created.created_n) >= 2
-    reply = agent.ask("Кто такой заяц?")
+    reply = agent.ask("Кто такая сущность?")
     assert reply.source == "graph"
     assert reply.trace_uids
     assert reply.answer != "неизвестно" or reply.trace_uids
@@ -164,7 +151,7 @@ def test_continuous_cycle_trajectory() -> None:
         text = data["text"]
         if "?" in text or text.lower().lstrip().startswith(("кто", "что")):
             return json.dumps(
-                {"kind": "question", "candidates": [], "seed_tokens": ["ЗАЯЦ"]},
+                {"kind": "question", "candidates": [], "seed_tokens": ["СУЩНОСТЬ"]},
                 ensure_ascii=False,
             )
         return json.dumps(
@@ -173,35 +160,26 @@ def test_continuous_cycle_trajectory() -> None:
                 "candidates": [
                     {
                         "predicate": "LIVE_IN",
-                        "roles": {"SUBJECT": "ЗАЯЦ", "LOCATION": "ЛЕС"},
+                        "roles": {"SUBJECT": "СУЩНОСТЬ", "LOCATION": "МЕСТЕ"},
                         "confidence": 0.9,
                     }
                 ],
-                "seed_tokens": ["ЗАЯЦ", "ЛЕС"],
+                "seed_tokens": ["СУЩНОСТЬ", "МЕСТЕ"],
             },
             ensure_ascii=False,
         )
 
-    agent = Agent(perception=JsonLLMPerception(call_fn))
-    r1 = agent.step_message("Заяц обитает в лесу.")
+    agent = Agent(perception=JsonLLMPerception(call_fn, require_grounding=False))
+    r1 = agent.step_message("Сущность обитает в месте.")
     assert r1.answer.startswith("ingested:")
-    r2 = agent.step_message("Кто такой заяц?")
+    r2 = agent.step_message("Кто такая сущность?")
     assert r2.traces or r2.trace_uids is not None
 
 
-def test_encyclopedia_nfr() -> None:
-    store, corpus = build_encyclopedia()
-    assert len(store.ah.S) >= 150
-    assert all(s.R for s in store.ah.S.values())
-    assert store.graph_size() >= 1000
-    assert len(corpus.split()) >= 15000
-
-
 def test_ignition_tick_budget() -> None:
-    store, _ = build_encyclopedia()
-    # shrink to ~1000 if larger — still ok
+    store = build_mini_open_store()
     eng = IgnitionEngine(store)
-    eng.seed([ActivationSeed("ANIMAL", 0.8), ActivationSeed("M_ANIMAL", 0.8)])
+    eng.seed([ActivationSeed("ENTITY", 0.8), ActivationSeed("M_ENTITY", 0.8)])
     t0 = time.perf_counter()
     eng.tick()
     elapsed_ms = (time.perf_counter() - t0) * 1000

@@ -326,6 +326,190 @@
       font-size: .72rem;
     }
     button.active { outline: 2px solid var(--accent2); }
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 10, 14, .72);
+      z-index: 40;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      width: min(440px, 100%);
+      max-height: min(90vh, 720px);
+      overflow: auto;
+      background: #152029;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.45);
+    }
+    .modal h2 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      font-weight: 650;
+    }
+    .modal .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      margin: 8px 0;
+      font-size: .85rem;
+    }
+    .modal label { color: var(--muted); }
+    .modal input, .modal select {
+      width: 140px;
+      min-height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #0f161d;
+      color: var(--text);
+      padding: 0 8px;
+    }
+    .modal .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .synth-result {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #0f161d;
+      border: 1px solid var(--line);
+      font-size: .82rem;
+      display: none;
+    }
+    .synth-result.show { display: block; }
+    .synth-result pre {
+      margin: 8px 0 0;
+      white-space: pre-wrap;
+      color: #c5d3e3;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: .78rem;
+    }
+    #synthPanel {
+      border-top: 1px solid var(--line);
+      padding: 10px 12px;
+      max-height: 42vh;
+      overflow: auto;
+      display: none;
+      background: rgba(12, 18, 24, .65);
+    }
+    #synthPanel.show { display: block; }
+    #synthPanel h3 {
+      margin: 0 0 8px;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--accent2);
+    }
+    #synthPanel .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 12px;
+      font-size: .8rem;
+      margin-bottom: 10px;
+    }
+    #synthPanel .metrics span { color: var(--muted); }
+    #erPanel {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      min-height: 0;
+      overflow: auto;
+      padding: 12px;
+      background: rgba(12, 18, 24, .72);
+      border-top: 1px solid var(--line);
+      gap: 10px;
+    }
+    #erPanel.show { display: flex; }
+    #erPanel h3 {
+      margin: 0;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--accent2);
+    }
+    #erPanel .er-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    #erPanel .er-controls select,
+    #erPanel .er-controls input {
+      min-height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #0f161d;
+      color: var(--text);
+      padding: 0 10px;
+    }
+    #erPanel .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 12px;
+      font-size: .8rem;
+    }
+    @media (min-width: 720px) {
+      #erPanel .metrics { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    }
+    #erPanel .metrics span { color: var(--muted); }
+    #erChartWrap {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      background: #0f161d;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+    }
+    #erChart { width: 100%; height: 220px; display: block; }
+    #erSweepTable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .75rem;
+    }
+    #erSweepTable th, #erSweepTable td {
+      border-bottom: 1px solid var(--line);
+      padding: 6px 8px;
+      text-align: right;
+    }
+    #erSweepTable th:first-child, #erSweepTable td:first-child { text-align: left; }
+    #synthQueries {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .synth-q {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #12181f;
+      font-size: .76rem;
+      cursor: pointer;
+    }
+    .synth-q:hover { border-color: var(--accent); }
+    .synth-q .muted { color: var(--muted); }
+    #proofView {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 8px;
+      background: #0c1218;
+      border: 1px solid var(--line);
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: .72rem;
+      white-space: pre-wrap;
+      color: #d7e6f7;
+      display: none;
+    }
+    #proofView.show { display: block; }
   </style>
 </head>
 <body>
@@ -360,13 +544,91 @@
         <div class="graph-tabs">
           <button type="button" class="active" id="tabGraph">Граф</button>
           <button type="button" id="tabTraceGraph">Трассировка (w)</button>
+          <button type="button" id="tabEntityRes">Entity Resolution</button>
         </div>
         <div class="toolbar" id="graphToolbar">
           <button class="secondary" id="refresh">Обновить</button>
           <button class="secondary" id="modeHyper">Гиперрёбра</button>
           <button class="secondary" id="modeAll">Все связи</button>
           <button class="secondary" id="dump">JSON</button>
+          <button class="secondary" id="synthOpen">Синтезировать граф</button>
+          <button class="secondary" id="toggleGraphViz" title="Включить/выключить отрисовку vis-network">Визуал: вкл</button>
           <button class="secondary" id="reset">Сброс</button>
+        </div>
+        <div id="erPanel">
+          <h3>Entity Resolution Benchmark</h3>
+          <div class="er-controls">
+            <label style="color:var(--muted);font-size:.75rem">Embedding
+              <select id="erEmbed">
+                <option value="EmbeddingsGigaR">EmbeddingsGigaR (GigaChat)</option>
+                <option value="Embeddings-2">Embeddings-2 (GigaChat)</option>
+                <option value="Embeddings">Embeddings (GigaChat)</option>
+                <option value="deterministic_ngram">deterministic_ngram (64)</option>
+                <option value="deterministic_ngram_32">deterministic_ngram_32</option>
+                <option value="deterministic_ngram_128">deterministic_ngram_128</option>
+              </select>
+            </label>
+            <label style="color:var(--muted);font-size:.75rem">Resolver
+              <select id="erResolver">
+                <option value="hybrid">Hybrid</option>
+                <option value="exact">Exact</option>
+                <option value="morphology">Morphology</option>
+                <option value="embedding">Embedding</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label style="color:var(--muted);font-size:.75rem">Report thr
+              <input id="erThr" type="number" min="0.5" max="0.99" step="0.01" value="0.85" style="width:5.5rem" />
+            </label>
+            <button type="button" id="erRun">Run benchmark</button>
+          </div>
+          <div class="metrics" id="erMetrics">
+            <div><span>Accuracy</span> <b id="erAcc">—</b></div>
+            <div><span>Precision</span> <b id="erP">—</b></div>
+            <div><span>Recall</span> <b id="erR">—</b></div>
+            <div><span>F1</span> <b id="erF1">—</b></div>
+            <div><span>False Merge</span> <b id="erFM">—</b></div>
+          </div>
+          <div id="erOpt" style="font-size:.8rem;color:var(--muted)">Best thresholds: —</div>
+          <div id="erChartWrap"><canvas id="erChart" width="640" height="220"></canvas></div>
+          <div style="overflow-x:auto;width:100%">
+            <table id="erSweepTable">
+              <thead>
+                <tr>
+                  <th>threshold</th><th>precision</th><th>recall</th><th>F1</th><th>false_merge</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="synthPanel">
+          <h3>Synthetic Benchmark</h3>
+          <div class="metrics" id="synthMetrics">
+            <div><span>Entities</span> <b id="smEnt">—</b></div>
+            <div><span>Factors</span> <b id="smFac">—</b></div>
+            <div><span>Events</span> <b id="smEvt">—</b></div>
+            <div><span>Queries</span> <b id="smQ">—</b></div>
+          </div>
+          <div class="actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+            <button type="button" id="synthRunBench">Запустить benchmark</button>
+            <select id="synthActFn" style="min-height:36px;border-radius:8px;border:1px solid var(--line);background:#0f161d;color:var(--text);padding:0 8px">
+              <option value="linear">Linear</option>
+              <option value="sigmoid">Sigmoid</option>
+              <option value="relu">ReLU</option>
+              <option value="decay">Decay</option>
+            </select>
+            <button type="button" class="secondary" id="synthDownload">Скачать dataset</button>
+          </div>
+          <div class="metrics" id="synthBenchMetrics" style="display:none">
+            <div><span>Accuracy</span> <b id="bmAcc">—</b></div>
+            <div><span>Path Precision</span> <b id="bmPP">—</b></div>
+            <div><span>Path Recall</span> <b id="bmPR">—</b></div>
+            <div><span>Path F1</span> <b id="bmF1">—</b></div>
+            <div><span>Noise</span> <b id="bmNoise">—</b></div>
+          </div>
+          <div id="synthQueries"></div>
+          <div id="proofView"></div>
         </div>
         <div class="legend" id="legend">
           <div class="legend-grid">
@@ -391,12 +653,49 @@
           <div class="legend-note">Гиперребро N — n-арный факт: жёлтый хаб + цветные роли + пунктирный mesh между всеми актантами одной микротемы. ASSOC-mesh также пишется в L.</div>
         </div>
         <div class="legend" id="traceGraphLegend" style="display:none">
-          Подграф активации: рёбра подписаны типом и силой <code>w</code>. Источник — seeds / WM / цепочки последнего хода.
+          Только подграф трассировки: seeds, активированные узлы, contribution-факторы и рёбра между ними. Остальной граф скрыт.
         </div>
         <div id="network"></div>
         <div id="networkTrace"></div>
         <div id="traceGraphEmpty">Нет данных активации — отправь сообщение, затем открой эту вкладку.</div>
       </section>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="synthModal">
+    <div class="modal" role="dialog" aria-labelledby="synthTitle">
+      <h2 id="synthTitle">Синтезировать граф</h2>
+      <div class="row"><label>Preset</label>
+        <select id="syPreset">
+          <option value="small">Small</option>
+          <option value="medium">Medium</option>
+          <option value="large">Large</option>
+          <option value="stress">Stress</option>
+        </select>
+      </div>
+      <div class="row"><label>Сущности</label><input id="syEnt" type="number" min="4" value="100" /></div>
+      <div class="row"><label>События</label><input id="syEvt" type="number" min="1" value="200" /></div>
+      <div class="row"><label>Факторы</label><input id="syFac" type="number" min="1" value="500" /></div>
+      <div class="row"><label>Макс. глубина</label><input id="syDepth" type="number" min="1" value="3" /></div>
+      <div class="row"><label>Distractors %</label><input id="syDist" type="number" min="0" max="100" value="30" /></div>
+      <div class="row"><label>Queries</label><input id="syQueries" type="number" min="1" value="50" /></div>
+      <div class="row"><label>Seed</label><input id="sySeed" type="number" value="42" /></div>
+      <div class="row" style="grid-template-columns:1fr auto;align-items:center">
+        <label for="syHideViz">Не показывать визуал графа</label>
+        <input id="syHideViz" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--accent)" />
+      </div>
+      <div class="actions">
+        <button type="button" id="syGenerate">Синтезировать</button>
+        <button type="button" class="secondary" id="syClose">Закрыть</button>
+      </div>
+      <div class="synth-result" id="syResult">
+        <b>Граф синтезирован</b>
+        <pre id="syResultBody"></pre>
+        <div class="actions">
+          <button type="button" id="syOpenGraph">Открыть граф</button>
+          <button type="button" id="syOpenBench">Открыть benchmark</button>
+          <button type="button" class="secondary" id="syDownload">Скачать dataset</button>
+        </div>
+      </div>
     </div>
   </div>
   <script>
@@ -407,12 +706,50 @@
     let network = null;
     let networkTrace = null;
     let highlight = new Set();
+    let graphVizEnabled = true;
+
+    function setGraphVizEnabled(enabled, { refresh = false } = {}) {
+      graphVizEnabled = !!enabled;
+      const btn = document.getElementById("toggleGraphViz");
+      if (btn) {
+        btn.textContent = graphVizEnabled ? "Визуал: вкл" : "Визуал: выкл";
+        btn.classList.toggle("active", !graphVizEnabled);
+      }
+      if (!graphVizEnabled) {
+        wipeNetwork();
+        showGraphVizPlaceholder();
+      } else if (refresh) {
+        return loadGraph();
+      }
+      return Promise.resolve();
+    }
+
+    function showGraphVizPlaceholder(stats) {
+      const container = document.getElementById("network");
+      const s = stats || lastGraphData?.stats || {};
+      const size = s.graph_size ?? s.factors ?? "—";
+      container.innerHTML =
+        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+        'height:100%;gap:10px;color:#8aa0b4;font-size:0.9rem;padding:16px;text-align:center">' +
+        "<div>Визуал графа отключён — большой граф не рендерится.</div>" +
+        `<div style="font-size:0.8rem">graph≈${size}` +
+        (s.semantic_factors != null ? ` · SF=${s.semantic_factors}` : "") +
+        (s.S != null ? ` · |S|=${s.S}` : "") +
+        "</div>" +
+        '<button type="button" class="secondary" id="enableGraphVizInline" style="min-height:44px;padding:0 14px">' +
+        "Показать визуал</button></div>";
+      const inline = document.getElementById("enableGraphVizInline");
+      if (inline) {
+        inline.addEventListener("click", () => setGraphVizEnabled(true, { refresh: true }));
+      }
+    }
     let graphMode = "hyper";
     let graphPane = "graph"; // graph | trace
     let lastHyperedges = [];
     let lastComponents = []; // [{ idx, ids }]
     let lastActivation = null;
     let lastGraphData = null;
+    let graphTopology = null; // topology cache for induced trace subgraph
 
     function esc(s) {
       return String(s ?? "").replace(/[&<>"']/g, (c) => ({
@@ -515,11 +852,21 @@
       `;
       traceView.querySelectorAll("code.uid").forEach((el) => {
         el.style.cursor = "pointer";
-        el.addEventListener("click", () => {
+        el.addEventListener("click", async () => {
           const id = el.getAttribute("data-uid");
           if (!id) return;
           highlight = new Set([id, ...highlight]);
-          loadGraph();
+          if (graphPane === "trace") {
+            await renderTraceGraph();
+            if (networkTrace) {
+              try {
+                networkTrace.selectNodes([id]);
+                networkTrace.focus(id, { scale: 1.2, animation: true });
+              } catch (_) {}
+            }
+            return;
+          }
+          await loadGraph();
           if (network) {
             try { network.selectNodes([id]); network.focus(id, { scale: 1.2, animation: true }); } catch (_) {}
           }
@@ -918,6 +1265,7 @@
     function wipeNetwork() {
       lastHyperedges = [];
       lastComponents = [];
+      graphTopology = null;
       if (network) {
         try { network.destroy(); } catch (_) { /* ignore */ }
         network = null;
@@ -932,34 +1280,66 @@
       if (traceEl) traceEl.innerHTML = "";
     }
 
+    function _addFocusUid(focus, uid) {
+      if (!uid || typeof uid !== "string") return;
+      // Skip priors / noise — not part of the illustrated ignition path.
+      if (uid.startsWith("PRIOR::")) return;
+      focus.add(uid);
+    }
+
     function collectFocusUids(act) {
-      const focus = new Set(highlight);
+      // Path-only: seeds + contribution messages + traced factors.
+      // Do not include global activated_nodes / beliefs (they flood the whole graph).
+      const focus = new Set();
+      for (const u of highlight) _addFocusUid(focus, u);
       if (!act) return focus;
-      for (const u of act.final_wm || []) focus.add(u);
-      for (const u of (act.user_ingest && act.user_ingest.seeds) || []) focus.add(u);
-      for (const u of (act.ask && act.ask.seed_uids) || []) focus.add(u);
-      for (const u of (act.assistant_ingest && act.assistant_ingest.seeds) || []) focus.add(u);
+      for (const u of (act.user_ingest && act.user_ingest.seeds) || []) _addFocusUid(focus, u);
+      for (const u of (act.user_ingest && act.user_ingest.created_n) || []) _addFocusUid(focus, u);
+      for (const u of (act.ask && act.ask.seed_uids) || []) _addFocusUid(focus, u);
+      for (const u of (act.assistant_ingest && act.assistant_ingest.seeds) || []) _addFocusUid(focus, u);
+      for (const u of (act.assistant_ingest && act.assistant_ingest.created_n) || []) _addFocusUid(focus, u);
+      const ft = act.full_trace || {};
+      for (const u of ft.activated_factors || []) _addFocusUid(focus, u);
       const ticks = [
-        ...((act.user_ingest && act.user_ingest.ticks) || []),
         ...((act.ask && act.ask.ticks) || []),
+        ...((act.user_ingest && act.user_ingest.ticks) || []),
         ...((act.assistant_ingest && act.assistant_ingest.ticks) || []),
       ];
+      let hasContributions = false;
       for (const t of ticks) {
-        for (const u of t.wm || []) focus.add(u);
-        for (const u of t.activated || []) focus.add(u);
-        for (const u of t.seeds || []) focus.add(u);
-        for (const u of Object.keys(t.beliefs_top || {})) focus.add(u);
-        for (const u of Object.keys(t.evidence || {})) focus.add(u);
+        for (const u of t.seeds || []) _addFocusUid(focus, u);
+        for (const u of t.trace_factors || []) _addFocusUid(focus, u);
+        for (const u of Object.keys(t.evidence || {})) _addFocusUid(focus, u);
+        for (const ev of t.events || []) {
+          hasContributions = true;
+          _addFocusUid(focus, ev.source_uid);
+          _addFocusUid(focus, ev.target_uid);
+          _addFocusUid(focus, ev.factor_uid);
+        }
       }
-      for (const line of act.chains || []) {
-        const re = /[A-Za-zА-Яа-яЁё0-9_]+/g;
-        let m;
-        while ((m = re.exec(line))) {
-          const tok = m[0];
-          if (tok.length >= 2 && /[A-ZА-Я]/.test(tok) && tok !== "seed") focus.add(tok);
+      // Fallback when contribution log is empty: compact WM / ask seeds only.
+      if (!hasContributions && focus.size < 2) {
+        for (const u of (act.final_wm || []).slice(0, 24)) _addFocusUid(focus, u);
+        for (const t of ticks) {
+          for (const u of (t.activated || []).slice(0, 16)) _addFocusUid(focus, u);
+          for (const u of (t.wm || []).slice(0, 16)) _addFocusUid(focus, u);
         }
       }
       return focus;
+    }
+
+    async function ensureTopology(limit = 1500) {
+      const r = await fetch(`/api/graph?limit=${limit}&mode=${graphMode}&_=${Date.now()}`, {
+        cache: "no-store",
+      });
+      const data = await r.json();
+      graphTopology = {
+        nodes: data.nodes || [],
+        edges: data.edges || [],
+        hyperedges: data.hyperedges || [],
+        stats: data.stats || {},
+      };
+      return graphTopology;
     }
 
     function weightLabel(e) {
@@ -991,27 +1371,152 @@
       };
     }
 
-    function setGraphPane(pane) {
+    async function setGraphPane(pane) {
       graphPane = pane;
       const isGraph = pane === "graph";
+      const isTrace = pane === "trace";
+      const isEr = pane === "er";
       document.getElementById("tabGraph").classList.toggle("active", isGraph);
-      document.getElementById("tabTraceGraph").classList.toggle("active", !isGraph);
+      document.getElementById("tabTraceGraph").classList.toggle("active", isTrace);
+      document.getElementById("tabEntityRes").classList.toggle("active", isEr);
       document.getElementById("graphToolbar").style.display = isGraph ? "flex" : "none";
       document.getElementById("legend").style.display = isGraph ? "block" : "none";
-      document.getElementById("traceGraphLegend").style.display = isGraph ? "none" : "block";
+      document.getElementById("traceGraphLegend").style.display = isTrace ? "block" : "none";
       document.getElementById("network").style.display = isGraph ? "block" : "none";
-      document.getElementById("networkTrace").style.display = isGraph ? "none" : "block";
+      document.getElementById("networkTrace").style.display = isTrace ? "block" : "none";
       document.getElementById("traceGraphEmpty").style.display = "none";
-      if (!isGraph) {
-        renderTraceGraph();
-      } else if (!network) {
-        loadGraph();
-      } else {
+      const erPanel = document.getElementById("erPanel");
+      if (erPanel) erPanel.classList.toggle("show", isEr);
+      if (isTrace) {
+        await renderTraceGraph();
+      } else if (isGraph && !network && graphVizEnabled) {
+        await loadGraph();
+      } else if (isGraph && network) {
         try { network.fit({ animation: false }); } catch (_) {}
       }
     }
 
-    function renderTraceGraph() {
+    function pct(v) {
+      if (v == null || Number.isNaN(v)) return "—";
+      return `${(Number(v) * 100).toFixed(1)}%`;
+    }
+
+    function drawErChart(sweep) {
+      const canvas = document.getElementById("erChart");
+      if (!canvas || !sweep || !sweep.length) return;
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const pad = { l: 36, r: 12, t: 16, b: 28 };
+      const xs = sweep.map((r) => r.threshold);
+      const series = [
+        { key: "f1", color: "#3d9c84", label: "F1" },
+        { key: "precision", color: "#4f8cff", label: "P" },
+        { key: "recall", color: "#c4a35a", label: "R" },
+        { key: "false_merge_rate", color: "#ff5c5c", label: "FM" },
+      ];
+      const x0 = pad.l;
+      const x1 = w - pad.r;
+      const y0 = h - pad.b;
+      const y1 = pad.t;
+      const xAt = (t) => {
+        const min = xs[0];
+        const max = xs[xs.length - 1];
+        return x0 + ((t - min) / (max - min || 1)) * (x1 - x0);
+      };
+      const yAt = (v) => y0 - Math.max(0, Math.min(1, v)) * (y0 - y1);
+      ctx.strokeStyle = "#2c3a47";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y0);
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x0, y1);
+      ctx.stroke();
+      ctx.fillStyle = "#8aa0b4";
+      ctx.font = "11px Segoe UI, sans-serif";
+      ctx.fillText("0", 8, y0 + 3);
+      ctx.fillText("1", 8, y1 + 8);
+      for (const s of series) {
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        sweep.forEach((row, i) => {
+          const x = xAt(row.threshold);
+          const y = yAt(row[s.key] ?? 0);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      }
+      let lx = x0;
+      for (const s of series) {
+        ctx.fillStyle = s.color;
+        ctx.fillText(s.label, lx, 12);
+        lx += 36;
+      }
+    }
+
+    function renderErReport(report, preferredResolver) {
+      const resolvers = report.resolvers || {};
+      const name =
+        (preferredResolver && resolvers[preferredResolver] && preferredResolver) ||
+        Object.keys(resolvers)[0];
+      if (!name) return;
+      const block = resolvers[name];
+      const m = block.metrics || {};
+      document.getElementById("erAcc").textContent = pct(m.accuracy);
+      document.getElementById("erP").textContent = pct(m.precision);
+      document.getElementById("erR").textContent = pct(m.recall);
+      document.getElementById("erF1").textContent = pct(m.f1);
+      document.getElementById("erFM").textContent = pct(m.false_merge_rate ?? block.false_merge_rate);
+      const opt = block.optimal || {};
+      document.getElementById("erOpt").textContent =
+        `${name}: F1-optimal=${opt.f1_optimal ?? "—"} · Safety-optimal=${opt.safety_optimal ?? "—"}`;
+      const sweep = (report.threshold_sweep || {})[name] || [];
+      drawErChart(sweep);
+      const thrWant = Number(document.getElementById("erThr").value);
+      const tbody = document.querySelector("#erSweepTable tbody");
+      tbody.innerHTML = sweep
+        .map((row) => {
+          const hi = Math.abs(row.threshold - thrWant) < 1e-9 ? ' style="color:var(--accent2)"' : "";
+          return `<tr${hi}><td>${row.threshold.toFixed(2)}</td>` +
+            `<td>${pct(row.precision)}</td><td>${pct(row.recall)}</td>` +
+            `<td>${pct(row.f1)}</td><td>${pct(row.false_merge_rate)}</td></tr>`;
+        })
+        .join("");
+    }
+
+    async function runEntityResolutionBench() {
+      const btn = document.getElementById("erRun");
+      btn.disabled = true;
+      btn.textContent = "Running…";
+      try {
+        const resolverSel = document.getElementById("erResolver").value;
+        const body = {
+          embedding_model: document.getElementById("erEmbed").value,
+          run_activation: true,
+        };
+        if (resolverSel !== "all") body.resolver = resolverSel;
+        const r = await fetch("/api/entity-resolution/benchmark", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.detail || r.statusText);
+        const prefer = resolverSel === "all" ? "hybrid" : resolverSel;
+        renderErReport(data, prefer);
+      } catch (err) {
+        document.getElementById("erOpt").textContent = `Error: ${err.message || err}`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Run benchmark";
+      }
+    }
+
+    async function renderTraceGraph() {
       const empty = document.getElementById("traceGraphEmpty");
       const container = document.getElementById("networkTrace");
       if (networkTrace) {
@@ -1020,34 +1525,55 @@
       }
       container.innerHTML = "";
 
-      const data = lastGraphData;
       const focus = collectFocusUids(lastActivation);
-      if (!data || !data.nodes || !focus.size) {
+      if (!focus.size) {
         empty.style.display = "flex";
+        empty.textContent = "Нет данных активации — отправь сообщение, затем открой эту вкладку.";
         container.style.display = "none";
         return;
       }
-      empty.style.display = "none";
-      container.style.display = "block";
 
-      // include hubs of hyperedges that touch focus
-      for (const he of data.hyperedges || []) {
-        if (focus.has(he.id) || (he.members || []).some((m) => focus.has(m))) {
-          focus.add(he.id);
-          for (const m of he.members || []) focus.add(m);
+      let data = graphTopology;
+      const have = new Set((data?.nodes || []).map((n) => n.id));
+      const missing = [...focus].filter((u) => !have.has(u)).length;
+      if (!data || !data.nodes || !data.nodes.length || missing > 0) {
+        try {
+          data = await ensureTopology(2000);
+        } catch (_) {
+          data = lastGraphData;
         }
       }
-
-      const nodesRaw = data.nodes.filter((n) => focus.has(n.id));
-      const nodeIds = new Set(nodesRaw.map((n) => n.id));
-      const edgesRaw = (data.edges || []).filter(
-        (e) => nodeIds.has(e.from) && nodeIds.has(e.to)
-      );
-      if (!nodesRaw.length) {
+      if (!data || !data.nodes || !data.nodes.length) {
         empty.style.display = "flex";
+        empty.textContent = "Нет топологии графа для отрисовки трассировки.";
         container.style.display = "none";
         return;
       }
+
+      // Induced subgraph only: keep hubs that are themselves in the focus set.
+      // Do NOT pull in all members of every touching hyperedge (that was the leak).
+      const nodesRaw = (data.nodes || [])
+        .filter((n) => focus.has(n.id))
+        .map((n) => ({ ...n }));
+      const nodeIds = new Set(nodesRaw.map((n) => n.id));
+
+      // Role spokes / binary edges between focus nodes only. Drop mesh noise.
+      const edgesRaw = (data.edges || []).filter((e) => {
+        if (!nodeIds.has(e.from) || !nodeIds.has(e.to)) return false;
+        if (e.kind === "hyper_mesh") return false;
+        return true;
+      });
+
+      if (!nodesRaw.length) {
+        empty.style.display = "flex";
+        empty.textContent =
+          `Трассировка: ${focus.size} UID, но ни один не найден в графе (limit/topology).`;
+        container.style.display = "none";
+        return;
+      }
+
+      empty.style.display = "none";
+      container.style.display = "block";
 
       // circle layout for readability
       const n = nodesRaw.length;
@@ -1091,6 +1617,31 @@
     }
 
     async function loadGraph() {
+      const h = document.getElementById("health");
+      const base = h.textContent.split(" · |S|=")[0];
+      document.getElementById("modeHyper").classList.toggle("active", graphMode === "hyper");
+      document.getElementById("modeAll").classList.toggle("active", graphMode === "all");
+
+      if (!graphVizEnabled) {
+        // Stats-only: avoid shipping/rendering a huge vis payload.
+        const r = await fetch(`/api/graph?limit=1&mode=${graphMode}&_=${Date.now()}`, {
+          cache: "no-store",
+        });
+        const data = await r.json();
+        wipeNetwork();
+        lastGraphData = {
+          nodes: [],
+          edges: [],
+          hyperedges: [],
+          stats: data.stats || {},
+        };
+        h.textContent =
+          `${base} · |S|=${data.stats.S} N=${data.stats.hyperedges} graph=${data.stats.graph_size}` +
+          " · viz off";
+        showGraphVizPlaceholder(data.stats);
+        return;
+      }
+
       const r = await fetch(`/api/graph?limit=400&mode=${graphMode}&_=${Date.now()}`, {
         cache: "no-store",
       });
@@ -1098,10 +1649,6 @@
       wipeNetwork();
       lastHyperedges = data.hyperedges || [];
       const container = document.getElementById("network");
-      const h = document.getElementById("health");
-      const base = h.textContent.split(" · |S|=")[0];
-      document.getElementById("modeHyper").classList.toggle("active", graphMode === "hyper");
-      document.getElementById("modeAll").classList.toggle("active", graphMode === "all");
 
       if (!data.nodes.length && !data.edges.length) {
         lastGraphData = { nodes: [], edges: [], hyperedges: [], stats: data.stats };
@@ -1120,13 +1667,14 @@
         hyperedges: data.hyperedges || [],
         stats: data.stats,
       };
+      graphTopology = lastGraphData;
       h.textContent =
         `${base} · |S|=${data.stats.S} N=${data.stats.hyperedges} graph=${data.stats.graph_size}` +
         ` · CC=${ccMeta.clusters}` +
         (ccMeta.singles ? ` +${ccMeta.singles} iso` : "");
 
       if (graphPane === "trace") {
-        renderTraceGraph();
+        await renderTraceGraph();
         return;
       }
 
@@ -1213,6 +1761,8 @@
     document.getElementById("modeAll").addEventListener("click", () => { graphMode = "all"; loadGraph(); });
     document.getElementById("tabGraph").addEventListener("click", () => setGraphPane("graph"));
     document.getElementById("tabTraceGraph").addEventListener("click", () => setGraphPane("trace"));
+    document.getElementById("tabEntityRes").addEventListener("click", () => setGraphPane("er"));
+    document.getElementById("erRun").addEventListener("click", () => runEntityResolutionBench());
     document.getElementById("dump").addEventListener("click", async () => {
       const r = await fetch("/api/dump");
       const blob = await r.blob();
@@ -1253,6 +1803,187 @@
     document.getElementById("llmDeep").addEventListener("click", async () => {
       try { await setLlmProvider("deepseek"); }
       catch (e) { addMsg("bot", String(e), "error"); }
+    });
+
+    const PRESET_VALUES = {
+      small: { entities: 100, events: 200, factors: 500, depth: 3, distractors: 30, queries: 50 },
+      medium: { entities: 1000, events: 2000, factors: 5000, depth: 5, distractors: 30, queries: 500 },
+      large: { entities: 10000, events: 20000, factors: 50000, depth: 8, distractors: 30, queries: 5000 },
+      stress: { entities: 25000, events: 40000, factors: 100000, depth: 8, distractors: 35, queries: 8000 },
+    };
+    const synthModal = document.getElementById("synthModal");
+    const synthPanel = document.getElementById("synthPanel");
+    const syResult = document.getElementById("syResult");
+    let lastSynthSummary = null;
+
+    function applyPresetFields(name) {
+      const p = PRESET_VALUES[name] || PRESET_VALUES.small;
+      document.getElementById("syEnt").value = p.entities;
+      document.getElementById("syEvt").value = p.events;
+      document.getElementById("syFac").value = p.factors;
+      document.getElementById("syDepth").value = p.depth;
+      document.getElementById("syDist").value = p.distractors;
+      document.getElementById("syQueries").value = p.queries;
+    }
+    function pct(v) {
+      if (v == null || Number.isNaN(v)) return "—";
+      return `${(Number(v) * 100).toFixed(1)}%`;
+    }
+    function showSynthSummary(summary) {
+      lastSynthSummary = summary;
+      const s = summary.stats || {};
+      document.getElementById("smEnt").textContent = s.entities ?? "—";
+      document.getElementById("smFac").textContent = s.factors ?? "—";
+      document.getElementById("smEvt").textContent = s.events ?? "—";
+      document.getElementById("smQ").textContent = s.queries ?? "—";
+      document.getElementById("syResultBody").textContent =
+        `Entities:      ${s.entities}\n` +
+        `Factors:       ${s.factors}\n` +
+        `Relations:     ${s.relations}\n` +
+        `Events:        ${s.events}\n` +
+        `Queries:       ${s.queries}\n` +
+        `Proof paths:   ${s.proof_paths}\n\n` +
+        `Generation time: ${(summary.generation_time_sec || 0).toFixed(2)} sec`;
+      syResult.classList.add("show");
+      synthPanel.classList.add("show");
+    }
+    async function loadSynthQueries() {
+      const r = await fetch("/api/synthetic/queries");
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.detail || "queries failed");
+      const box = document.getElementById("synthQueries");
+      box.innerHTML = "";
+      (j.queries || []).slice(0, 40).forEach((q) => {
+        const el = document.createElement("div");
+        el.className = "synth-q";
+        const res = q.result;
+        el.innerHTML =
+          `<div><b>${q.query_id}</b> · ${q.category}` +
+          (res ? ` · ${res.answer_correct ? "OK" : "FAIL"} · F1=${(res.path_f1 || 0).toFixed(2)}` : "") +
+          `</div><div>${q.question}</div>` +
+          `<div class="muted">GT: ${q.answer}</div>`;
+        el.addEventListener("click", () => openProof(q.query_id));
+        box.appendChild(el);
+      });
+    }
+    async function openProof(queryId) {
+      const r = await fetch(`/api/synthetic/proof/${encodeURIComponent(queryId)}`);
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.detail || "proof failed");
+      const steps = (j.proof.steps || []).map((step, i) => {
+        const args = Object.entries(step.arguments || {})
+          .map(([role, info]) => `${role}=${info.name || info.uid}`)
+          .join(", ");
+        return `${i + 1}. ${step.type}(${args})`;
+      });
+      const nodes = (j.proof.nodes || []).map((n) => n.name || n.uid);
+      const pv = document.getElementById("proofView");
+      pv.textContent =
+        `Query ${queryId}\n` +
+        nodes.map((n, i) => (i ? `  │\n  ▼\n${n}` : n)).join("\n") +
+        `\n\n` + steps.join("\n");
+      pv.classList.add("show");
+      highlight = new Set(j.highlight || []);
+      await loadGraph();
+    }
+    function downloadDataset() {
+      window.location.href = "/api/synthetic/download";
+    }
+
+    document.getElementById("synthOpen").addEventListener("click", () => {
+      applyPresetFields(document.getElementById("syPreset").value);
+      synthModal.classList.add("show");
+    });
+    document.getElementById("syClose").addEventListener("click", () => {
+      synthModal.classList.remove("show");
+    });
+    document.getElementById("syPreset").addEventListener("change", (e) => {
+      applyPresetFields(e.target.value);
+    });
+    document.getElementById("toggleGraphViz").addEventListener("click", async () => {
+      await setGraphVizEnabled(!graphVizEnabled, { refresh: true });
+    });
+    document.getElementById("syGenerate").addEventListener("click", async () => {
+      const btn = document.getElementById("syGenerate");
+      btn.disabled = true;
+      try {
+        wipeNetwork();
+        const hideViz = document.getElementById("syHideViz").checked;
+        if (hideViz) {
+          await setGraphVizEnabled(false);
+        }
+        const body = {
+          preset: document.getElementById("syPreset").value,
+          num_entities: Number(document.getElementById("syEnt").value),
+          num_events: Number(document.getElementById("syEvt").value),
+          num_factors: Number(document.getElementById("syFac").value),
+          max_hop_depth: Number(document.getElementById("syDepth").value),
+          distractor_ratio: Number(document.getElementById("syDist").value) / 100,
+          num_queries: Number(document.getElementById("syQueries").value),
+          random_seed: Number(document.getElementById("sySeed").value),
+        };
+        const r = await fetch("/api/synthetic/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.detail || "generate failed");
+        showSynthSummary(j);
+        document.getElementById("synthBenchMetrics").style.display = "none";
+        await loadHealth();
+        await loadGraph();
+        await loadSynthQueries();
+        addMsg(
+          "bot",
+          `Synthetic graph: entities=${j.stats.entities}, factors=${j.stats.factors}, queries=${j.stats.queries}` +
+            (hideViz ? " · визуал отключён" : ""),
+          "system"
+        );
+      } catch (e) {
+        addMsg("bot", String(e), "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+    document.getElementById("syOpenGraph").addEventListener("click", async () => {
+      synthModal.classList.remove("show");
+      await setGraphVizEnabled(true, { refresh: true });
+    });
+    document.getElementById("syOpenBench").addEventListener("click", () => {
+      synthModal.classList.remove("show");
+      synthPanel.classList.add("show");
+      synthPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+    document.getElementById("syDownload").addEventListener("click", downloadDataset);
+    document.getElementById("synthDownload").addEventListener("click", downloadDataset);
+    document.getElementById("synthRunBench").addEventListener("click", async () => {
+      const btn = document.getElementById("synthRunBench");
+      btn.disabled = true;
+      try {
+        const r = await fetch("/api/synthetic/benchmark", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            limit: 50,
+            activation: document.getElementById("synthActFn").value,
+          }),
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.detail || "benchmark failed");
+        const a = j.aggregate || {};
+        document.getElementById("bmAcc").textContent = pct(a.answer_accuracy);
+        document.getElementById("bmPP").textContent = pct(a.path_precision);
+        document.getElementById("bmPR").textContent = pct(a.path_recall);
+        document.getElementById("bmF1").textContent = pct(a.path_f1);
+        document.getElementById("bmNoise").textContent = pct(a.activation_noise);
+        document.getElementById("synthBenchMetrics").style.display = "grid";
+        await loadSynthQueries();
+      } catch (e) {
+        addMsg("bot", String(e), "error");
+      } finally {
+        btn.disabled = false;
+      }
     });
 
     (async () => {

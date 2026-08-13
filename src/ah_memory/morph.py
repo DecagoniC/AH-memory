@@ -109,15 +109,6 @@ def lemma(word: str) -> str:
     return nf
 
 
-def pos_of(word: str) -> str | None:
-    w = _norm(word)
-    if not w or w.isdigit():
-        return "NUMR" if w.isdigit() else None
-    if re.fullmatch(r"[a-z0-9_\-]+", w):
-        return "LATN"
-    return _parse(w).tag.POS
-
-
 _PRONOUNS = frozenset({"я", "мы", "ты"})
 
 

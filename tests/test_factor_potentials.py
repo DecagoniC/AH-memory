@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from ah_memory.belief_propagation import BeliefPropagation
-from ah_memory.examples.rabbit import build_rabbit_memory
+from tests._mini_graph import build_mini_open_store
 from ah_memory.factor_graph import Factor, FactorGraph, FactorKind, build_factor_graph
 from ah_memory.potentials import (
     AssociativePotential,
@@ -129,7 +129,7 @@ def test_factor_graph_keeps_all_incident_variables() -> None:
 
 
 def test_existing_episode_follow_links_enter_factor_graph() -> None:
-    graph = build_factor_graph(build_rabbit_memory(), include_prior=False)
+    graph = build_factor_graph(build_mini_open_store(), include_prior=False)
     follow = [factor for factor in graph.factors if factor.potential_key == "follow"]
     assert follow
     assert all(len(factor.variables) == 2 for factor in follow)

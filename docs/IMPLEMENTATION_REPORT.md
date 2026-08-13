@@ -47,8 +47,8 @@ Runtime contribution is message delta. Optional
 - ASSOC remains symmetric M↔M.
 - IS_A uses independent upward/downward weights.
 - FOLLOW and CAUSE use independent forward/backward weights.
-- Episode `ElementList` objects are stable factor-graph variables, so
-  existing FOLLOW links are no longer dropped.
+- Episode markers are ordinary `SecondOrderSymbol` nodes (`Mt kind=Episode`);
+  FOLLOW links between them stay in the factor graph.
 - Hypernodes are true n-ary factors with `and`, `soft_and` and
   `pairwise` semantics.
 - Exact mode enumerates all `2^(arity-1)` assignments. No arity is

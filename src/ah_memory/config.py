@@ -82,6 +82,24 @@ class OpenSemanticsConfig:
 
 
 @dataclass(frozen=True)
+class EmbeddingConfig:
+    """Embedding backend label + size (entity resolution / open semantics)."""
+
+    model: str = "deterministic_ngram"
+    dimensions: int = 64
+
+
+@dataclass(frozen=True)
+class IdentityConfig:
+    """Symbol identity at ingest: avoid duplicates via resolve-before-create."""
+
+    enabled: bool = True
+    use_embeddings: bool = True
+    safety_threshold: float = 0.94
+    margin: float = 0.05
+
+
+@dataclass(frozen=True)
 class AppConfig:
     gigachat: GigaChatConfig
     deepseek: DeepSeekConfig
@@ -89,6 +107,8 @@ class AppConfig:
     agent: AgentConfig
     experiment: ExperimentConfig = ExperimentConfig()
     open_semantics: OpenSemanticsConfig = OpenSemanticsConfig()
+    embedding: EmbeddingConfig = EmbeddingConfig()
+    identity: IdentityConfig = IdentityConfig()
 
 
 def _deep_merge(base: dict[str, Any], over: dict[str, Any]) -> dict[str, Any]:
@@ -137,6 +157,8 @@ def load_config(path: Path | None = None) -> AppConfig:
     web = raw.get("web", {})
     ag = raw.get("agent", {})
     semantics = raw.get("open_semantics", {})
+    emb = raw.get("embedding", {}) or {}
+    ident = raw.get("identity", {}) or {}
 
     credentials = (
         os.environ.get("GIGACHAT_CREDENTIALS")
@@ -195,5 +217,15 @@ def load_config(path: Path | None = None) -> AppConfig:
             ),
             parameter_seed=int(semantics.get("parameter_seed", 42)),
             trace_messages=bool(semantics.get("trace_messages", False)),
+        ),
+        embedding=EmbeddingConfig(
+            model=str(emb.get("model", "deterministic_ngram")),
+            dimensions=int(emb.get("dimensions", 64)),
+        ),
+        identity=IdentityConfig(
+            enabled=bool(ident.get("enabled", True)),
+            use_embeddings=bool(ident.get("use_embeddings", True)),
+            safety_threshold=float(ident.get("safety_threshold", 0.94)),
+            margin=float(ident.get("margin", 0.05)),
         ),
     )

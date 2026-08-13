@@ -46,14 +46,11 @@ SYSTEM_PROMPT = """Ты модуль восприятия АГ-памяти.
 }
 
 raw_relation ОБЯЗАТЕЛЕН для каждого факта: точный глагол/отношение из исходного текста.
-canonical_relation: выбери известный canonical label, если уверен, иначе null.
-Начальный, но НЕ закрытый словарь canonical relation:
-IS | LIVE_IN | BE_BORN | HAVE | RUN | BE_COLORED | CREATE | CAUSE | USE | MOVE |
-PURCHASE | SELL | BORROW | RECEIVE | FOLLOW | BEFORE | AFTER | DURING | IS_A |
-LOCATED_IN | PART_OF | WORKS_FOR | OWNS.
-predicate оставь как legacy-копию canonical_relation; если canonical_relation=null,
-используй UPPER_SNAKE транслитерацию/обобщение raw_relation. Не пропускай факт
-только потому, что отношения нет в словаре.
+canonical_relation: UPPER_SNAKE ярлык отношения (можно новый, не из списка).
+Известные примеры (не закрытый словарь): IS, LIVE_IN, BE_BORN, HAVE, PURCHASE,
+WORKS_FOR, OWNS, LOCATED_IN, IS_A — или дословно по смыслу текста (ПРИЕХАЛ, ВСТРЕТИЛИСЬ…).
+predicate = canonical_relation (или UPPER_SNAKE от raw_relation, если canonical null).
+Не пропускай факт только потому, что отношения нет в примерах.
 
 Закрытый список ключей roles:
 SUBJECT | OBJECT | LOCATION | TIME | CAUSE | TOOL | MATERIAL | PURPOSE | HOW-TO
@@ -193,6 +190,97 @@ class GigaChatClient:
                 )
             data = r.json()
         return data["choices"][0]["message"]["content"]
+
+    def embeddings(
+        self,
+        texts: list[str],
+        *,
+        model: str = "EmbeddingsGigaR",
+    ) -> list[list[float]]:
+        """POST /embeddings — Sber vector representations for input texts."""
+        if not texts:
+            return []
+        payload = {"model": model, "input": texts}
+        with self._http() as client:
+            token = self._ensure_token(client)
+            url = self.cfg.base_url.rstrip("/") + "/embeddings"
+            headers = {
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            }
+            r = client.post(url, headers=headers, json=payload)
+            if r.status_code == 401:
+                self._token = None
+                token = self._ensure_token(client)
+                headers["Authorization"] = f"Bearer {token}"
+                r = client.post(url, headers=headers, json=payload)
+            if r.status_code >= 400:
+                detail = (r.text or r.reason_phrase or "")[:500]
+                raise httpx.HTTPStatusError(
+                    f"GigaChat embeddings failed ({r.status_code}): {detail}",
+                    request=r.request,
+                    response=r,
+                )
+            data = r.json()
+        items = sorted(data.get("data") or [], key=lambda row: int(row.get("index", 0)))
+        if len(items) != len(texts):
+            raise RuntimeError(
+                f"GigaChat embeddings size mismatch: got {len(items)} for {len(texts)} inputs"
+            )
+        return [list(map(float, row["embedding"])) for row in items]
+
+
+# Symmetric instruction for EmbeddingsGigaR (entity / synonym matching).
+DEFAULT_GIGAR_INSTRUCTION = (
+    "Дано обозначение сущности или понятия, найди тождественное "
+    "или синонимичное обозначение той же сущности\nтекст: {query}"
+)
+
+
+class GigaChatEmbedder:
+    """Cached embed callable backed by GigaChat /embeddings."""
+
+    def __init__(
+        self,
+        client: GigaChatClient,
+        *,
+        model: str = "EmbeddingsGigaR",
+        instruction: str | None = DEFAULT_GIGAR_INSTRUCTION,
+        batch_size: int = 16,
+    ) -> None:
+        self.client = client
+        self.model = model
+        self.instruction = (
+            instruction
+            if instruction and model.lower() == "embeddingsgigar"
+            else None
+        )
+        self.batch_size = max(1, batch_size)
+        self._cache: dict[str, tuple[float, ...]] = {}
+
+    def _payload_text(self, text: str) -> str:
+        raw = text.strip()
+        if self.instruction:
+            return self.instruction.format(query=raw)
+        return raw
+
+    def warm(self, texts: list[str]) -> None:
+        missing = [t for t in dict.fromkeys(texts) if t not in self._cache]
+        for start in range(0, len(missing), self.batch_size):
+            chunk = missing[start : start + self.batch_size]
+            vectors = self.client.embeddings(
+                [self._payload_text(t) for t in chunk],
+                model=self.model,
+            )
+            for text, vector in zip(chunk, vectors):
+                self._cache[text] = tuple(vector)
+
+    def __call__(self, text: str) -> tuple[float, ...]:
+        key = text.strip()
+        if key not in self._cache:
+            self.warm([key])
+        return self._cache[key]
 
 
 class GigaChatPerception:

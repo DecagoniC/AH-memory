@@ -70,7 +70,7 @@ AH — это не одно дерево и не три пересекающих
 | ЕЯ-ярлык | UID понятия словами | ЗАЯЦ, СЕРГЕЙ, МОСКВА |
 | R[TEXT] | словоформы / написания | заяц, зайца, зайцу |
 | R[VISION] и др. | сенсорные привязки (монография) | образ куба, звук … |
-| Предикатный ярлык | имя отношения в S | часто через T.predicate → IS, LIVE_IN |
+| Предикатный ярлык | строка на T (не узел S) | `T.predicate` → IS, LIVE_IN |
 
 «Разновидности s» — не разные классы в коде, а разная начинка R и роль UID. Математически все \(s = \langle UID, R \rangle\).
 
@@ -121,7 +121,7 @@ C, P, H как носители элементов в реализации **д�
 ```text
 s ∈ S:     s = ⟨ UID, R ⟩
 m:         m = ⟨ UID, Pr, Mt ⟩
-T:         T = ⟨ UID, s_pred*, A ⟩
+T:         T = ⟨ UID, predicate, A ⟩
 N:         N = ⟨ UID, w, T*, fillers, Pr, Mt ⟩
 l ∈ L:     l = ⟨ UID, id, w, (e1*, e2*) ⟩
 k:         k = ⟨ UID, items, Pr, Mt ⟩
@@ -155,7 +155,7 @@ Pr — свойства, Mt — мета-свойства
 ### T — шаблон предиката
 
 ```text
-T = ⟨ UID, s_pred*, A ⟩
+T = ⟨ UID, predicate, A ⟩
 A = [ ActantSlot(role, filler?) , … ]
 пример: T_IS → roles { SUBJECT, OBJECT }
          T_LIVE_IN → { SUBJECT, LOCATION }

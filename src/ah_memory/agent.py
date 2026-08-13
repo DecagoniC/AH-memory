@@ -1,4 +1,8 @@
-"""Cognitive agent loop: perceive → transform → ignite → answer."""
+"""Agent: perceive → transform → ignite → (опц.) ответить из графа.
+
+Оркестратор без LLM-диалога (диалог — dialogue.DialogueAgent поверх Agent).
+Читать после transform/identity; ignition — чёрный ящик «посеяли UID → тики».
+"""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
@@ -10,11 +14,11 @@ from ah_memory.ignition import ActivationSeed, IgnitionEngine, TickTrace
 from ah_memory.perception import PerceptionBackend, PerceptionResult, SeedPerception, FactCandidate
 from ah_memory.store import AHStore
 from ah_memory.transform import IngestReport, Transform
-from ah_memory.types import Role, Section
+from ah_memory.types import Section
 
 
 def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
-    """Keep only confident structural facts from chat replies (drop greetings / fluff)."""
+    """Из ответа ассистента в граф — только уверенные структурные факты (не small talk)."""
     from ah_memory.morph import is_nounish, sanitize_roles, seeds_from_roles
 
     kept: list[FactCandidate] = []
@@ -51,6 +55,8 @@ def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
 
 @dataclass
 class AgentReply:
+    """Ответ ask/step + трасса активации для UI."""
+
     answer: str
     trace_uids: list[str]
     traces: list[TickTrace] = field(default_factory=list)
@@ -61,6 +67,9 @@ class AgentReply:
 
 
 class Agent:
+    # ── Сборка пайплайна ─────────────────────────────────────────────────────
+    # perception → Transform(+identity) → IgnitionEngine; dsl — эвристики ответа.
+
     def __init__(
         self,
         store: AHStore | None = None,
@@ -70,6 +79,7 @@ class Agent:
         relation_normalizer=None,
         parameter_generator=None,
         state_engine=None,
+        identity=None,
     ) -> None:
         self.store = store or AHStore()
         self.hp = hp or HyperParams()
@@ -80,17 +90,18 @@ class Agent:
             relation_normalizer=relation_normalizer,
             parameter_generator=parameter_generator,
             state_engine=state_engine,
+            identity=identity,
         )
         self.ignition = IgnitionEngine(self.store, self.hp)
         self.dsl = DSLInterpreter(self.store)
 
     def ingest(self, text: str, section: Section = Section.C, *, source: str = "user") -> IngestReport:
-        """Perceive → materialize S/m seeds + N factors."""
+        """Текст → граф (+ короткий прогон активации по новым seeds)."""
         perc = self.perception.parse(text, list(self.ignition.wm.contents()))
         if source == "assistant":
             perc = _filter_assistant_perception(perc)
         report = self.transform.apply(perc, section=section)
-        # activate only role-bearing seeds (report.seed_uids already from perception.seed_tokens)
+        # Зачем: новые символы сразу «подогреть», чтобы следующий ask их видел в WM.
         seeds = [
             ActivationSeed(uid=u, delta_x=self.hp.seed_delta) for u in report.seed_uids
         ]
@@ -101,6 +112,7 @@ class Agent:
         return report
 
     def ask(self, question: str, ticks: int = 6) -> AgentReply:
+        # Зачем: не писать вопрос как факт, а найти UID по seeds → ignition → compose.
         perc = self.perception.parse(question, list(self.ignition.wm.contents()))
         seeds: list[ActivationSeed] = []
         seen: set[str] = set()
@@ -150,7 +162,7 @@ class Agent:
         )
 
     def step_message(self, text: str, ticks: int = 3) -> AgentReply:
-        """Continuous perception cycle (bonus track)."""
+        """Один шаг цикла: вопрос → ask, иначе → ingest."""
         perc = self.perception.parse(text, list(self.ignition.wm.contents()))
         if perc.kind == "question" and not perc.candidates:
             return self.ask(text, ticks=ticks)
@@ -175,6 +187,7 @@ class Agent:
         *,
         answer: str = "",
     ) -> dict:
+        # Зачем: единый JSON для web/dialogue — узлы, факторы, events, state.
         requested = set(activated_nodes)
         semantic_factor_ids = set(self.store.semantic_factors)
         actual_nodes = [
@@ -238,6 +251,7 @@ class Agent:
         }
 
     def _compose_answer(self, question: str, seeds: list[str], trace: list[str]) -> str:
+        # Зачем: эвристический ответ без LLM (кто/где/labels активированных M).
         q = question.lower()
         subjects = self._resolve_subjects(seeds + trace)
         if "кто" in q or "что" in q:
@@ -247,10 +261,22 @@ class Agent:
                     return str(ans)
         if "где" in q:
             for subj in subjects:
-                for n in self.store.find_roles("SUBJECT", subj):
-                    loc = n.fillers.get(Role.LOCATION)
-                    if loc:
-                        return f"location:{loc.target_uid}"
+                for factor in self.store.list_semantic_factors():
+                    if factor.roles.get("SUBJECT") != subj:
+                        continue
+                    loc = factor.roles.get("LOCATION") or factor.roles.get("OBJECT")
+                    pred = (
+                        factor.relation.canonical_label.upper()
+                        if factor.relation
+                        else ""
+                    )
+                    if loc and pred in {
+                        "LIVE_IN",
+                        "LIVES_IN",
+                        "LOCATED_IN",
+                        "BE_BORN",
+                    }:
+                        return f"location:{loc}"
         labels: list[str] = []
         for uid in trace:
             try:

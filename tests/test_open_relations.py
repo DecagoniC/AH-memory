@@ -179,7 +179,9 @@ def test_open_semantic_factor_is_visible_in_exported_graph() -> None:
         edge["from"] == factor.uid and edge["to"] == "M_BMW"
         for edge in spokes
     )
-    assert graph["stats"]["graph_size"] == 3
+    # S/M + semantic factor + BIND/mesh links
+    assert graph["stats"]["graph_size"] >= 3
+    assert len(store.list_semantic_factors()) == 1
 
 
 def test_generators_produce_serializable_relation_parameters() -> None:

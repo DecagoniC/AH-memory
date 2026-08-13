@@ -1,4 +1,8 @@
-"""AH memory core types (monograph §3)."""
+"""Модель данных AH (монография §3 + open-semantics).
+
+Актуальный путь:
+  S (слова) → M (сущности) → Event/Factor (open relations) → L (BIND/ASSOC/…) → AH
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -7,6 +11,8 @@ from typing import Any, Union
 
 
 class Section(str, Enum):
+    """Секции гиперслоя: C — общее, P — личное, H — история."""
+
     C = "C"
     P = "P"
     H = "H"
@@ -26,6 +32,8 @@ class LinkId(str, Enum):
 
 
 class Role(str, Enum):
+    """Слоты Event/Factor — кто/где/чем."""
+
     SUBJECT = "SUBJECT"
     OBJECT = "OBJECT"
     AUXILIARY = "AUXILIARY"
@@ -58,10 +66,9 @@ class Property:
 
 @dataclass(frozen=True)
 class SRef:
-    """s* = ⟨'S, UID, UID*⟩"""
+    """Ссылка на AbstractSymbol в S (лексика)."""
 
     target_uid: str
-    ref_uid: str
     kind: RefKind = RefKind.S
 
     def __post_init__(self) -> None:
@@ -71,10 +78,9 @@ class SRef:
 
 @dataclass(frozen=True)
 class MRef:
-    """m* = ⟨'M, UID, UID*⟩"""
+    """Ссылка на сущность в C∪P∪H (обычно SecondOrderSymbol)."""
 
     target_uid: str
-    ref_uid: str
     kind: RefKind = RefKind.M
 
     def __post_init__(self) -> None:
@@ -87,12 +93,13 @@ ElementRef = Union[SRef, MRef]
 
 @dataclass
 class AbstractSymbol:
-    """s_i = ⟨UID, R⟩"""
+    """s_i = ⟨UID, R⟩ — лексика 1-го порядка."""
 
     uid: str
     R: dict[str, set[str]] = field(default_factory=dict)
     x: float = 0.0
     created_tau: int = 0
+    added_at: str = ""
 
     def modality_partition_ok(self) -> bool:
         seen: set[str] = set()
@@ -105,94 +112,35 @@ class AbstractSymbol:
 
 @dataclass
 class SecondOrderSymbol:
-    """m = ⟨UID, Pr, Mt⟩"""
+    """m = ⟨UID, Pr, Mt⟩ — сущность / смысл 2-го порядка."""
 
     uid: str
     Pr: list[Property] = field(default_factory=list)
     Mt: list[Property] = field(default_factory=list)
     x: float = 0.0
     created_tau: int = 0
-
-
-@dataclass
-class FunctionalSymbol:
-    """g = ⟨UID, ID, {e_i*}⟩"""
-
-    uid: str
-    id: str
-    operands: list[ElementRef] = field(default_factory=list)
-    x: float = 0.0
-    created_tau: int = 0
-
-
-@dataclass
-class ElementList:
-    """k = ⟨UID, {e_i*}, Pr, Mt⟩"""
-
-    uid: str
-    items: list[ElementRef] = field(default_factory=list)
-    Pr: list[Property] = field(default_factory=list)
-    Mt: list[Property] = field(default_factory=list)
-    x: float = 0.0
-    created_tau: int = 0
-
-
-@dataclass
-class ActantSlot:
-    role: Role
-    filler: ElementRef | None = None
-
-
-@dataclass
-class Template:
-    """T = ⟨UID, s*, A⟩"""
-
-    uid: str
-    predicate: SRef
-    actants: list[ActantSlot] = field(default_factory=list)
-    x: float = 0.0
-    created_tau: int = 0
-
-
-@dataclass
-class Hyperlink:
-    """N = ⟨UID, w, t*, {fillers}, Pr, Mt⟩ — fact = filled control model."""
-
-    uid: str
-    w: float
-    template: ElementRef
-    fillers: dict[Role, ElementRef] = field(default_factory=dict)
-    Pr: list[Property] = field(default_factory=list)
-    Mt: list[Property] = field(default_factory=list)
-    x: float = 0.0
-    created_tau: int = 0
+    added_at: str = ""
 
 
 @dataclass
 class AssocLink:
-    """l = ⟨UID, ID, w, (e1*, e2*)⟩"""
+    """l = ⟨UID, ID, w, (e1*, e2*)⟩ — бинарная связь (IS-A, BIND, ASSOC…)."""
 
     uid: str
     id: str
     w: float
     e1: ElementRef
     e2: ElementRef
+    created_tau: int = 0
+    added_at: str = ""
 
 
-HyperElement = Union[
-    SecondOrderSymbol,
-    FunctionalSymbol,
-    ElementList,
-    Template,
-    Hyperlink,
-    SRef,
-    MRef,
-]
+HyperElement = Union[SecondOrderSymbol, SRef, MRef]
 
 
 @dataclass
 class AH:
-    """AH = ⟨S, C, P, H, L⟩"""
+    """AH = ⟨S, C, P, H, L⟩. Event/Factor живут в AHStore, не в AH."""
 
     S: dict[str, AbstractSymbol] = field(default_factory=dict)
     C: dict[str, HyperElement] = field(default_factory=dict)

@@ -24,23 +24,48 @@ ah-web
 ```
 
 Открой http://127.0.0.1:8000 — чат слева, граф справа, кнопка «Скачать JSON» для дампа.
-Демо:
+
+### Entity Resolution Benchmark
+
+Отдельный benchmark разрешения упоминаний на символы графа
+(морфология / синонимы / negative false-merge / contextual), без изменения synthetic aggregation.
 
 ```bash
-python -c "from ah_memory.examples.rabbit import build_rabbit_memory, syntactic_answer_who_is_hare, rabbit_auto_score; s=build_rabbit_memory(); print(rabbit_auto_score(s), syntactic_answer_who_is_hare(s))"
-python -c "from ah_memory.examples.dog import run_dog_ignition; print(run_dog_ignition(6)[-1])"
-python -c "from ah_memory.corpus import build_encyclopedia; st,c=build_encyclopedia(); print(len(st.ah.S), st.graph_size(), len(c.split()))"
+python -m benchmark.entity_resolution
+# или
+python -m ah_memory.benchmarks.entity_resolution
+```
+
+Результаты: `results/entity_resolution/{summary,threshold_sweep,cases,activation_traces}.json`.
+В UI — вкладка **Entity Resolution**.
+
+### Synthetic Graph
+
+Кнопка **«Синтезировать граф»** создаёт контролируемый synthetic world с ground truth
+(сущности, факторы, события, документы, вопросы, proof paths), загружает его в АГ-память
+и позволяет запустить benchmark активации.
+
+CLI (Small, seed=42):
+
+```bash
+python -c "
+from ah_memory.synthetic import get_preset, SyntheticGraphGenerator, ingest_world, run_benchmark, export_dataset
+world = SyntheticGraphGenerator(get_preset('small')).generate()
+print(world.stats(), round(world.generation_time_sec, 3))
+ingest = ingest_world(world)
+report = run_benchmark(ingest.store, world, ingest, limit=20)
+print(report.aggregate)
+export_dataset(world, 'results/synthetic_small_42')
+"
 ```
 
 ## Модули
 
-- `perception` / `transform` — текст → факты → `N`
-- `templates` — ≥8 шаблонов, CREATE×7
-- `ignition` — 8-шаговый такт + WM + pacemaker
+- `perception` / `transform` — текст → open relations (Event / Factor)
+- `ignition` — такт активации + WM
 - `gc` — сборка мусора с TTL
 - `dsl` — интерпретатор запросов
 - `agent` — цикл ingest/ask/step_message
-- `corpus` — энциклопедия N≥1000, \|S\|≥150, ≥15k слов
 
 ## Architecture
 

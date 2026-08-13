@@ -73,7 +73,7 @@ class TransformResult:
 | getMReference / findMReferences | … |
 | getSymbol | `(uid) → m` |
 | findSymbols | `(query) → {m}` |
-| getList / findLists | … |
+| findLists | `(kind?) → {m}` with `Mt kind` (e.g. Episode) |
 | getTemplate | `(uid) → T` |
 | getHypernode / findHypernodes | … |
 | findRoles | `(role, value) → {N}` |

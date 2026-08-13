@@ -8,7 +8,6 @@ from typing import Any
 from ah_memory.relations import (
     Relation,
     RelationProperties,
-    Vector,
     canonicalize_label,
 )
 

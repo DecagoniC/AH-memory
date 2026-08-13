@@ -1,4 +1,9 @@
-"""Perception: NL → FactCandidate. LLM extracts; morph gate validates; offline = seeds only."""
+"""Perception: текст → FactCandidate / seed_tokens.
+
+Слой между NL и Transform. LLM (или offline seeds) предлагает факты;
+gate_candidates отбрасывает мусор (роли не из текста, слишком широкие UID…).
+Читать после types/store; дальше — transform.py.
+"""
 from __future__ import annotations
 
 import json
@@ -16,6 +21,11 @@ from ah_memory.morph import (
     slug_uid,
     uid_too_wide,
 )
+
+
+# ── Выход perception ─────────────────────────────────────────────────────────
+# Зачем: единый контракт для Transform. predicate — legacy-имя; raw/canonical —
+# для open relations. seed_tokens — «о чём речь», даже если факта нет.
 
 
 @dataclass(frozen=True)
@@ -36,7 +46,7 @@ class PerceptionResult:
     meta: dict[str, Any] = field(default_factory=dict)
 
     def to_graph_json(self) -> dict[str, Any]:
-        """Normalized JSON that Transform uses to build AH."""
+        """Нормализованный JSON для Transform / UI."""
         out: dict[str, Any] = {
             "kind": self.kind,
             "candidates": [
@@ -62,33 +72,41 @@ class PerceptionBackend(Protocol):
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult: ...
 
 
+# ── Reserved labels (не entity UID) ──────────────────────────────────────────
+# Не whitelist ingest: open relations принимает любой predicate.
+# Нужны лишь чтобы seed/токен «IS»/«HAVE» не становились сущностями.
+
 PREDICATES = {
     "CREATE",
     "IS",
+    "IS_A",
     "LIVE_IN",
+    "LIVES_IN",
+    "LOCATED_IN",
     "BE_BORN",
     "HAVE",
     "RUN",
     "BE_COLORED",
     "CAUSE_EVENT",
+    "CAUSE",
     "USE",
     "MOVE",
+    "PURCHASE",
+    "SELL",
+    "OWNS",
+    "WORKS_FOR",
+    "PART_OF",
+    "FOLLOW",
+    "BEFORE",
+    "AFTER",
+    "DURING",
+    "RELATED_TO",
+    "ASSOC",
+    "BIND",
 }
 
-PRED_ALIASES = {
-    "STUDY_AT": "LIVE_IN",
-    "STUDY": "LIVE_IN",
-    "WORK_AT": "LIVE_IN",
-    "WORK": "LIVE_IN",
-    "LOCATED_IN": "LIVE_IN",
-    "BORN": "BE_BORN",
-    "BORN_IN": "BE_BORN",
-    "BIRTH": "BE_BORN",
-    "ORIGIN": "BE_BORN",
-    "FROM": "BE_BORN",
-    "OWN": "HAVE",
-    "NAME": "IS",
-}
+# ── Текстовые хелперы / grounding ────────────────────────────────────────────
+# Зачем: не пускать в граф сущности, которых нет в исходной фразе (галлюцинации LLM).
 
 _TOKEN_RE = re.compile(r"[a-zа-я0-9]+", re.IGNORECASE)
 _SHORT_KEEP = frozenset({"я", "мы", "ты", "он", "а"})
@@ -159,22 +177,21 @@ def _normalize_place_roles(pred: str, roles: dict[str, str]) -> dict[str, str]:
 
 
 def _finalize_candidates(cands: list[FactCandidate]) -> list[FactCandidate]:
+    # Зачем: sanitize roles, place-heuristic, dedup. Canonical не схлопываем.
     out: list[FactCandidate] = []
     seen: set[tuple[str, tuple[tuple[str, str], ...]]] = set()
     for c in cands:
         raw_relation = (c.raw_relation or c.predicate).strip()
-        requested_canonical = c.canonical_relation or c.predicate
-        pred = PRED_ALIASES.get(
-            requested_canonical.upper(),
-            requested_canonical.upper(),
-        )
+        pred = (c.canonical_relation or c.predicate).strip().upper()
+        if not pred:
+            continue
         roles = sanitize_roles(dict(c.roles))
         if roles is None:
             continue
         roles = _normalize_place_roles(pred, roles)
         if any(uid_too_wide(v) for v in roles.values()):
             continue
-        if pred in {"LIVE_IN", "BE_BORN"} and "LOCATION" not in roles:
+        if pred in {"LIVE_IN", "LIVES_IN", "BE_BORN", "LOCATED_IN"} and "LOCATION" not in roles:
             continue
         key = (pred, tuple(sorted(roles.items())))
         if key in seen:
@@ -199,15 +216,14 @@ def gate_candidates(
     *,
     min_confidence: float = 0.5,
     require_grounding: bool = True,
-    allow_open_relations: bool = False,
+    allow_open_relations: bool = True,
 ) -> list[FactCandidate]:
-    """Hard acceptor: whitelist predicate, morph roles, optional lemma-in-text."""
+    """Акцептор: confidence + lemma-in-text. Open relations по умолчанию."""
+    del allow_open_relations  # всегда open; флаг оставлен для совместимости вызовов
     finalized = _finalize_candidates(cands)
     text_lemmas = _collect_text_lemmas(text) if require_grounding else set()
     out: list[FactCandidate] = []
     for c in finalized:
-        if c.predicate not in PREDICATES and not allow_open_relations:
-            continue
         if c.confidence < min_confidence:
             continue
         if require_grounding and not _roles_grounded(c.roles, text_lemmas, text):
@@ -217,7 +233,7 @@ def gate_candidates(
 
 
 def content_entity_uids(text: str, *, limit: int = 32) -> list[str]:
-    """POS-filtered entity UIDs from text (offline seeds, no facts)."""
+    """POS-фильтр сущностей из текста → seed UID (без изобретения фактов)."""
     low = _norm(text)
     out: list[str] = []
     for w in _TOKEN_RE.findall(low):
@@ -234,8 +250,13 @@ def content_entity_uids(text: str, *, limit: int = 32) -> list[str]:
     return out
 
 
+# ── Бэкенды ──────────────────────────────────────────────────────────────────
+# SeedPerception — без LLM (тесты / offline).
+# JsonLLMPerception — любой call_fn, возвращающий JSON candidates.
+
+
 class SeedPerception:
-    """Offline perception: entity seeds only, never invents N / FactCandidate."""
+    """Offline: только seed_tokens, никогда не создаёт FactCandidate."""
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
         raw = text.strip()
@@ -261,14 +282,14 @@ RulePerception = SeedPerception
 
 
 class JsonLLMPerception:
-    """Callable JSON extractor → gated FactCandidate list."""
+    """Обёртка: call_fn(prompt) → JSON → gate_candidates → PerceptionResult."""
 
     def __init__(
         self,
         call_fn,
         *,
         require_grounding: bool = True,
-        allow_open_relations: bool = False,
+        allow_open_relations: bool = True,
     ) -> None:
         self.call_fn = call_fn
         self.require_grounding = require_grounding

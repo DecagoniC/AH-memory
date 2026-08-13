@@ -4,18 +4,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 from types import MappingProxyType
-from typing import Iterable, Mapping
+from typing import Mapping
 
 from ah_memory.factor_parameters import FactorParameters
 from ah_memory.relations import Relation
 from ah_memory.store import AHStore
-from ah_memory.types import (
-    ElementList,
-    Hyperlink,
-    LinkId,
-    Role,
-    SecondOrderSymbol,
-)
+from ah_memory.types import SecondOrderSymbol
 
 
 class FactorKind(str, Enum):
@@ -148,20 +142,10 @@ class FactorGraph:
             object.__setattr__(self, "structural_signature", signature)
 
 
-def is_variable(store: AHStore, uid: str) -> bool:
-    if uid in store.ah.S:
-        return True
-    try:
-        e = store._find_anywhere(uid)  # noqa: SLF001
-    except Exception:
-        return False
-    return isinstance(e, (SecondOrderSymbol, ElementList))
-
-
 def collect_variables(store: AHStore) -> list[str]:
     vars_: list[str] = list(store.ah.S.keys())
     for e in store.ah.all_hyper().values():
-        if isinstance(e, (SecondOrderSymbol, ElementList)):
+        if isinstance(e, SecondOrderSymbol):
             vars_.append(e.uid)
     return list(dict.fromkeys(vars_))
 
@@ -191,16 +175,11 @@ def build_factor_graph(
     epsilon: float = 0.05,
     include_prior: bool = True,
 ) -> FactorGraph:
-    """Build FG: variables = S ∪ m ∪ episode lists; factors = N, L, obs, prior."""
+    """Build FG: variables = S ∪ M; factors = semantic factors, L, obs, prior."""
     variables = collect_variables(store)
     var_set = set(variables)
     factors: list[Factor] = []
     evidence = evidence or {}
-    semantic_by_source = {
-        str(factor.metadata.get("legacy_source_uid")): factor
-        for factor in store.list_semantic_factors()
-        if factor.metadata.get("legacy_source_uid")
-    }
 
     if include_prior:
         for v in variables:
@@ -247,40 +226,7 @@ def build_factor_graph(
             )
         )
 
-    for n in store.find_hypernodes():
-        roles = {r.value: f.target_uid for r, f in n.fillers.items()}
-        members = [uid for uid in roles.values() if uid in var_set]
-        # unique preserve order
-        seen: set[str] = set()
-        uniq: list[str] = []
-        for u in members:
-            if u not in seen:
-                seen.add(u)
-                uniq.append(u)
-        if not uniq:
-            continue
-        semantic = semantic_by_source.get(n.uid)
-        factors.append(
-            Factor(
-                fid=f"N::{n.uid}",
-                kind=FactorKind.HYPER,
-                variables=uniq,
-                w=n.w,
-                roles={r: u for r, u in roles.items() if u in seen},
-                potential_key=semantic.potential_key if semantic else "hypernode",
-                source_uid=n.uid,
-                relation=semantic.relation if semantic else None,
-                parameters=semantic.parameters if semantic else None,
-                confidence=semantic.confidence if semantic else 1.0,
-                embedding=semantic.embedding if semantic else None,
-                metadata=dict(semantic.metadata) if semantic else {},
-            )
-        )
-
     for semantic in store.list_semantic_factors():
-        legacy_source = str(semantic.metadata.get("legacy_source_uid") or "")
-        if legacy_source and legacy_source in semantic_by_source:
-            continue
         members = [uid for uid in semantic.variables if uid in var_set]
         if len(members) < 2:
             continue
@@ -308,11 +254,3 @@ def build_factor_graph(
 def build_structural_factor_graph(store: AHStore) -> FactorGraph:
     """Build reusable topology; evidence is supplied to BPState, not embedded."""
     return build_factor_graph(store, evidence=None, include_prior=True)
-
-
-def role_beta_weight(role: str) -> float:
-    if role in {Role.SUBJECT.value, Role.OBJECT.value}:
-        return 0.35
-    if role in {Role.LOCATION.value, Role.CAUSE.value, Role.TOOL.value}:
-        return 0.2
-    return 0.1

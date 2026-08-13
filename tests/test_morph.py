@@ -66,11 +66,16 @@ def test_gate_rejects_ungrounded_and_bad_pred() -> None:
         [FactCandidate("LIVE_IN", {"SUBJECT": "Я", "LOCATION": "МОСКВА"}, confidence=0.9)],
     )
     assert len(ok) == 1
+    # open relations: неизвестный predicate ок, если роли grounded
+    fly = gate_candidates(
+        text,
+        [FactCandidate("FLY", {"SUBJECT": "Я", "OBJECT": "МОСКВА"}, confidence=0.9)],
+    )
+    assert len(fly) == 1
     bad = gate_candidates(
         text,
         [
             FactCandidate("LIVE_IN", {"SUBJECT": "Я", "LOCATION": "ПАРИЖ"}, confidence=0.9),
-            FactCandidate("FLY", {"SUBJECT": "Я", "OBJECT": "МОСКВА"}, confidence=0.9),
             FactCandidate("IS", {"SUBJECT": "ЗАНИМАЮСЬ", "OBJECT": "ЛЕПКА"}, confidence=0.9),
         ],
     )

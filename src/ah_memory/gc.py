@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 
 from ah_memory.hyperparams import HyperParams
 from ah_memory.store import AHStore
-from ah_memory.types import Hyperlink
 
 
 @dataclass
@@ -21,31 +20,14 @@ class GCReport:
 
 
 def _incident_weights(store: AHStore, uid: str) -> list[float]:
-    ws: list[float] = []
-    for link in store.find_links(uid):
-        ws.append(link.w)
-    for n in store.find_hypernodes():
-        if n.uid == uid:
-            ws.append(n.w)
-            continue
-        if n.template.target_uid == uid:
-            ws.append(n.w)
-        for f in n.fillers.values():
-            if f.target_uid == uid:
-                ws.append(n.w)
-    return ws
+    return [link.w for link in store.find_links(uid)]
 
 
 def _undirected_edges(store: AHStore) -> list[tuple[str, str]]:
-    edges: list[tuple[str, str]] = []
-    for link in store.ah.L.values():
-        edges.append((link.e1.target_uid, link.e2.target_uid))
-    for n in store.find_hypernodes():
-        nodes = [n.uid, n.template.target_uid] + [f.target_uid for f in n.fillers.values()]
-        for i, a in enumerate(nodes):
-            for b in nodes[i + 1 :]:
-                edges.append((a, b))
-    return edges
+    return [
+        (link.e1.target_uid, link.e2.target_uid)
+        for link in store.ah.L.values()
+    ]
 
 
 def _connected_to_S(store: AHStore) -> set[str]:
@@ -71,10 +53,8 @@ def collect(store: AHStore, hp: HyperParams | None = None) -> GCReport:
     report = GCReport()
     linked_to_s = _connected_to_S(store)
 
-    # orphan links with w==0
     for link in list(store.ah.L.values()):
-        age_ok = True  # links have no created_tau; always collectible when w==0
-        if link.w == 0.0 and age_ok:
+        if link.w == 0.0:
             store.remove_link(link.uid)
             report.removed_links.append(link.uid)
 
@@ -93,7 +73,6 @@ def collect(store: AHStore, hp: HyperParams | None = None) -> GCReport:
         zero_weights = (not weights) or all(w == 0.0 for w in weights)
         detached = uid not in linked_to_s and uid not in store.ah.S
         if zero_weights or detached:
-            # never drop S symbols that still have non-empty R and live links unless zero
             if uid in store.ah.S and not zero_weights:
                 continue
             candidates.append(uid)
@@ -101,7 +80,6 @@ def collect(store: AHStore, hp: HyperParams | None = None) -> GCReport:
     for uid in candidates:
         if store.remove_element(uid):
             report.removed_elements.append(uid)
-        # drop links touching removed
         for link in list(store.find_links(uid)):
             if store.remove_link(link.uid):
                 report.removed_links.append(link.uid)

@@ -56,6 +56,7 @@ def ingest_world(
         store,
         parameter_generator=parameter_generator or RuleBasedParameterGenerator(),
         identity=identity,
+        dedup_semantic_factors=False,
     )
     uid_map: dict[str, str] = {}
     factor_map: dict[str, str] = {}

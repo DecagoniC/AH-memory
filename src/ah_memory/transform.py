@@ -15,7 +15,7 @@ from ah_memory.factor_parameters import (
     RuleBasedParameterGenerator,
 )
 from ah_memory.hyperparams import HyperParams
-from ah_memory.perception import PREDICATES, FactCandidate, PerceptionResult, slug_uid
+from ah_memory.perception import FactCandidate, PerceptionResult, slug_uid
 from ah_memory.relation_normalizer import ExactNormalizer, RelationNormalizer
 from ah_memory.relations import (
     Event,
@@ -59,6 +59,7 @@ class Transform:
         parameter_generator: FactorParameterGenerator | None = None,
         state_engine: StateEngine | None = None,
         identity=None,
+        dedup_semantic_factors: bool = True,
     ) -> None:
         self.store = store
         self.hp = hp or HyperParams()
@@ -71,6 +72,7 @@ class Transform:
         )
         self.state_engine = state_engine or default_state_engine()
         self.identity = identity
+        self.dedup_semantic_factors = dedup_semantic_factors
 
     def apply(self, perception: PerceptionResult, section: Section = Section.C) -> IngestReport:
         del section  # open events не кладутся в C/P/H
@@ -81,7 +83,7 @@ class Transform:
             if tok_slug in compound_heads:
                 continue
             uid = self._resolve_bare(tok)
-            if uid in PREDICATES:
+            if self.store.get_relation(uid) is not None:
                 continue
             m_uid = self._m_uid(uid)
             surface = tok.lower().replace("ё", "е")
@@ -155,6 +157,14 @@ class Transform:
         }
         if len(arguments) < 2:
             raise ValueError("open relation factor requires at least two arguments")
+        roles_map = {role: reference.uid for role, reference in arguments.items()}
+        duplicate = self._duplicate_semantic_factor_uid(
+            relation.canonical_label,
+            roles_map,
+            candidate.statement_type,
+        )
+        if duplicate is not None and self.dedup_semantic_factors:
+            return duplicate
         event_uid = self.store.new_uid("E")
         added_at = _now_iso()
         created_tau = self.store.ah.tau
@@ -169,21 +179,36 @@ class Transform:
                 "raw_relation": candidate.raw_relation or candidate.predicate,
                 "normalization": normalized.strategy,
                 "normalization_confidence": normalized.confidence,
+                "statement_type": candidate.statement_type,
+                "source": candidate.source,
                 "added_at": added_at,
                 "created_tau": created_tau,
             },
         )
         self.store.add_event(event)
-        variables = list(
+        role_variables = list(
             dict.fromkeys(reference.uid for reference in arguments.values())
         )
+        context_uid = self._conversation_anchor_uid()
+        variables = list(role_variables)
+        if context_uid and context_uid not in variables:
+            variables.append(context_uid)
         parameters = self.parameter_generator.generate(relation)
+        epistemic_scale = {
+            "decision": 1.0,
+            "assertion": 1.0,
+            "topic": 0.55,
+            "open_question": 0.5,
+            "proposal": 0.45,
+            "explanation": 0.4,
+        }[candidate.statement_type]
+        factor_weight = self.hp.initial_w * epistemic_scale
         factor_uid = f"SF::{event_uid}"
         factor = Factor(
             fid=factor_uid,
             kind=FactorKind.HYPER,
             variables=variables,
-            w=self.hp.initial_w,
+            w=factor_weight,
             roles={role: reference.uid for role, reference in arguments.items()},
             potential_key="semantic",
             source_uid=event_uid,
@@ -195,6 +220,9 @@ class Transform:
                 "event_uid": event_uid,
                 "raw_relation": candidate.raw_relation or candidate.predicate,
                 "canonical_relation": relation.canonical_label,
+                "statement_type": candidate.statement_type,
+                "source": candidate.source,
+                "context_uid": context_uid,
                 "source_variable": arguments.get(
                     "SUBJECT",
                     next(iter(arguments.values())),
@@ -204,15 +232,65 @@ class Transform:
             },
         )
         self.store.add_semantic_factor(factor)
-        self._weave_assoc_mesh(variables, w=self.hp.initial_w)
+        self._weave_assoc_mesh(role_variables, w=factor_weight)
         self._bind_subject_surface(candidate.roles.get("SUBJECT"))
-        next_state = self.state_engine.apply(self.store.state, event)
-        self.store.state = next_state
-        self.store.state_transitions.extend(
-            transition.to_dict()
-            for transition in self.state_engine.last_transitions
-        )
+        if candidate.statement_type in {"assertion", "decision"}:
+            next_state = self.state_engine.apply(self.store.state, event)
+            self.store.state = next_state
+            self.store.state_transitions.extend(
+                transition.to_dict()
+                for transition in self.state_engine.last_transitions
+            )
         return factor_uid
+
+    def _conversation_anchor_uid(self) -> str | None:
+        """Use the first authoritative non-speaker entity as conversation scope."""
+        discourse_uids = {
+            "M_Я",
+            "M_МЫ",
+            "M_USER",
+            "M_ПОЛЬЗОВАТЕЛЬ",
+            "M_ДИАЛОГ",
+            "M_АССИСТЕНТ",
+        }
+        role_priority = (
+            "OBJECT",
+            "LOCATION",
+            "PURPOSE",
+            "TOOL",
+            "MATERIAL",
+            "WITH",
+            "SUBJECT",
+        )
+        for factor in self.store.list_semantic_factors():
+            if (factor.metadata or {}).get("statement_type") not in {
+                "assertion",
+                "decision",
+            }:
+                continue
+            for role in role_priority:
+                anchor = factor.roles.get(role)
+                if anchor and anchor not in discourse_uids:
+                    return anchor
+        return None
+
+    def _duplicate_semantic_factor_uid(
+        self,
+        canonical: str,
+        roles: dict[str, str],
+        statement_type: str,
+    ) -> str | None:
+        """Тот же canonical + те же роли уже в графе (user + assistant ingest)."""
+        key = tuple(sorted(roles.items()))
+        for factor in self.store.list_semantic_factors():
+            rel = factor.relation
+            if rel is None or rel.canonical_label != canonical:
+                continue
+            if (factor.metadata or {}).get("statement_type", "assertion") != statement_type:
+                continue
+            if tuple(sorted(factor.roles.items())) == key:
+                return str(getattr(factor, "fid", factor.uid))
+        return None
 
     def _bind_subject_surface(self, subj: str | None) -> None:
         if not subj:

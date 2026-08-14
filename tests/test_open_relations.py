@@ -41,10 +41,10 @@ def test_exact_normalizer_preserves_raw_relation() -> None:
     registry = default_relation_registry()
     normalized = RelationNormalizer(
         registry,
-        (ExactNormalizer(),),
-    ).normalize("приобрёл")
-    assert normalized.raw_label == "приобрёл"
-    assert normalized.canonical_label == "PURCHASE"
+        (ExactNormalizer({"linked": "RELATE"}),),
+    ).normalize("linked")
+    assert normalized.raw_label == "linked"
+    assert normalized.canonical_label == "RELATE"
     assert normalized.strategy == "exact"
 
 
@@ -204,12 +204,16 @@ def test_generators_produce_serializable_relation_parameters() -> None:
 
 
 def test_relation_specific_parameters_are_data_driven_overrides() -> None:
-    purchase = default_relation_registry().require_relation("PURCHASE")
+    relation = Relation(
+        uid="REL_CUSTOM",
+        raw_label="custom",
+        canonical_label="CUSTOM",
+    )
     override = FactorParameters(transmission_strength=0.93, persistence=0.88)
     generator = RuleBasedParameterGenerator(
-        overrides={"PURCHASE": override}
+        overrides={"CUSTOM": override}
     )
-    assert generator.generate(purchase) == override
+    assert generator.generate(relation) == override
 
 
 def test_embedding_projection_can_be_replaced_for_training() -> None:

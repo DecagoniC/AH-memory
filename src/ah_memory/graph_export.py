@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from ah_memory.perception import PREDICATES
 from ah_memory.store import AHStore
 from ah_memory.types import SecondOrderSymbol
 
@@ -60,7 +59,7 @@ def dump_graph(
 
     # --- vertices: S + m/g/k (not N, not T unless mode=all) ---
     for uid, s in store.ah.S.items():
-        if uid in PREDICATES and mode != "all":
+        if store.get_relation(uid) is not None and mode != "all":
             continue
         px, py = _place("S")
         nodes.append(
@@ -101,6 +100,7 @@ def dump_graph(
             )
 
     # --- semantic factors (open relations) ---
+    co_member_pairs: set[tuple[str, str]] = set()
     for factor in store.list_semantic_factors():
         roles = dict(factor.roles)
         members = list(dict.fromkeys(factor.variables))
@@ -159,6 +159,9 @@ def dump_graph(
                 ),
             }
         )
+        for i, a in enumerate(members):
+            for b in members[i + 1 :]:
+                co_member_pairs.add(tuple(sorted((a, b))))
         directional = bool(
             relation is not None
             and relation.properties.directional
@@ -198,6 +201,9 @@ def dump_graph(
 
     # --- binary associative links L ---
     for link in store.ah.L.values():
+        pair = tuple(sorted((link.e1.target_uid, link.e2.target_uid)))
+        if link.id == "ASSOC" and pair in co_member_pairs:
+            continue
         # ASSOC симметрична; IS-A / FOLLOW направлены e1→e2
         directed = link.id in {"IS-A", "FOLLOW"}
         edges.append(

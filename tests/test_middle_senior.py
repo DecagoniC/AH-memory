@@ -23,11 +23,9 @@ from tests._mini_graph import build_mini_open_store
 SAMPLE_TEXT = "Сущность — это вид. Сущность обитает в месте."
 
 
-def test_open_registry_has_core_relations() -> None:
+def test_open_registry_starts_without_domain_relations() -> None:
     store = AHStore()
-    labels = {r.canonical_label for r in store.list_relations()}
-    for need in ("IS", "LIVE_IN", "HAVE", "PURCHASE", "OWNS"):
-        assert need in labels
+    assert store.list_relations() == ()
 
 
 def test_mini_open_extract_and_answer() -> None:

@@ -1,23 +1,24 @@
 """DeepSeek OpenAI-compatible client + HybridPerception."""
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import httpx
 
 from ah_memory.config import DeepSeekConfig
-from ah_memory.gigachat_llm import SYSTEM_PROMPT, _parse_json
+from ah_memory.gigachat_llm import _parse_json
 from ah_memory.morph import seeds_from_roles, slug_uid
 from ah_memory.perception import (
-    FactCandidate,
     PerceptionResult,
     SeedPerception,
     _is_question,
     _norm,
+    candidates_from_llm_json,
     content_entity_uids,
     gate_candidates,
+    llm_payload_errors,
 )
+from ah_memory.perception_prompt import SYSTEM_PROMPT, build_user_payload
 
 
 class DeepSeekClient:
@@ -59,10 +60,7 @@ class DeepSeekPerception:
         self.require_grounding = require_grounding
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
-        user = json.dumps(
-            {"text": text, "wm_context": wm_context or []},
-            ensure_ascii=False,
-        )
+        user = build_user_payload(text, wm_context)
         raw = self.client.chat(
             [
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -70,33 +68,19 @@ class DeepSeekPerception:
             ]
         )
         data = _parse_json(raw)
-        cands = [
-            FactCandidate(
-                predicate=str(
-                    c.get("canonical_relation")
-                    or c.get("predicate")
-                    or c.get("raw_relation")
-                    or c.get("relation", "")
-                ).upper(),
-                roles={str(k).upper(): slug_uid(str(v)) for k, v in (c.get("roles") or {}).items()},
-                raw_span=c.get("raw_span"),
-                confidence=float(c.get("confidence", 0.8)),
-                raw_relation=str(
-                    c.get("raw_relation")
-                    or c.get("relation")
-                    or c.get("predicate", "")
-                ),
-                canonical_relation=c.get("canonical_relation"),
-            )
-            for c in data.get("candidates", [])
-            if isinstance(c, dict)
-            and (c.get("predicate") or c.get("raw_relation") or c.get("relation"))
-        ]
-        gated = gate_candidates(
+        cands = candidates_from_llm_json(data)
+        gated_result = gate_candidates(
             text,
             cands,
             require_grounding=self.require_grounding,
             allow_open_relations=True,
+            report=True,
+        )
+        gated, gate_report = gated_result
+        validation_errors = llm_payload_errors(data)
+        validation_errors.extend(
+            f"candidate rejected: {item.get('reason', 'validation')}"
+            for item in gate_report.get("dropped", [])
         )
         kind = data.get("kind", "fact")
         if kind not in {"fact", "question", "message"}:
@@ -104,7 +88,8 @@ class DeepSeekPerception:
         low = _norm(text.strip())
         if _is_question(text.strip(), low):
             kind = "question"
-            gated = []
+        elif gated:
+            kind = "fact"
         seeds = seeds_from_roles(
             gated,
             extra=[slug_uid(str(s)) for s in data.get("seed_tokens", [])][:12],
@@ -120,6 +105,8 @@ class DeepSeekPerception:
             meta={
                 "backend": "deepseek",
                 "llm_raw": data,
+                "gate_report": gate_report,
+                "validation_errors": validation_errors,
                 "system_prompt": SYSTEM_PROMPT,
             },
         )

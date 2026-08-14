@@ -18,12 +18,12 @@ from ah_memory.types import Section
 
 
 def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
-    """Из ответа ассистента в граф — только уверенные структурные факты (не small talk)."""
+    """Из ответа ассистента — только уверенные proposals/explanations."""
     from ah_memory.morph import is_nounish, sanitize_roles, seeds_from_roles
 
     kept: list[FactCandidate] = []
     for c in perc.candidates:
-        if c.confidence < 0.85:
+        if c.confidence < 0.75 or c.statement_type not in {"proposal", "explanation"}:
             continue
         roles = sanitize_roles(c.roles)
         if roles is None:
@@ -44,6 +44,8 @@ def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
                 c.confidence,
                 raw_relation=c.raw_relation,
                 canonical_relation=c.canonical_relation,
+                statement_type=c.statement_type,
+                source="assistant",
             )
         )
     seeds = seeds_from_roles(kept)
@@ -95,9 +97,19 @@ class Agent:
         self.ignition = IgnitionEngine(self.store, self.hp)
         self.dsl = DSLInterpreter(self.store)
 
-    def ingest(self, text: str, section: Section = Section.C, *, source: str = "user") -> IngestReport:
+    def ingest(
+        self,
+        text: str,
+        section: Section = Section.C,
+        *,
+        source: str = "user",
+        perception: PerceptionResult | None = None,
+    ) -> IngestReport:
         """Текст → граф (+ короткий прогон активации по новым seeds)."""
-        perc = self.perception.parse(text, list(self.ignition.wm.contents()))
+        if perception is None:
+            perc = self.perception.parse(text, list(self.ignition.wm.contents()))
+        else:
+            perc = perception
         if source == "assistant":
             perc = _filter_assistant_perception(perc)
         report = self.transform.apply(perc, section=section)
@@ -111,9 +123,18 @@ class Agent:
         collect(self.store, self.hp)
         return report
 
-    def ask(self, question: str, ticks: int = 6) -> AgentReply:
+    def ask(
+        self,
+        question: str,
+        ticks: int = 6,
+        *,
+        perception: PerceptionResult | None = None,
+    ) -> AgentReply:
         # Зачем: не писать вопрос как факт, а найти UID по seeds → ignition → compose.
-        perc = self.perception.parse(question, list(self.ignition.wm.contents()))
+        if perception is None:
+            perc = self.perception.parse(question, list(self.ignition.wm.contents()))
+        else:
+            perc = perception
         seeds: list[ActivationSeed] = []
         seen: set[str] = set()
         for u in perc.seed_tokens:
@@ -264,18 +285,8 @@ class Agent:
                 for factor in self.store.list_semantic_factors():
                     if factor.roles.get("SUBJECT") != subj:
                         continue
-                    loc = factor.roles.get("LOCATION") or factor.roles.get("OBJECT")
-                    pred = (
-                        factor.relation.canonical_label.upper()
-                        if factor.relation
-                        else ""
-                    )
-                    if loc and pred in {
-                        "LIVE_IN",
-                        "LIVES_IN",
-                        "LOCATED_IN",
-                        "BE_BORN",
-                    }:
+                    loc = factor.roles.get("LOCATION")
+                    if loc:
                         return f"location:{loc}"
         labels: list[str] = []
         for uid in trace:

@@ -1,0 +1,14 @@
+---
+description: Keep production memory logic independent of conversation domains
+alwaysApply: true
+---
+
+# No Domain-Specific Hardcoding
+
+- Domain vocabulary may appear in user data, fixtures, and benchmarks only.
+- Never branch on concrete entities, technologies, topics, relation names, or fixture phrases in production code.
+- Do not add domain-specific regexes, alias maps, suffix lists, prompt examples, or relation whitelists.
+- Keep only explicit protocol contracts: JSON fields, allowed roles, epistemic types, graph invariants, and provider API schemas.
+- Handle malformed model output by validation and schema-based repair, not semantic guessing.
+- Express optional behavior through relation metadata or generic structural rules.
+- Tests must assert behavioral and graph invariants; realistic domain terms belong only to fixture input.

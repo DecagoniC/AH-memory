@@ -5,13 +5,22 @@
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+import json
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime
 from typing import Any
 
 from ah_memory.config import GigaChatConfig
-from ah_memory.gigachat_llm import GigaChatClient
+from ah_memory.gigachat_llm import GigaChatClient, _parse_json
 from ah_memory.ignition import TickTrace
+from ah_memory.perception import (
+    PerceptionResult,
+    SeedPerception,
+    candidates_from_llm_json,
+    content_entity_uids,
+    gate_candidates,
+    llm_payload_errors,
+)
 from ah_memory.store import AHStore
 from ah_memory.types import Section
 
@@ -34,19 +43,72 @@ def _format_added_at(iso: str, tau: int | None = None) -> str:
     return ""
 
 
+_EPISTEMIC_PREFIX = {
+    "decision": "РЕШЕНИЕ",
+    "topic": "ТЕМА",
+    "open_question": "ОТКРЫТЫЙ ВОПРОС",
+    "proposal": "ПРЕДЛОЖЕНИЕ АССИСТЕНТА",
+    "explanation": "ПОЯСНЕНИЕ АССИСТЕНТА",
+}
+
+
+def _mark_epistemic(line: str | None, metadata: dict) -> str | None:
+    if not line:
+        return line
+    prefix = _EPISTEMIC_PREFIX.get(str(metadata.get("statement_type") or ""))
+    return f"{prefix}: {line}" if prefix else line
+
+
+def _is_recap_request(text: str) -> bool:
+    low = text.lower()
+    return any(
+        cue in low
+        for cue in (
+            "напомни",
+            "подведи итог",
+            "подведем итог",
+            "подведём итог",
+            "итог",
+            "что решили",
+            "резюме",
+            "recap",
+            "summary",
+        )
+    )
+
+
 # ── Системный промпт диалога ─────────────────────────────────────────────────
-# Зачем: LLM отвечает как чат; AH — приоритет только для личных фактов сессии.
+# Зачем: LLM отвечает как чат; AH хранит релевантные заметки всей сессии.
 
 DIALOGUE_SYSTEM = """Ты обычный полезный собеседник. Отвечай по-русски ясно и по делу.
 
-Контекст «АГ-память» / «Активировано» (если есть ниже) — приоритетный источник для личных фактов о пользователе
-и связей из этой сессии (имя, родные, учёба, места, задачи). Если там есть релевантное — используй.
+Контекст «АГ-память» / «Активировано» (если есть ниже) — приоритетный источник фактов,
+решений, ограничений, планов и связей из этой сессии. Если там есть релевантное — используй,
+независимо от темы разговора.
 
 На обычные вопросы (общие знания, пояснения, small talk, бытовые советы) отвечай как обычный ассистент:
 не отмалчивайся и не требуй наличия АГ-памяти.
 
-Не выдумывай личные факты о пользователе, которых нет в контексте АГ-памяти.
+Не выдумывай факты о пользователе или текущем диалоге, которых нет в репликах или контексте АГ-памяти.
 Не упоминай внутреннюю память, UID, JSON и не спрашивай, записать ли что-то в память."""
+
+
+ASSISTANT_MEMORY_SYSTEM = """Ты редактор блокнотика диалога.
+Из ответа ассистента извлеки 1–5 атомарных заметок, полезных в следующих репликах.
+Верни только JSON: {"kind":"message","candidates":[...],"seed_tokens":[...]}.
+
+Каждый candidate содержит raw_relation, canonical_relation, predicate, roles, raw_span,
+confidence и statement_type. statement_type только:
+- "explanation" — определение, причинная или процедурная связь, изложенная ассистентом;
+- "proposal" — рекомендация, вариант или предлагаемое действие.
+
+Роли только SUBJECT | OBJECT | LOCATION | TIME | CAUSE | TOOL | MATERIAL | PURPOSE | HOW-TO | WITH.
+Одна роль — одна сущность; SUBJECT обязателен. Для общей рекомендации допустим
+SUBJECT:"АССИСТЕНТ". Разбивай списки и этапы на отдельные candidates.
+Если предложено несколько вариантов, верни отдельный proposal для каждого:
+не OBJECT:"X, Y", а два candidates с OBJECT:"X" и OBJECT:"Y".
+Не используй assertion/decision: ответ ассистента не является подтверждённым фактом пользователя.
+Не извлекай риторические фразы, оговорки и повторы. Не добавляй знания вне ответа."""
 
 
 def _tick_dict(t: TickTrace) -> dict:
@@ -146,10 +208,15 @@ class DialogueAgent:
         self._turn += 1
         ign = self.agent.ignition
 
+        # Один LLM-parse пользователя на turn (ask + ingest user не дублируют вызов).
+        wm_ctx = list(ign.wm.contents())
+        user_perc = self.agent.perception.parse(user_text, wm_ctx)
+        ask_ticks = ticks if user_perc.kind == "question" else min(ticks, 2)
+
         # 1) Активация + LLM/fallback по текущей памяти
         mem = self._memory_context(user_text)
         i_ask = len(ign.traces)
-        ask = self.agent.ask(user_text, ticks=ticks)
+        ask = self.agent.ask(user_text, ticks=ask_ticks, perception=user_perc)
         ask_ticks = [_tick_dict(t) for t in ign.traces[i_ask:]]
         graph_hint = ask.answer if ask.answer and ask.answer != "неизвестно" else ""
 
@@ -172,11 +239,24 @@ class DialogueAgent:
 
         # 2) Запись user и assistant в Section.H
         i0 = len(ign.traces)
-        user_rep = self.agent.ingest(user_text, section=Section.H)
+        user_rep = self.agent.ingest(
+            user_text, section=Section.H, perception=user_perc
+        )
         user_ticks = [_tick_dict(t) for t in ign.traces[i0:]]
 
         i1 = len(ign.traces)
-        asst_rep = self.agent.ingest(reply, section=Section.H, source="assistant")
+        # Ответ ассистента хранится как proposals/explanations, не как пользовательская истина.
+        asst_perc = (
+            SeedPerception().parse(reply, list(ign.wm.contents()))
+            if _is_recap_request(user_text)
+            else self._parse_assistant_memory(reply, list(ign.wm.contents()))
+        )
+        asst_rep = self.agent.ingest(
+            reply,
+            section=Section.H,
+            source="assistant",
+            perception=asst_perc,
+        )
         asst_ticks = [_tick_dict(t) for t in ign.traces[i1:]]
 
         self.history.append({"role": "user", "content": user_text})
@@ -197,6 +277,13 @@ class DialogueAgent:
             "ask_perception": ask.perception,
             "assistant_text": reply,
             "assistant_perception": asst_rep.perception,
+            "parser": {
+                "llm_raw": user_perc.meta.get("llm_raw"),
+                "gate_report": user_perc.meta.get("gate_report"),
+                "gated_candidates": user_perc.to_graph_json().get("candidates", []),
+                "ingest_skipped": list(user_rep.skipped),
+                "ingest_created": list(user_rep.created_n),
+            },
             "created": {
                 "user_n": user_rep.created_n,
                 "assistant_n": asst_rep.created_n,
@@ -249,6 +336,82 @@ class DialogueAgent:
             full_trace=full_trace,
         )
 
+    def _parse_assistant_memory(
+        self,
+        text: str,
+        wm_context: list[str],
+    ) -> PerceptionResult:
+        fallback = SeedPerception().parse(text, wm_context)
+        if self.client is None:
+            return fallback
+        try:
+            payload: dict[str, Any] = {"assistant_text": text}
+            raw = self.client.chat(
+                [
+                    {"role": "system", "content": ASSISTANT_MEMORY_SYSTEM},
+                    {
+                        "role": "user",
+                        "content": json.dumps(payload, ensure_ascii=False),
+                    },
+                ],
+                json_mode=True,
+            )
+            data = _parse_json(raw)
+            parsed = candidates_from_llm_json(data)
+            invalid_statuses = [
+                candidate.statement_type
+                for candidate in parsed
+                if candidate.statement_type not in {"proposal", "explanation"}
+            ]
+            typed = [
+                replace(candidate, source="assistant")
+                for candidate in parsed
+                if candidate.statement_type in {"proposal", "explanation"}
+            ]
+            gated_result = gate_candidates(text, typed, report=True)
+            gated, gate_report = gated_result
+            validation_errors = llm_payload_errors(data)
+            if invalid_statuses:
+                validation_errors.append(
+                    "assistant candidates require proposal or explanation"
+                )
+            validation_errors.extend(
+                f"candidate rejected: {item.get('reason', 'validation')}"
+                for item in gate_report.get("dropped", [])
+            )
+            seeds = list(
+                dict.fromkeys(
+                    [
+                        uid
+                        for candidate in gated
+                        for uid in candidate.roles.values()
+                    ]
+                    + content_entity_uids(text)[:8]
+                )
+            )[:16]
+            return PerceptionResult(
+                kind="message",
+                candidates=list(gated),
+                seed_tokens=seeds,
+                meta={
+                    "backend": f"{self.provider}_assistant_memory",
+                    "llm_raw": data,
+                    "gate_report": gate_report,
+                    "validation_errors": validation_errors,
+                },
+            )
+        except Exception as exc:  # noqa: BLE001
+            return PerceptionResult(
+                kind=fallback.kind,
+                candidates=[],
+                seed_tokens=fallback.seed_tokens,
+                meta={
+                    **fallback.meta,
+                    "backend": "assistant_seeds",
+                    "llm_error": str(exc),
+                },
+            )
+
     def _compose_system_blocks(
         self,
         mem: str,
@@ -285,7 +448,8 @@ class DialogueAgent:
         lines: list[str] = []
         seen: set[str] = set()
 
-        # Prefer semantic factors touching activated nodes.
+        # Decisions are durable context. Semantic relevance ignores the shared
+        # conversation scope, otherwise every scoped factor looks equally relevant.
         activated = [
             uid
             for uid in prepared_context.get("activated_nodes") or []
@@ -293,9 +457,83 @@ class DialogueAgent:
         ]
         activated_set = set(activated)
         fact_lines: list[str] = []
-        for factor in self.store.list_semantic_factors():
-            if activated_set and not activated_set.intersection(factor.variables):
-                continue
+        all_factors = [
+            factor
+            for factor in self.store.list_semantic_factors()
+            if factor.relation is not None
+        ]
+        def semantic_variables(factor) -> set[str]:
+            context_uid = (factor.metadata or {}).get("context_uid")
+            return {
+                uid
+                for uid in factor.variables
+                if not context_uid or uid != context_uid
+            }
+
+        def created_tau(factor) -> int:
+            return int((factor.metadata or {}).get("created_tau", -1))
+
+        decisions = sorted(
+            [
+                factor
+                for factor in all_factors
+                if (factor.metadata or {}).get("statement_type") == "decision"
+            ],
+            key=created_tau,
+        )
+        relevant = [
+            factor
+            for factor in all_factors
+            if activated_set.intersection(semantic_variables(factor))
+        ]
+        relevant_authoritative = [
+            factor
+            for factor in relevant
+            if (factor.metadata or {}).get("statement_type")
+            in {"assertion", "decision"}
+        ]
+        relevant_nonfactual = [
+            factor
+            for factor in relevant
+            if (factor.metadata or {}).get("statement_type")
+            not in {"assertion", "decision"}
+        ]
+        recent_assertions = sorted(
+            [
+                factor
+                for factor in all_factors
+                if (factor.metadata or {}).get("statement_type") == "assertion"
+            ],
+            key=created_tau,
+            reverse=True,
+        )[:4]
+        recent_nonfactual = sorted(
+            [
+                factor
+                for factor in all_factors
+                if (factor.metadata or {}).get("statement_type")
+                in {"topic", "open_question", "proposal", "explanation"}
+            ],
+            key=created_tau,
+            reverse=True,
+        )[:4]
+        ordered_factors = list(
+            dict.fromkeys(
+                [
+                    factor.uid
+                    for factor in (
+                        decisions
+                        + relevant_authoritative
+                        + recent_assertions
+                        + relevant_nonfactual
+                        + recent_nonfactual
+                    )
+                ]
+            )
+        )
+        factors_by_uid = {factor.uid: factor for factor in all_factors}
+        for factor_uid in ordered_factors:
+            factor = factors_by_uid[factor_uid]
             if factor.relation is None:
                 continue
             roles = {
@@ -312,6 +550,7 @@ class DialogueAgent:
             if not when and factor.variables:
                 when = self._format_uid_added_at(factor.variables[0])
             line = self._fmt_semantic_fact(pred, roles, when=when)
+            line = _mark_epistemic(line, meta)
             if not line or line in seen:
                 continue
             seen.add(line)
@@ -344,6 +583,7 @@ class DialogueAgent:
                     else None,
                 )
                 line = self._fmt_semantic_fact(str(pred), roles, when=when)
+                line = _mark_epistemic(line, meta)
                 if line and line not in seen:
                     seen.add(line)
                     fact_lines.append(f"• {line}")
@@ -392,73 +632,32 @@ class DialogueAgent:
         *,
         when: str = "",
     ) -> str | None:
-        subj = roles.get("SUBJECT") or roles.get("BUYER") or next(
-            iter(roles.values()), "?"
-        )
-        obj = roles.get("OBJECT")
-        loc = roles.get("LOCATION")
+        subj = roles.get("SUBJECT")
         pred_u = pred.upper()
-        if pred_u in {"PURCHASE", "BUY"} and obj:
-            base = f"{subj} купил(а) {obj}"
-        elif pred_u == "SELL" and obj:
-            base = f"{subj} продал(а) {obj}"
-        elif pred_u in {"WORKS_FOR", "WORK"} and obj:
-            base = f"{subj} работает в {obj}"
-        elif pred_u in {"LIVES_IN", "LIVE_IN"} and (obj or loc):
-            base = f"{subj} живёт в {obj or loc}"
-        elif pred_u == "LOCATED_IN" and (obj or loc):
-            base = f"{subj} находится в {obj or loc}"
-        elif pred_u == "OWNS" and obj:
-            base = f"{subj} владеет {obj}"
-        elif pred_u in {"IS", "IS_A"} and obj:
-            base = f"{subj} — {obj}"
-        elif pred_u == "HAVE" and obj:
-            base = f"у {subj} есть {obj}"
-        elif pred_u == "BE_COLORED" and obj:
-            base = f"{subj} цвета {obj}"
-        elif pred_u == "RUN":
-            how = roles.get("HOW-TO")
-            base = f"{subj} бегает" + (f" ({how})" if how else "")
-        elif pred_u == "BE_BORN" and (obj or loc):
-            base = f"{subj} родился(ась) в {obj or loc}"
-        elif pred_u == "PART_OF" and obj:
-            base = f"{subj} входит в {obj}"
-        elif pred_u == "CAUSE" and obj:
-            base = f"{subj} вызывает {obj}"
-        elif pred_u == "FOLLOW" and obj:
-            base = f"{subj} → {obj}"
-        elif pred_u == "KNOW" and obj:
-            base = f"{subj} знает {obj}"
-        elif pred_u == "MOVE" and obj:
-            base = f"{subj} переехал(а) в {obj}"
-        else:
-            extras = ", ".join(
-                f"{k}: {v}" for k, v in roles.items() if k not in {"SUBJECT"} and v
-            )
-            if not extras and subj == "?":
-                return None
-            base = f"{pred_u}: {subj}" + (f" — {extras}" if extras else "")
+        role_parts = [
+            f"{role}: {value}"
+            for role, value in roles.items()
+            if role != "SUBJECT" and value
+        ]
+        if not subj and not role_parts:
+            return None
+        base = pred_u
+        if subj:
+            base += f": {subj}"
+        if role_parts:
+            base += " — " + ", ".join(role_parts)
         if when:
             return f"{base} [добавлено: {when}]"
         return base
 
     def _fmt_state_item(self, key: str, value: Any) -> str | None:
-        parts = key.split(":")
-        if parts[0] == "OWNS" and len(parts) >= 3:
-            owner = self._label(parts[1])
-            obj = self._label(parts[2])
-            owned = bool(value)
-            return f"{owner} {'владеет' if owned else 'не владеет'} {obj}"
-        if parts[0] == "LAST_PURCHASE" and len(parts) >= 2:
-            return f"последняя покупка {self._label(parts[1])}: {self._label(str(value))}"
         if isinstance(value, (list, tuple)):
             return None
         if value is None or value == "":
             return None
-        # Skip opaque synthetic keys.
-        if key.startswith(("PURCHASE_HISTORY", "SF::", "PRIOR::")):
-            return None
-        return f"{key} = {value}"
+        readable_key = ":".join(self._label(part) for part in key.split(":"))
+        readable_value = self._label(str(value)) if isinstance(value, str) else value
+        return f"{readable_key} = {readable_value}"
 
     def _llm_reply(
         self,
@@ -523,17 +722,33 @@ class DialogueAgent:
             return ""
 
         q = user_text.lower()
+        recall_requested = _is_recap_request(user_text)
         scored: list[tuple[int, Any]] = []
         for factor in factors:
             if factor.relation is None:
                 continue
             score = 0
+            meta = factor.metadata or {}
+            statement_type = meta.get("statement_type")
+            if recall_requested and statement_type == "decision":
+                score += 100
+            elif recall_requested and statement_type == "assertion":
+                score += 20
+            context_uid = meta.get("context_uid")
             for uid in factor.variables:
+                if context_uid and uid == context_uid:
+                    continue
                 lab = self._label(uid)
                 if lab.lower() in q or uid.lower().replace("m_", "") in q:
                     score += 3
             scored.append((score, factor))
-        scored.sort(key=lambda x: (x[0], x[1].uid), reverse=True)
+        scored.sort(
+            key=lambda x: (
+                x[0],
+                int((x[1].metadata or {}).get("created_tau", -1)),
+            ),
+            reverse=True,
+        )
 
         lines: list[str] = []
         seen: set[str] = set()
@@ -551,6 +766,7 @@ class DialogueAgent:
             line = self._fmt_semantic_fact(
                 factor.relation.canonical_label, roles, when=when
             )
+            line = _mark_epistemic(line, meta)
             if not line or line in seen:
                 continue
             seen.add(line)

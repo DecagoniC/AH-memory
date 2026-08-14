@@ -874,6 +874,45 @@
       });
     }
 
+    function formatParserPanel(parser) {
+      if (!parser) return "нет данных парсера";
+      const lines = [];
+      const raw = parser.llm_raw;
+      if (raw) {
+        lines.push("=== LLM (сырой JSON) ===");
+        lines.push(JSON.stringify(raw, null, 2));
+      } else {
+        lines.push("=== LLM: нет llm_raw (offline / ошибка) ===");
+      }
+      const gr = parser.gate_report;
+      if (gr) {
+        lines.push("");
+        lines.push(
+          `=== Gate: llm=${gr.llm_candidate_count} → finalize=${gr.finalized_count} → ingest=${gr.gated_count} ===`
+        );
+        if (gr.dropped && gr.dropped.length) {
+          lines.push("Отброшено gate:");
+          lines.push(JSON.stringify(gr.dropped, null, 2));
+        }
+      }
+      if (parser.gated_candidates && parser.gated_candidates.length) {
+        lines.push("");
+        lines.push("=== В граф (после gate) ===");
+        lines.push(JSON.stringify(parser.gated_candidates, null, 2));
+      }
+      if (parser.ingest_skipped && parser.ingest_skipped.length) {
+        lines.push("");
+        lines.push("=== Ingest skipped ===");
+        lines.push(parser.ingest_skipped.join("\n"));
+      }
+      if (parser.ingest_created && parser.ingest_created.length) {
+        lines.push("");
+        lines.push("=== Ingest created ===");
+        lines.push(parser.ingest_created.join("\n"));
+      }
+      return lines.join("\n");
+    }
+
     function addMsg(role, text, tag, extras) {
       extras = extras || {};
       const el = document.createElement("div");
@@ -892,6 +931,21 @@
         const actions = document.createElement("div");
         actions.className = "msg-actions";
         el.appendChild(actions);
+        if (extras.graphBuildJson && extras.graphBuildJson.parser) {
+          const btnP = document.createElement("button");
+          btnP.type = "button";
+          btnP.textContent = "ответ парсера";
+          const panelP = document.createElement("pre");
+          panelP.className = "prompt-panel";
+          panelP.textContent = formatParserPanel(extras.graphBuildJson.parser);
+          btnP.addEventListener("click", () => {
+            const open = panelP.classList.toggle("show");
+            btnP.classList.toggle("open", open);
+            btnP.textContent = open ? "скрыть парсер" : "ответ парсера";
+          });
+          actions.appendChild(btnP);
+          el.appendChild(panelP);
+        }
         if (extras.systemPrompt) {
           const btn = document.createElement("button");
           btn.type = "button";

@@ -12,69 +12,16 @@ import httpx
 from ah_memory.config import GigaChatConfig
 from ah_memory.morph import seeds_from_roles, slug_uid
 from ah_memory.perception import (
-    FactCandidate,
     PerceptionResult,
     SeedPerception,
     _is_question,
     _norm,
+    candidates_from_llm_json,
     content_entity_uids,
     gate_candidates,
+    llm_payload_errors,
 )
-
-SYSTEM_PROMPT = """Ты модуль восприятия АГ-памяти.
-
-КРИТИЧНО — формат ответа:
-- Верни ровно один JSON-объект. Без markdown, без текста вокруг, без комментариев.
-- Имена ВСЕХ ключей — только латиница и ТОЧНО как в примере ниже. Кириллические ключи запрещены
-  (нельзя: кандидаты, роли, уверенность, сырой_спан, семантические_токены и любые переводы).
-- Имена ролей — из списка ниже. Отношение может быть произвольным и должно сохранять формулировку текста.
-
-Точный каркас (копируй ключи буквально):
-{
-  "kind": "fact",
-  "candidates": [
-    {
-      "raw_relation": "зовут",
-      "canonical_relation": "IS",
-      "predicate": "IS",
-      "roles": {"SUBJECT": "Я", "OBJECT": "СЕРГЕЙ"},
-      "raw_span": "меня зовут сергей",
-      "confidence": 1.0
-    }
-  ],
-  "seed_tokens": ["Я", "СЕРГЕЙ"]
-}
-
-raw_relation ОБЯЗАТЕЛЕН для каждого факта: точный глагол/отношение из исходного текста.
-canonical_relation: UPPER_SNAKE ярлык отношения (можно новый, не из списка).
-Известные примеры (не закрытый словарь): IS, LIVE_IN, BE_BORN, HAVE, PURCHASE,
-WORKS_FOR, OWNS, LOCATED_IN, IS_A — или дословно по смыслу текста (ПРИЕХАЛ, ВСТРЕТИЛИСЬ…).
-predicate = canonical_relation (или UPPER_SNAKE от raw_relation, если canonical null).
-Не пропускай факт только потому, что отношения нет в примерах.
-
-Закрытый список ключей roles:
-SUBJECT | OBJECT | LOCATION | TIME | CAUSE | TOOL | MATERIAL | PURPOSE | HOW-TO
-
-ОБЯЗАТЕЛЬНО извлекай (если явно есть в тексте):
-- Новую информацию о пользователе (Я / ты / вы): имя, родство, учёба/работа, места, рождение, свойства, связи с людьми и организациями.
-- Текущие задачи и занятия пользователя: чем занимается, что делает/создаёт/использует сейчас (CREATE / USE / HAVE / CAUSE_EVENT по смыслу).
-- Сравни с wm_context в запросе: не дублируй факты, которые уже покрыты известным контекстом; выноси только новое или уточняющее.
-- Если в тексте есть такие новые факты — candidates НЕ должен быть пустым (нельзя ограничиться seed_tokens).
-
-Правила содержания:
-- Только явные утверждения из текста. Запрещены домыслы, знания модели, имена/сущности, которых нет в тексте.
-- Смысл → predicate:
-  • родился / родом / место рождения → BE_BORN + SUBJECT + LOCATION
-  • живёт / находится / учится / работает в … → LIVE_IN + SUBJECT + LOCATION
-  • есть / имеет / брат/сестра/… → HAVE + SUBJECT + OBJECT
-  • это / является / зовут → IS + SUBJECT + OBJECT
-  • цвет → BE_COLORED; бег → RUN; создание → CREATE; причина → CAUSE_EVENT; использование → USE; перемещение → MOVE
-- LIVE_IN и BE_BORN: место только в LOCATION (не OBJECT); SUBJECT и LOCATION обязательны.
-- UID в ролях и seed_tokens: одна сущность, UPPER_SNAKE, им. падеж (Я, СЕРГЕЙ, БРАТ_МАКСИМ, НИЯУ_МИФИ, МОСКВА).
-  Запрещены фразы («младший брат Максим», «НИЯУ МИФИ в Москве», «главный преподаватель…»).
-- Один факт = одна микротема. confidence < 0.7 → не включай.
-- Чистый вопрос / этикет / условие без нового факта → "kind":"question"|"message", "candidates":[].
-Верни только JSON."""
+from ah_memory.perception_prompt import SYSTEM_PROMPT, build_user_payload
 
 
 class GigaChatClient:
@@ -289,10 +236,7 @@ class GigaChatPerception:
         self.require_grounding = require_grounding
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
-        user = json.dumps(
-            {"text": text, "wm_context": wm_context or []},
-            ensure_ascii=False,
-        )
+        user = build_user_payload(text, wm_context)
         raw = self.client.chat(
             [
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -300,33 +244,19 @@ class GigaChatPerception:
             ]
         )
         data = _parse_json(raw)
-        cands = [
-            FactCandidate(
-                predicate=str(
-                    c.get("canonical_relation")
-                    or c.get("predicate")
-                    or c.get("raw_relation")
-                    or c.get("relation", "")
-                ).upper(),
-                roles={str(k).upper(): slug_uid(str(v)) for k, v in (c.get("roles") or {}).items()},
-                raw_span=c.get("raw_span"),
-                confidence=float(c.get("confidence", 0.8)),
-                raw_relation=str(
-                    c.get("raw_relation")
-                    or c.get("relation")
-                    or c.get("predicate", "")
-                ),
-                canonical_relation=c.get("canonical_relation"),
-            )
-            for c in data.get("candidates", [])
-            if isinstance(c, dict)
-            and (c.get("predicate") or c.get("raw_relation") or c.get("relation"))
-        ]
-        gated = gate_candidates(
+        cands = candidates_from_llm_json(data)
+        gated_result = gate_candidates(
             text,
             cands,
             require_grounding=self.require_grounding,
             allow_open_relations=True,
+            report=True,
+        )
+        gated, gate_report = gated_result
+        validation_errors = llm_payload_errors(data)
+        validation_errors.extend(
+            f"candidate rejected: {item.get('reason', 'validation')}"
+            for item in gate_report.get("dropped", [])
         )
         kind = data.get("kind", "fact")
         if kind not in {"fact", "question", "message"}:
@@ -334,7 +264,8 @@ class GigaChatPerception:
         low = _norm(text.strip())
         if _is_question(text.strip(), low):
             kind = "question"
-            gated = []
+        elif gated:
+            kind = "fact"
         seeds = seeds_from_roles(
             gated,
             extra=[slug_uid(str(s)) for s in data.get("seed_tokens", [])][:12],
@@ -350,6 +281,8 @@ class GigaChatPerception:
             meta={
                 "backend": "gigachat",
                 "llm_raw": data,
+                "gate_report": gate_report,
+                "validation_errors": validation_errors,
                 "system_prompt": SYSTEM_PROMPT,
             },
         )
@@ -390,6 +323,7 @@ class HybridPerception:
             meta={
                 "backend": "hybrid-llm" if llm.candidates else "hybrid-seeds",
                 "llm_raw": llm.meta.get("llm_raw"),
+                "gate_report": llm.meta.get("gate_report"),
                 "system_prompt": llm.meta.get("system_prompt", SYSTEM_PROMPT),
                 "llm_candidates": len(llm.candidates),
             },

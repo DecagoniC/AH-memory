@@ -16,16 +16,6 @@ class State:
     def get(self, key: str, default: Any = None) -> Any:
         return self.values.get(key, default)
 
-    def owns(self, owner_uid: str, object_uid: str) -> bool:
-        return bool(self.values.get(f"OWNS:{owner_uid}:{object_uid}", False))
-
-    def last_purchase(self, owner_uid: str) -> str | None:
-        value = self.values.get(f"LAST_PURCHASE:{owner_uid}")
-        return str(value) if value is not None else None
-
-    def purchase_history(self, owner_uid: str) -> list[str]:
-        return list(self.history.get(f"PURCHASE_HISTORY:{owner_uid}", ()))
-
     def to_dict(self) -> dict[str, Any]:
         return {
             "values": dict(self.values),
@@ -148,29 +138,5 @@ class StateEngine:
 
 
 def default_state_engine() -> StateEngine:
-    return StateEngine(
-        (
-            TransitionRule(
-                relation="PURCHASE",
-                operations=(
-                    StateOperation("set", "OWNS:{SUBJECT}:{OBJECT}", True),
-                    StateOperation(
-                        "set",
-                        "LAST_PURCHASE:{SUBJECT}",
-                        "{OBJECT}",
-                    ),
-                    StateOperation(
-                        "append",
-                        "PURCHASE_HISTORY:{SUBJECT}",
-                        "{OBJECT}",
-                    ),
-                ),
-            ),
-            TransitionRule(
-                relation="SELL",
-                operations=(
-                    StateOperation("set", "OWNS:{SUBJECT}:{OBJECT}", False),
-                ),
-            ),
-        )
-    )
+    """Return an empty engine; applications register transition rules explicitly."""
+    return StateEngine()

@@ -47,6 +47,20 @@ def _connected_to_S(store: AHStore) -> set[str]:
     return seen
 
 
+def orphan_uids(store: AHStore) -> set[str]:
+    """Return elements matching the challenge definition of a lost node."""
+    connected_to_s = _connected_to_S(store)
+    elements = set(store.ah.S) | set(store.ah.all_hyper())
+    result: set[str] = set()
+    for uid in elements:
+        weights = _incident_weights(store, uid)
+        all_zero = not weights or all(weight == 0.0 for weight in weights)
+        detached = uid not in connected_to_s and uid not in store.ah.S
+        if all_zero or detached:
+            result.add(uid)
+    return result
+
+
 def collect(store: AHStore, hp: HyperParams | None = None) -> GCReport:
     hp = hp or HyperParams()
     tau = store.ah.tau

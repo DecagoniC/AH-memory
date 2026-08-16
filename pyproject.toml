@@ -25,11 +25,13 @@ experiment = ["matplotlib>=3.8"]
 [project.scripts]
 ah-web = "web.app:main"
 ah-entity-resolution = "ah_memory.benchmarks.entity_resolution.runner:main"
+ah-challenge = "ah_memory.benchmarks.challenge.runner:main"
 
 [tool.setuptools]
 packages = [
   "ah_memory",
   "ah_memory.benchmarks",
+  "ah_memory.benchmarks.challenge",
   "ah_memory.benchmarks.entity_resolution",
   "ah_memory.synthetic",
   "benchmark",
@@ -47,3 +49,6 @@ web = ["static/*"]
 [tool.pytest.ini_options]
 pythonpath = ["src", "."]
 testpaths = ["tests"]
+markers = [
+  "integration: live model tests; skipped unless --run-integration",
+]

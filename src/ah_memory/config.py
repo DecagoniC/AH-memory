@@ -58,6 +58,21 @@ class DeepSeekConfig:
 
 
 @dataclass(frozen=True)
+class OllamaConfig:
+    """Connection settings for a local Ollama HTTP server."""
+
+    base_url: str = "http://127.0.0.1:11434"
+    model: str = "llama3.2"
+    embedding_model: str = "nomic-embed-text"
+    timeout_sec: float = 60.0
+    temperature: float = 0.1
+
+    @property
+    def configured(self) -> bool:
+        return bool(self.base_url.strip() and self.model.strip())
+
+
+@dataclass(frozen=True)
 class WebConfig:
     host: str = "127.0.0.1"
     port: int = 8000
@@ -105,6 +120,7 @@ class AppConfig:
     deepseek: DeepSeekConfig
     web: WebConfig
     agent: AgentConfig
+    ollama: OllamaConfig = OllamaConfig()
     experiment: ExperimentConfig = ExperimentConfig()
     open_semantics: OpenSemanticsConfig = OpenSemanticsConfig()
     embedding: EmbeddingConfig = EmbeddingConfig()
@@ -154,6 +170,7 @@ def load_config(path: Path | None = None) -> AppConfig:
 
     gc = raw.get("gigachat") or {}
     ds = raw.get("deepseek") or {}
+    ollama = raw.get("ollama") or {}
     web = raw.get("web", {})
     ag = raw.get("agent", {})
     semantics = raw.get("open_semantics", {})
@@ -194,6 +211,29 @@ def load_config(path: Path | None = None) -> AppConfig:
             model=str(ds.get("model", "deepseek-chat")),
             timeout_sec=float(ds.get("timeout_sec", 60)),
             temperature=float(ds.get("temperature", 0.1)),
+        ),
+        ollama=OllamaConfig(
+            base_url=str(
+                os.environ.get("OLLAMA_BASE_URL")
+                or ollama.get("base_url", "http://127.0.0.1:11434")
+            ),
+            model=str(
+                os.environ.get("OLLAMA_CHAT_MODEL")
+                or os.environ.get("OLLAMA_MODEL")
+                or ollama.get("model", "llama3.2")
+            ),
+            embedding_model=str(
+                os.environ.get("OLLAMA_EMBEDDING_MODEL")
+                or ollama.get("embedding_model", "nomic-embed-text")
+            ),
+            timeout_sec=float(
+                os.environ.get("OLLAMA_TIMEOUT_SEC")
+                or ollama.get("timeout_sec", 60)
+            ),
+            temperature=float(
+                os.environ.get("OLLAMA_TEMPERATURE")
+                or ollama.get("temperature", 0.1)
+            ),
         ),
         web=WebConfig(
             host=web.get("host", "127.0.0.1"),

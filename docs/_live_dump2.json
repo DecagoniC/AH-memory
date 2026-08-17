@@ -1,0 +1,493 @@
+{
+  "tau": 0,
+  "S": {},
+  "stats": {
+    "S": 0,
+    "C": 0,
+    "P": 0,
+    "H": 0,
+    "L": 0,
+    "hyperedges": 0,
+    "semantic_factors": 0,
+    "relations": 29,
+    "events": 0,
+    "graph_size": 0,
+    "tau": 0
+  },
+  "hyperedges": [],
+  "links": [],
+  "relations": {
+    "AFTER": {
+      "uid": "REL_AFTER",
+      "raw_label": "AFTER",
+      "canonical_label": "AFTER",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": true,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "ASSOC": {
+      "uid": "REL_ASSOC",
+      "raw_label": "ASSOC",
+      "canonical_label": "ASSOC",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": false,
+        "symmetric": true,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BEFORE": {
+      "uid": "REL_BEFORE",
+      "raw_label": "BEFORE",
+      "canonical_label": "BEFORE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": true,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BE_BORN": {
+      "uid": "REL_BE_BORN",
+      "raw_label": "BE_BORN",
+      "canonical_label": "BE_BORN",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BE_COLORED": {
+      "uid": "REL_BE_COLORED",
+      "raw_label": "BE_COLORED",
+      "canonical_label": "BE_COLORED",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BIND": {
+      "uid": "REL_BIND",
+      "raw_label": "BIND",
+      "canonical_label": "BIND",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": false,
+        "symmetric": true,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BORROW": {
+      "uid": "REL_BORROW",
+      "raw_label": "BORROW",
+      "canonical_label": "BORROW",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "CAUSE": {
+      "uid": "REL_CAUSE",
+      "raw_label": "CAUSE",
+      "canonical_label": "CAUSE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": true,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "CREATE": {
+      "uid": "REL_CREATE",
+      "raw_label": "CREATE",
+      "canonical_label": "CREATE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "DELETE": {
+      "uid": "REL_DELETE",
+      "raw_label": "DELETE",
+      "canonical_label": "DELETE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "DURING": {
+      "uid": "REL_DURING",
+      "raw_label": "DURING",
+      "canonical_label": "DURING",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "FOLLOW": {
+      "uid": "REL_FOLLOW",
+      "raw_label": "FOLLOW",
+      "canonical_label": "FOLLOW",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "HAVE": {
+      "uid": "REL_HAVE",
+      "raw_label": "HAVE",
+      "canonical_label": "HAVE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "IS": {
+      "uid": "REL_IS",
+      "raw_label": "IS",
+      "canonical_label": "IS",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": false,
+        "symmetric": true,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "IS_A": {
+      "uid": "REL_IS_A",
+      "raw_label": "IS_A",
+      "canonical_label": "IS_A",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": true,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "LIVE_IN": {
+      "uid": "REL_LIVE_IN",
+      "raw_label": "LIVE_IN",
+      "canonical_label": "LIVE_IN",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "LOCATED_IN": {
+      "uid": "REL_LOCATED_IN",
+      "raw_label": "LOCATED_IN",
+      "canonical_label": "LOCATED_IN",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "MOVE": {
+      "uid": "REL_MOVE",
+      "raw_label": "MOVE",
+      "canonical_label": "MOVE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "OWNS": {
+      "uid": "REL_OWNS",
+      "raw_label": "OWNS",
+      "canonical_label": "OWNS",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "PART_OF": {
+      "uid": "REL_PART_OF",
+      "raw_label": "PART_OF",
+      "canonical_label": "PART_OF",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": true,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "PURCHASE": {
+      "uid": "REL_PURCHASE",
+      "raw_label": "PURCHASE",
+      "canonical_label": "PURCHASE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "RECEIVE": {
+      "uid": "REL_RECEIVE",
+      "raw_label": "RECEIVE",
+      "canonical_label": "RECEIVE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "RELATED_TO": {
+      "uid": "REL_RELATED_TO",
+      "raw_label": "RELATED_TO",
+      "canonical_label": "RELATED_TO",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": false,
+        "symmetric": true,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "RUN": {
+      "uid": "REL_RUN",
+      "raw_label": "RUN",
+      "canonical_label": "RUN",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "SELL": {
+      "uid": "REL_SELL",
+      "raw_label": "SELL",
+      "canonical_label": "SELL",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "START": {
+      "uid": "REL_START",
+      "raw_label": "START",
+      "canonical_label": "START",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "STOP": {
+      "uid": "REL_STOP",
+      "raw_label": "STOP",
+      "canonical_label": "STOP",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "USE": {
+      "uid": "REL_USE",
+      "raw_label": "USE",
+      "canonical_label": "USE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "WORKS_FOR": {
+      "uid": "REL_WORKS_FOR",
+      "raw_label": "WORKS_FOR",
+      "canonical_label": "WORKS_FOR",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    }
+  },
+  "semantic_factors": [],
+  "events": [],
+  "state": {
+    "values": {},
+    "history": {},
+    "applied_events": []
+  },
+  "state_transitions": []
+}

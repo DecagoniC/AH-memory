@@ -20,6 +20,13 @@ deepseek:
   timeout_sec: 60
   temperature: 0.1
 
+ollama:
+  base_url: "http://127.0.0.1:11434"
+  model: "llama3.2"
+  embedding_model: "nomic-embed-text"
+  timeout_sec: 60
+  temperature: 0.1
+
 web:
   host: "127.0.0.1"
   port: 8000
@@ -28,7 +35,7 @@ agent:
   use_llm: true
   fallback_rules: true
   ticks: 6
-  preload: "empty"  # empty | rabbit | encyclopedia
+  preload: "empty"
   llm_provider: deepseek
 
 open_semantics:
@@ -37,6 +44,20 @@ open_semantics:
   embedding_similarity_threshold: 0.55
   parameter_seed: 42
   trace_messages: false
+
+# Pluggable embedding backend for entity resolution (and future semantic match).
+# GigaChat models use GIGACHAT_CREDENTIALS (same key as chat).
+embedding:
+  model: EmbeddingsGigaR  # EmbeddingsGigaR | Embeddings-2 | Embeddings | deterministic_ngram
+  dimensions: 64  # ignored for GigaChat (taken from API response)
+
+# Resolve mentions to existing symbols before creating duplicates.
+identity:
+  enabled: true
+  use_embeddings: true
+  safety_threshold: 0.94
+  margin: 0.05
+
 
 experiment:
   random_seed: 42

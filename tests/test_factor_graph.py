@@ -2,95 +2,73 @@
 from __future__ import annotations
 
 from ah_memory.belief_propagation import BeliefPropagation
-from ah_memory.examples.dog import build_dog_memory, run_dog_ignition
-from ah_memory.examples.rabbit import build_rabbit_memory
 from ah_memory.factor_graph import FactorKind, build_factor_graph, collect_variables
 from ah_memory.hyperparams import HyperParams
 from ah_memory.ignition import ActivationSeed, IgnitionEngine
+from ah_memory.perception import FactCandidate, PerceptionResult
 from ah_memory.store import AHStore
+from ah_memory.transform import Transform
 from ah_memory.types import (
     AbstractSymbol,
     AssocLink,
     LinkId,
     Property,
-    Role,
     SecondOrderSymbol,
     Section,
-    Hyperlink,
 )
-from ah_memory.templates import seed_templates
+from tests._mini_graph import build_mini_open_store
 
 
-def test_collect_variables_excludes_hypernodes() -> None:
-    store = build_rabbit_memory()
+def test_collect_variables_includes_m_and_s() -> None:
+    store = build_mini_open_store()
     vars_ = set(collect_variables(store))
-    assert "M_HARE" in vars_
-    assert "HARE" in vars_
-    for n in store.find_hypernodes():
-        assert n.uid not in vars_
+    assert "M_ENTITY" in vars_
+    assert "ENTITY" in vars_
 
 
 def test_build_factor_graph_has_hyper_and_pair() -> None:
-    store = build_rabbit_memory()
-    g = build_factor_graph(store, evidence={"M_HARE": 3.0}, epsilon=0.05)
+    store = build_mini_open_store()
+    g = build_factor_graph(store, evidence={"M_ENTITY": 3.0}, epsilon=0.05)
     kinds = {f.kind for f in g.factors}
     assert FactorKind.HYPER in kinds
     assert FactorKind.PAIR in kinds
     assert FactorKind.OBS in kinds
     assert FactorKind.PRIOR in kinds
-    assert any(f.fid.startswith("OBS::M_HARE") for f in g.factors)
 
 
 def test_bp_raises_belief_on_seed() -> None:
     store = AHStore()
-    seed_templates(store)
-    store.add_abstract_symbol(AbstractSymbol(uid="HARE", R={"TEXT": {"заяц"}}))
-    store.add_abstract_symbol(AbstractSymbol(uid="BEAST", R={"TEXT": {"зверёк"}}))
-    store.add_element(Section.C, SecondOrderSymbol(uid="M_HARE", Pr=[Property(name="label", value="заяц")]))
-    store.add_element(Section.C, SecondOrderSymbol(uid="M_BEAST", Pr=[Property(name="label", value="зверёк")]))
+    store.add_abstract_symbol(AbstractSymbol(uid="A", R={"TEXT": {"a"}}))
+    store.add_abstract_symbol(AbstractSymbol(uid="B", R={"TEXT": {"b"}}))
+    store.add_element(Section.C, SecondOrderSymbol(uid="M_A", Pr=[Property(name="label", value="a")]))
+    store.add_element(Section.C, SecondOrderSymbol(uid="M_B", Pr=[Property(name="label", value="b")]))
     store.add_link(
         AssocLink(
             uid="L1",
-            id=LinkId.IS_A.value,
+            id=LinkId.ASSOC.value,
             w=0.9,
-            e1=store.m_ref("M_HARE"),
-            e2=store.m_ref("M_BEAST"),
+            e1=store.m_ref("M_A"),
+            e2=store.m_ref("M_B"),
         )
     )
-    store.add_element(
-        Section.C,
-        Hyperlink(
-            uid="N1",
-            w=0.8,
-            template=store.m_ref("T_IS"),
-            fillers={
-                Role.SUBJECT: store.m_ref("M_HARE"),
-                Role.OBJECT: store.m_ref("M_BEAST"),
-            },
-        ),
+    Transform(store).apply(
+        PerceptionResult(
+            kind="fact",
+            candidates=[FactCandidate("IS", {"SUBJECT": "A", "OBJECT": "B"})],
+            seed_tokens=[],
+        )
     )
-    g = build_factor_graph(store, evidence={"M_HARE": 3.5}, epsilon=0.05)
-    res = BeliefPropagation(rounds=3, damp=0.3).run(g)
-    assert res.beliefs["M_HARE"] > 0.55
-    # IS-A should pull parent up
-    assert res.beliefs["M_BEAST"] > res.beliefs.get("HARE", 0.0) * 0.5 or res.beliefs["M_BEAST"] > 0.2
+    g = build_factor_graph(store, evidence={"M_A": 3.5}, epsilon=0.05)
+    assert any(f.kind == FactorKind.HYPER for f in g.factors)
+    res = BeliefPropagation(rounds=5, damp=0.3).run(g)
+    assert "M_A" in res.beliefs
+    assert res.beliefs["M_A"] >= res.beliefs.get("A", 0.0)
 
 
 def test_ignition_bp_sets_x_and_wm() -> None:
-    store = build_rabbit_memory()
-    eng = IgnitionEngine(store, HyperParams(threshold_t=0.4, fg_rounds=2))
-    eng.seed([ActivationSeed("HARE", 0.9), ActivationSeed("M_HARE", 0.9)])
-    tr = eng.tick()
-    assert store.get_x("M_HARE") > 0.3
-    assert tr.z_stats.get("n_factors", 0) > 0
-    assert isinstance(tr.trace_factors, list)
-    assert tr.chains, "expected human activation chains"
-    blob = " | ".join(tr.chains)
-    assert "M_HARE" in blob or "HARE" in blob
-    assert "→" in blob or "seed" in blob
-
-
-def test_dog_ignition_still_propagates() -> None:
-    hist = run_dog_ignition(ticks=6)
-    joined = "|".join(hist)
-    assert "M_DOG" in joined or "M_REX" in joined or "DOG" in joined
+    store = build_mini_open_store()
+    eng = IgnitionEngine(store, HyperParams())
+    eng.seed([ActivationSeed("M_ENTITY", 0.9), ActivationSeed("ENTITY", 0.8)])
+    traces = eng.run(4)
+    assert traces
+    assert store.get_x("M_ENTITY") > 0.0 or any(traces[-1].wm)

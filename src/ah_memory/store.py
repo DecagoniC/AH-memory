@@ -1,7 +1,12 @@
-"""Full AHStore operations (monograph §4 table 3)."""
+"""AHStore — CRUD над AH (монография §4, таблица 3).
+
+Читать после types.py. Здесь нет perception/LLM: только создать/найти/связать.
+Поверх AH лежат open-semantics слои: RelationRegistry, events, semantic_factors, State.
+"""
 from __future__ import annotations
 
-from typing import Any, Iterable
+from datetime import datetime
+from typing import Any
 
 from ah_memory.relation_registry import (
     RelationRegistry,
@@ -13,19 +18,18 @@ from ah_memory.types import (
     AH,
     AbstractSymbol,
     AssocLink,
-    ElementList,
     ElementRef,
-    FunctionalSymbol,
     HyperElement,
-    Hyperlink,
     MRef,
     Property,
-    Role,
     SRef,
     SecondOrderSymbol,
     Section,
-    Template,
 )
+
+
+def _now_iso() -> str:
+    return datetime.now().astimezone().isoformat(timespec="seconds")
 
 
 class AHError(Exception):
@@ -33,10 +37,15 @@ class AHError(Exception):
 
 
 class AHStore:
+    # ── Состояние хранилища ──────────────────────────────────────────────────
+    # Зачем: ah — классический граф S/C/P/H/L; relations/events/factors —
+    # параллельный слой open relations (то, что пишет Transform для новых предикатов).
+
     def __init__(self, ah: AH | None = None) -> None:
         self.ah = ah or AH()
-        self._ref_seq = 0
         self._uid_seq = 0
+        self._s_refs: dict[str, SRef] = {}
+        self._m_refs: dict[str, MRef] = {}
         self.relations: RelationRegistry = default_relation_registry()
         self.semantic_factors: dict[str, Any] = {}
         self.events: dict[str, Event] = {}
@@ -44,10 +53,11 @@ class AHStore:
         self.state_transitions: list[dict[str, Any]] = []
 
     def clear(self) -> None:
-        """Wipe all AH sets (in-place)."""
+        """Полный сброс графа и open-semantics (in-place)."""
         self.ah = AH()
-        self._ref_seq = 0
         self._uid_seq = 0
+        self._s_refs = {}
+        self._m_refs = {}
         self.relations = default_relation_registry()
         self.semantic_factors = {}
         self.events = {}
@@ -55,28 +65,71 @@ class AHStore:
         self.state_transitions = []
 
     def _touch_structure(self) -> None:
+        # Зачем: UI/кэши могут инвалидироваться по revision без полного diff.
         self.ah.revision += 1
+
+    def _stamp_creation(self, obj: Any) -> None:
+        """Проставить τ (тик AH) и wall-clock added_at на новый символ."""
+        iso = _now_iso()
+        if hasattr(obj, "created_tau"):
+            obj.created_tau = self.ah.tau
+        if hasattr(obj, "added_at") and not getattr(obj, "added_at", ""):
+            obj.added_at = iso
+
+    def get_added_at(self, uid: str) -> tuple[str, int | None]:
+        """Return (added_at ISO or '', created_tau or None) for a symbol."""
+        bare = uid[2:] if str(uid).startswith("M_") else str(uid)
+        if bare in self.ah.S:
+            s = self.ah.S[bare]
+            return (getattr(s, "added_at", "") or "", int(s.created_tau))
+        try:
+            e = self._find_anywhere(uid if str(uid).startswith("M_") else f"M_{bare}")
+        except AHError:
+            try:
+                e = self._find_anywhere(bare)
+            except AHError:
+                return ("", None)
+        added = getattr(e, "added_at", "") or ""
+        tau = getattr(e, "created_tau", None)
+        return (added, int(tau) if tau is not None else None)
+
+    # ── UID / ссылки ─────────────────────────────────────────────────────────
+    # Зачем: new_uid — для автогенерируемых N/E/L; s_ref/m_ref — один экземпляр
+    # ссылки на target (все рёбра на один UID разделяют один SRef/MRef).
 
     def new_uid(self, prefix: str) -> str:
         self._uid_seq += 1
         return f"{prefix}_{self._uid_seq:05d}"
 
-    def _next_ref(self, prefix: str = "REF") -> str:
-        self._ref_seq += 1
-        return f"{prefix}{self._ref_seq:06d}"
+    def s_ref(self, target_uid: str) -> SRef:
+        ref = self._s_refs.get(target_uid)
+        if ref is None:
+            ref = SRef(target_uid=target_uid)
+            self._s_refs[target_uid] = ref
+        return ref
 
-    def s_ref(self, target_uid: str, ref_uid: str | None = None) -> SRef:
-        return SRef(target_uid=target_uid, ref_uid=ref_uid or self._next_ref("S"))
+    def m_ref(self, target_uid: str) -> MRef:
+        ref = self._m_refs.get(target_uid)
+        if ref is None:
+            ref = MRef(target_uid=target_uid)
+            self._m_refs[target_uid] = ref
+        return ref
 
-    def m_ref(self, target_uid: str, ref_uid: str | None = None) -> MRef:
-        return MRef(target_uid=target_uid, ref_uid=ref_uid or self._next_ref("M"))
+    def _canon_ref(self, ref: ElementRef) -> ElementRef:
+        if isinstance(ref, SRef):
+            return self.s_ref(ref.target_uid)
+        if isinstance(ref, MRef):
+            return self.m_ref(ref.target_uid)
+        return ref
+
+    # ── Базовый CRUD (таблица операций §4) ───────────────────────────────────
 
     def add_abstract_symbol(self, s: AbstractSymbol) -> AbstractSymbol:
         if s.uid in self.ah.S:
             raise AHError(f"abstract symbol already exists: {s.uid}")
         if not s.modality_partition_ok():
             raise AHError(f"R modalities intersect for {s.uid}")
-        s.created_tau = self.ah.tau
+        self._stamp_creation(s)
         self.ah.S[s.uid] = s
         self._touch_structure()
         return s
@@ -98,8 +151,7 @@ class AHStore:
             raise AHError("element must have uid")
         if uid in bucket:
             raise AHError(f"element already exists in {section.value}: {uid}")
-        if hasattr(e, "created_tau"):
-            e.created_tau = self.ah.tau  # type: ignore[attr-defined]
+        self._stamp_creation(e)
         self._check_property_unique(e)
         bucket[uid] = e
         self._touch_structure()
@@ -142,9 +194,16 @@ class AHStore:
     def add_link(self, link: AssocLink) -> AssocLink:
         if link.uid in self.ah.L:
             raise AHError(f"link already exists: {link.uid}")
+        link.e1 = self._canon_ref(link.e1)  # type: ignore[assignment]
+        link.e2 = self._canon_ref(link.e2)  # type: ignore[assignment]
+        self._stamp_creation(link)
         self.ah.L[link.uid] = link
         self._touch_structure()
         return link
+
+    # ── Open semantics (параллельно классическому N/T) ───────────────────────
+    # Зачем: LLM может выдать любой predicate; registry хранит канон + свойства,
+    # Event — конкретное событие, semantic_factor — узел для belief propagation.
 
     def register_relation(self, relation: Relation) -> Relation:
         return self.relations.register_relation(relation)
@@ -204,51 +263,18 @@ class AHStore:
                 out.append(s)
         return out
 
-    def get_s_reference(self, ref_uid: str) -> SRef:
+    def find_symbols_by_kind(self, kind: str | None = None) -> list[SecondOrderSymbol]:
+        """M с Mt kind=… (например Episode)."""
+        out: list[SecondOrderSymbol] = []
         for e in self.ah.all_hyper().values():
-            for ref in self._iter_refs(e):
-                if isinstance(ref, SRef) and ref.ref_uid == ref_uid:
-                    return ref
-        for link in self.ah.L.values():
-            for ref in (link.e1, link.e2):
-                if isinstance(ref, SRef) and ref.ref_uid == ref_uid:
-                    return ref
-        raise AHError(f"SRef not found: {ref_uid}")
-
-    def find_s_references(self, target_uid: str) -> list[SRef]:
-        found: list[SRef] = []
-        for e in self.ah.all_hyper().values():
-            for ref in self._iter_refs(e):
-                if isinstance(ref, SRef) and ref.target_uid == target_uid:
-                    found.append(ref)
-        for link in self.ah.L.values():
-            for ref in (link.e1, link.e2):
-                if isinstance(ref, SRef) and ref.target_uid == target_uid:
-                    found.append(ref)
-        return found
-
-    def get_m_reference(self, ref_uid: str) -> MRef:
-        for e in self.ah.all_hyper().values():
-            for ref in self._iter_refs(e):
-                if isinstance(ref, MRef) and ref.ref_uid == ref_uid:
-                    return ref
-        for link in self.ah.L.values():
-            for ref in (link.e1, link.e2):
-                if isinstance(ref, MRef) and ref.ref_uid == ref_uid:
-                    return ref
-        raise AHError(f"MRef not found: {ref_uid}")
-
-    def find_m_references(self, target_uid: str) -> list[MRef]:
-        found: list[MRef] = []
-        for e in self.ah.all_hyper().values():
-            for ref in self._iter_refs(e):
-                if isinstance(ref, MRef) and ref.target_uid == target_uid:
-                    found.append(ref)
-        for link in self.ah.L.values():
-            for ref in (link.e1, link.e2):
-                if isinstance(ref, MRef) and ref.target_uid == target_uid:
-                    found.append(ref)
-        return found
+            if not isinstance(e, SecondOrderSymbol):
+                continue
+            if kind is None:
+                out.append(e)
+                continue
+            if any(p.name == "kind" and p.value == kind for p in e.Mt):
+                out.append(e)
+        return out
 
     def get_symbol(self, uid: str) -> SecondOrderSymbol:
         e = self._find_anywhere(uid)
@@ -267,53 +293,6 @@ class AHStore:
                 out.append(e)
         return out
 
-    def get_list(self, uid: str) -> ElementList:
-        e = self._find_anywhere(uid)
-        if not isinstance(e, ElementList):
-            raise AHError(f"not a list: {uid}")
-        return e
-
-    def find_lists(self, kind: str | None = None) -> list[ElementList]:
-        out: list[ElementList] = []
-        for e in self.ah.all_hyper().values():
-            if not isinstance(e, ElementList):
-                continue
-            if kind is None:
-                out.append(e)
-                continue
-            if any(p.name == "kind" and p.value == kind for p in e.Mt):
-                out.append(e)
-        return out
-
-    def get_template(self, uid: str) -> Template:
-        e = self._find_anywhere(uid)
-        if not isinstance(e, Template):
-            raise AHError(f"not a template: {uid}")
-        return e
-
-    def find_templates(self) -> list[Template]:
-        return [e for e in self.ah.all_hyper().values() if isinstance(e, Template)]
-
-    def get_hypernode(self, uid: str) -> Hyperlink:
-        e = self._find_anywhere(uid)
-        if not isinstance(e, Hyperlink):
-            raise AHError(f"not a hyperlink: {uid}")
-        return e
-
-    def find_hypernodes(self) -> list[Hyperlink]:
-        return [e for e in self.ah.all_hyper().values() if isinstance(e, Hyperlink)]
-
-    def find_roles(self, role: str | Role, value: str) -> list[Hyperlink]:
-        role_e = Role(role) if not isinstance(role, Role) else role
-        found: list[Hyperlink] = []
-        for e in self.ah.all_hyper().values():
-            if not isinstance(e, Hyperlink):
-                continue
-            filler = e.fillers.get(role_e)
-            if filler is not None and filler.target_uid == value:
-                found.append(e)
-        return found
-
     def get_link(self, uid: str) -> AssocLink:
         try:
             return self.ah.L[uid]
@@ -329,8 +308,16 @@ class AHStore:
                 out.append(link)
         return out
 
+    # ── Ingest-friendly helpers ──────────────────────────────────────────────
+    # Зачем: Transform зовёт именно их. ensure_abstract мержит новые словоформы
+    # в TEXT (важно для identity); ensure_m создаёт сущность с label, если нет.
+
     def ensure_abstract(self, uid: str, forms: set[str] | None = None) -> AbstractSymbol:
         if uid in self.ah.S:
+            if forms:
+                self.ah.S[uid].R.setdefault("TEXT", set()).update(
+                    f.lower().replace("ё", "е") for f in forms if f
+                )
             return self.ah.S[uid]
         return self.add_abstract_symbol(
             AbstractSymbol(uid=uid, R={"TEXT": forms or {uid.lower()}})
@@ -412,18 +399,6 @@ class AHStore:
             if uid in self.ah.section(sec):
                 return sec
         return None
-
-    @staticmethod
-    def _iter_refs(e: HyperElement) -> Iterable[ElementRef]:
-        if isinstance(e, Hyperlink):
-            yield e.template
-            yield from e.fillers.values()
-        elif isinstance(e, Template):
-            yield e.predicate
-        elif isinstance(e, FunctionalSymbol):
-            yield from e.operands
-        elif isinstance(e, ElementList):
-            yield from e.items
 
     @staticmethod
     def _check_property_unique(e: HyperElement) -> None:

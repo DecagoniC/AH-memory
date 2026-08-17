@@ -1,0 +1,67 @@
+{
+  "config": {
+    "num_entities": 100,
+    "num_events": 200,
+    "num_factors": 500,
+    "max_hop_depth": 3,
+    "distractor_ratio": 0.3,
+    "num_queries": 50,
+    "random_seed": 42,
+    "num_persons": 0,
+    "num_companies": 0,
+    "num_places": 0,
+    "num_objects": 0,
+    "num_documents": 0,
+    "relation_types": [
+      "KNOW",
+      "WORKS_FOR",
+      "LIVES_IN",
+      "LOCATED_IN",
+      "OWNS",
+      "PURCHASE",
+      "SELL",
+      "MOVE",
+      "VISITS",
+      "USES",
+      "CREATED",
+      "CAUSE",
+      "FOLLOW",
+      "PART_OF",
+      "IS_A"
+    ],
+    "preset": "small"
+  },
+  "stats": {
+    "entities": 163,
+    "factors": 500,
+    "relations": 737,
+    "events": 200,
+    "documents": 50,
+    "queries": 50,
+    "proof_paths": 50
+  },
+  "generation_time_sec": 0.026610500004608184,
+  "seed": 42,
+  "metadata": {
+    "seed": 42,
+    "preset": "small",
+    "relation_types": [
+      "KNOW",
+      "WORKS_FOR",
+      "LIVES_IN",
+      "LOCATED_IN",
+      "OWNS",
+      "PURCHASE",
+      "SELL",
+      "MOVE",
+      "VISITS",
+      "USES",
+      "CREATED",
+      "CAUSE",
+      "FOLLOW",
+      "PART_OF",
+      "IS_A"
+    ]
+  },
+  "format": "ah_memory.synthetic.v1"
+}

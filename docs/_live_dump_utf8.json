@@ -1,0 +1,1323 @@
+{
+  "tau": 42,
+  "S": {
+    "Я": {
+      "R": {
+        "TEXT": [
+          "я"
+        ]
+      },
+      "activation": 0.006968064245786148,
+      "created_tau": 6,
+      "added_at": "2026-08-13T19:35:54+03:00"
+    },
+    "РОМАН_ДУШКИН": {
+      "R": {
+        "TEXT": [
+          "роман душкин",
+          "роман_душкин"
+        ]
+      },
+      "activation": 0.006968064245786148,
+      "created_tau": 6,
+      "added_at": "2026-08-13T19:35:56+03:00"
+    },
+    "ТЫ": {
+      "R": {
+        "TEXT": [
+          "ты"
+        ]
+      },
+      "activation": 1.0,
+      "created_tau": 22,
+      "added_at": "2026-08-13T19:37:12+03:00"
+    },
+    "БРАТ": {
+      "R": {
+        "TEXT": [
+          "брат"
+        ]
+      },
+      "activation": 1.0,
+      "created_tau": 22,
+      "added_at": "2026-08-13T19:37:12+03:00"
+    },
+    "КОЛЛЕДЖ": {
+      "R": {
+        "TEXT": [
+          "колледж"
+        ]
+      },
+      "activation": 1.0,
+      "created_tau": 30,
+      "added_at": "2026-08-13T19:37:33+03:00"
+    },
+    "БРАТ_МАКСИМ": {
+      "R": {
+        "TEXT": [
+          "брат максим",
+          "брат_максим"
+        ]
+      },
+      "activation": 1.0,
+      "created_tau": 40,
+      "added_at": "2026-08-13T19:37:55+03:00"
+    }
+  },
+  "stats": {
+    "S": 6,
+    "C": 11,
+    "P": 0,
+    "H": 0,
+    "L": 14,
+    "hyperedges": 6,
+    "semantic_factors": 6,
+    "relations": 32,
+    "events": 6,
+    "graph_size": 31,
+    "tau": 42
+  },
+  "hyperedges": [
+    {
+      "id": "SF::E_00001",
+      "predicate": "IS",
+      "raw_relation": "зовут",
+      "w": 0.5,
+      "confidence": 1.0,
+      "roles": {
+        "SUBJECT": "M_Я",
+        "OBJECT": "M_СЕРГЕЙ"
+      },
+      "members": [
+        "M_Я",
+        "M_СЕРГЕЙ"
+      ],
+      "hub": "SF::E_00001",
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.5,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      }
+    },
+    {
+      "id": "SF::E_00004",
+      "predicate": "HAVE",
+      "raw_relation": "есть",
+      "w": 0.5,
+      "confidence": 1.0,
+      "roles": {
+        "SUBJECT": "M_Я",
+        "OBJECT": "M_БРАТ_МАКСИМ"
+      },
+      "members": [
+        "M_Я",
+        "M_БРАТ_МАКСИМ"
+      ],
+      "hub": "SF::E_00004",
+      "parameters": {
+        "transmission_strength": 0.6,
+        "decay": 0.1,
+        "directionality": 0.9,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.8
+      }
+    },
+    {
+      "id": "SF::E_00006",
+      "predicate": "STUDY_AT",
+      "raw_relation": "учусь",
+      "w": 0.5,
+      "confidence": 1.0,
+      "roles": {
+        "SUBJECT": "M_Я",
+        "OBJECT": "M_НИЯУ_МИФИ",
+        "LOCATION": "M_МОСКВА"
+      },
+      "members": [
+        "M_Я",
+        "M_НИЯУ_МИФИ",
+        "M_МОСКВА"
+      ],
+      "hub": "SF::E_00006",
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.9,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      }
+    },
+    {
+      "id": "SF::E_00010",
+      "predicate": "IS",
+      "raw_relation": "является",
+      "w": 0.5,
+      "confidence": 1.0,
+      "roles": {
+        "SUBJECT": "M_РОМАН_ДУШКИН",
+        "OBJECT": "M_ПРЕПОДАВАТЕЛЬ",
+        "LOCATION": "M_КАФЕДРА_22"
+      },
+      "members": [
+        "M_РОМАН_ДУШКИН",
+        "M_ПРЕПОДАВАТЕЛЬ",
+        "M_КАФЕДРА_22"
+      ],
+      "hub": "SF::E_00010",
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.5,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      }
+    },
+    {
+      "id": "SF::E_00015",
+      "predicate": "ENROLL_IN_COLLEGE",
+      "raw_relation": "поступает в колледж",
+      "w": 0.5,
+      "confidence": 1.0,
+      "roles": {
+        "SUBJECT": "M_БРАТ",
+        "OBJECT": "M_КОЛЛЕДЖ"
+      },
+      "members": [
+        "M_БРАТ",
+        "M_КОЛЛЕДЖ"
+      ],
+      "hub": "SF::E_00015",
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.9,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      }
+    },
+    {
+      "id": "SF::E_00018",
+      "predicate": "STUDY_AT",
+      "raw_relation": "учится",
+      "w": 0.5,
+      "confidence": 1.0,
+      "roles": {
+        "SUBJECT": "M_БРАТ_МАКСИМ",
+        "LOCATION": "M_КОЛЛЕДЖ"
+      },
+      "members": [
+        "M_БРАТ_МАКСИМ",
+        "M_КОЛЛЕДЖ"
+      ],
+      "hub": "SF::E_00018",
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.9,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      }
+    }
+  ],
+  "links": [
+    {
+      "uid": "L_MESH_00002",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_Я",
+      "e2": "M_СЕРГЕЙ"
+    },
+    {
+      "uid": "L_BIND_00003",
+      "id": "BIND",
+      "w": 1.0,
+      "e1": "M_Я",
+      "e2": "Я"
+    },
+    {
+      "uid": "L_MESH_00005",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_Я",
+      "e2": "M_БРАТ_МАКСИМ"
+    },
+    {
+      "uid": "L_MESH_00007",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_Я",
+      "e2": "M_НИЯУ_МИФИ"
+    },
+    {
+      "uid": "L_MESH_00008",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_Я",
+      "e2": "M_МОСКВА"
+    },
+    {
+      "uid": "L_MESH_00009",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_НИЯУ_МИФИ",
+      "e2": "M_МОСКВА"
+    },
+    {
+      "uid": "L_MESH_00011",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_РОМАН_ДУШКИН",
+      "e2": "M_ПРЕПОДАВАТЕЛЬ"
+    },
+    {
+      "uid": "L_MESH_00012",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_РОМАН_ДУШКИН",
+      "e2": "M_КАФЕДРА_22"
+    },
+    {
+      "uid": "L_MESH_00013",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_ПРЕПОДАВАТЕЛЬ",
+      "e2": "M_КАФЕДРА_22"
+    },
+    {
+      "uid": "L_BIND_00014",
+      "id": "BIND",
+      "w": 1.0,
+      "e1": "M_РОМАН_ДУШКИН",
+      "e2": "РОМАН_ДУШКИН"
+    },
+    {
+      "uid": "L_MESH_00016",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_БРАТ",
+      "e2": "M_КОЛЛЕДЖ"
+    },
+    {
+      "uid": "L_BIND_00017",
+      "id": "BIND",
+      "w": 1.0,
+      "e1": "M_БРАТ",
+      "e2": "БРАТ"
+    },
+    {
+      "uid": "L_MESH_00019",
+      "id": "ASSOC",
+      "w": 0.5,
+      "e1": "M_БРАТ_МАКСИМ",
+      "e2": "M_КОЛЛЕДЖ"
+    },
+    {
+      "uid": "L_BIND_00020",
+      "id": "BIND",
+      "w": 1.0,
+      "e1": "M_БРАТ_МАКСИМ",
+      "e2": "БРАТ_МАКСИМ"
+    }
+  ],
+  "relations": {
+    "AFTER": {
+      "uid": "REL_AFTER",
+      "raw_label": "AFTER",
+      "canonical_label": "AFTER",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": true,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "ASSOC": {
+      "uid": "REL_ASSOC",
+      "raw_label": "ASSOC",
+      "canonical_label": "ASSOC",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": false,
+        "symmetric": true,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BEFORE": {
+      "uid": "REL_BEFORE",
+      "raw_label": "BEFORE",
+      "canonical_label": "BEFORE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": true,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BE_BORN": {
+      "uid": "REL_BE_BORN",
+      "raw_label": "BE_BORN",
+      "canonical_label": "BE_BORN",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BE_COLORED": {
+      "uid": "REL_BE_COLORED",
+      "raw_label": "BE_COLORED",
+      "canonical_label": "BE_COLORED",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BIND": {
+      "uid": "REL_BIND",
+      "raw_label": "BIND",
+      "canonical_label": "BIND",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": false,
+        "symmetric": true,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "BORROW": {
+      "uid": "REL_BORROW",
+      "raw_label": "BORROW",
+      "canonical_label": "BORROW",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "CAUSE": {
+      "uid": "REL_CAUSE",
+      "raw_label": "CAUSE",
+      "canonical_label": "CAUSE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": true,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "CREATE": {
+      "uid": "REL_CREATE",
+      "raw_label": "CREATE",
+      "canonical_label": "CREATE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "DELETE": {
+      "uid": "REL_DELETE",
+      "raw_label": "DELETE",
+      "canonical_label": "DELETE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "DURING": {
+      "uid": "REL_DURING",
+      "raw_label": "DURING",
+      "canonical_label": "DURING",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "ENROLL_IN_COLLEGE": {
+      "uid": "REL_ENROLL_IN_COLLEGE",
+      "raw_label": "поступает в колледж",
+      "canonical_label": "ENROLL_IN_COLLEGE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {
+        "normalization_confidence": 1.0,
+        "normalization_strategy": "parser_new_relation",
+        "created_by_normalizer": true
+      }
+    },
+    "FOLLOW": {
+      "uid": "REL_FOLLOW",
+      "raw_label": "FOLLOW",
+      "canonical_label": "FOLLOW",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": true,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "HAVE": {
+      "uid": "REL_HAVE",
+      "raw_label": "HAVE",
+      "canonical_label": "HAVE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "IS": {
+      "uid": "REL_IS",
+      "raw_label": "IS",
+      "canonical_label": "IS",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": false,
+        "symmetric": true,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "IS_A": {
+      "uid": "REL_IS_A",
+      "raw_label": "IS_A",
+      "canonical_label": "IS_A",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": true,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "LIVE_IN": {
+      "uid": "REL_LIVE_IN",
+      "raw_label": "LIVE_IN",
+      "canonical_label": "LIVE_IN",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "LOCATED_IN": {
+      "uid": "REL_LOCATED_IN",
+      "raw_label": "LOCATED_IN",
+      "canonical_label": "LOCATED_IN",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "MOVE": {
+      "uid": "REL_MOVE",
+      "raw_label": "MOVE",
+      "canonical_label": "MOVE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "OWNS": {
+      "uid": "REL_OWNS",
+      "raw_label": "OWNS",
+      "canonical_label": "OWNS",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "PART_OF": {
+      "uid": "REL_PART_OF",
+      "raw_label": "PART_OF",
+      "canonical_label": "PART_OF",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": true,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "PURCHASE": {
+      "uid": "REL_PURCHASE",
+      "raw_label": "PURCHASE",
+      "canonical_label": "PURCHASE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "RECEIVE": {
+      "uid": "REL_RECEIVE",
+      "raw_label": "RECEIVE",
+      "canonical_label": "RECEIVE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "RELATED_TO": {
+      "uid": "REL_RELATED_TO",
+      "raw_label": "RELATED_TO",
+      "canonical_label": "RELATED_TO",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": false,
+        "symmetric": true,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "RUN": {
+      "uid": "REL_RUN",
+      "raw_label": "RUN",
+      "canonical_label": "RUN",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "SELL": {
+      "uid": "REL_SELL",
+      "raw_label": "SELL",
+      "canonical_label": "SELL",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "START": {
+      "uid": "REL_START",
+      "raw_label": "START",
+      "canonical_label": "START",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "STOP": {
+      "uid": "REL_STOP",
+      "raw_label": "STOP",
+      "canonical_label": "STOP",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": true
+      },
+      "metadata": {}
+    },
+    "STUDY_AT": {
+      "uid": "REL_STUDY_AT",
+      "raw_label": "учусь",
+      "canonical_label": "STUDY_AT",
+      "embedding": null,
+      "arity": 3,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {
+        "normalization_confidence": 1.0,
+        "normalization_strategy": "parser_new_relation",
+        "created_by_normalizer": true
+      }
+    },
+    "STUDY_COMPUTER_SCIENCE": {
+      "uid": "REL_STUDY_COMPUTER_SCIENCE",
+      "raw_label": "учится на програмиста",
+      "canonical_label": "STUDY_COMPUTER_SCIENCE",
+      "embedding": null,
+      "arity": 1,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {
+        "normalization_confidence": 1.0,
+        "normalization_strategy": "parser_new_relation",
+        "created_by_normalizer": true
+      }
+    },
+    "USE": {
+      "uid": "REL_USE",
+      "raw_label": "USE",
+      "canonical_label": "USE",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    },
+    "WORKS_FOR": {
+      "uid": "REL_WORKS_FOR",
+      "raw_label": "WORKS_FOR",
+      "canonical_label": "WORKS_FOR",
+      "embedding": null,
+      "arity": 2,
+      "properties": {
+        "directional": true,
+        "symmetric": false,
+        "transitive": false,
+        "temporal": false,
+        "causal": false,
+        "state_changing": false
+      },
+      "metadata": {}
+    }
+  },
+  "semantic_factors": [
+    {
+      "uid": "SF::E_00001",
+      "relation": "IS",
+      "variables": [
+        "M_Я",
+        "M_СЕРГЕЙ"
+      ],
+      "roles": {
+        "SUBJECT": "M_Я",
+        "OBJECT": "M_СЕРГЕЙ"
+      },
+      "weight": 0.5,
+      "confidence": 1.0,
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.5,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      },
+      "metadata": {
+        "event_uid": "E_00001",
+        "raw_relation": "зовут",
+        "canonical_relation": "IS",
+        "source_variable": "M_Я",
+        "added_at": "2026-08-13T19:35:57+03:00",
+        "created_tau": 6
+      }
+    },
+    {
+      "uid": "SF::E_00004",
+      "relation": "HAVE",
+      "variables": [
+        "M_Я",
+        "M_БРАТ_МАКСИМ"
+      ],
+      "roles": {
+        "SUBJECT": "M_Я",
+        "OBJECT": "M_БРАТ_МАКСИМ"
+      },
+      "weight": 0.5,
+      "confidence": 1.0,
+      "parameters": {
+        "transmission_strength": 0.6,
+        "decay": 0.1,
+        "directionality": 0.9,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.8
+      },
+      "metadata": {
+        "event_uid": "E_00004",
+        "raw_relation": "есть",
+        "canonical_relation": "HAVE",
+        "source_variable": "M_Я",
+        "added_at": "2026-08-13T19:35:57+03:00",
+        "created_tau": 6
+      }
+    },
+    {
+      "uid": "SF::E_00006",
+      "relation": "STUDY_AT",
+      "variables": [
+        "M_Я",
+        "M_НИЯУ_МИФИ",
+        "M_МОСКВА"
+      ],
+      "roles": {
+        "SUBJECT": "M_Я",
+        "OBJECT": "M_НИЯУ_МИФИ",
+        "LOCATION": "M_МОСКВА"
+      },
+      "weight": 0.5,
+      "confidence": 1.0,
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.9,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      },
+      "metadata": {
+        "event_uid": "E_00006",
+        "raw_relation": "учусь",
+        "canonical_relation": "STUDY_AT",
+        "source_variable": "M_Я",
+        "added_at": "2026-08-13T19:35:57+03:00",
+        "created_tau": 6
+      }
+    },
+    {
+      "uid": "SF::E_00010",
+      "relation": "IS",
+      "variables": [
+        "M_РОМАН_ДУШКИН",
+        "M_ПРЕПОДАВАТЕЛЬ",
+        "M_КАФЕДРА_22"
+      ],
+      "roles": {
+        "SUBJECT": "M_РОМАН_ДУШКИН",
+        "OBJECT": "M_ПРЕПОДАВАТЕЛЬ",
+        "LOCATION": "M_КАФЕДРА_22"
+      },
+      "weight": 0.5,
+      "confidence": 1.0,
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.5,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      },
+      "metadata": {
+        "event_uid": "E_00010",
+        "raw_relation": "является",
+        "canonical_relation": "IS",
+        "source_variable": "M_РОМАН_ДУШКИН",
+        "added_at": "2026-08-13T19:35:57+03:00",
+        "created_tau": 6
+      }
+    },
+    {
+      "uid": "SF::E_00015",
+      "relation": "ENROLL_IN_COLLEGE",
+      "variables": [
+        "M_БРАТ",
+        "M_КОЛЛЕДЖ"
+      ],
+      "roles": {
+        "SUBJECT": "M_БРАТ",
+        "OBJECT": "M_КОЛЛЕДЖ"
+      },
+      "weight": 0.5,
+      "confidence": 1.0,
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.9,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      },
+      "metadata": {
+        "event_uid": "E_00015",
+        "raw_relation": "поступает в колледж",
+        "canonical_relation": "ENROLL_IN_COLLEGE",
+        "source_variable": "M_БРАТ",
+        "added_at": "2026-08-13T19:37:33+03:00",
+        "created_tau": 30
+      }
+    },
+    {
+      "uid": "SF::E_00018",
+      "relation": "STUDY_AT",
+      "variables": [
+        "M_БРАТ_МАКСИМ",
+        "M_КОЛЛЕДЖ"
+      ],
+      "roles": {
+        "SUBJECT": "M_БРАТ_МАКСИМ",
+        "LOCATION": "M_КОЛЛЕДЖ"
+      },
+      "weight": 0.5,
+      "confidence": 1.0,
+      "parameters": {
+        "transmission_strength": 0.5,
+        "decay": 0.1,
+        "directionality": 0.9,
+        "selectivity": 0.5,
+        "temporal_bias": 0.0,
+        "causal_bias": 0.0,
+        "persistence": 0.5
+      },
+      "metadata": {
+        "event_uid": "E_00018",
+        "raw_relation": "учится",
+        "canonical_relation": "STUDY_AT",
+        "source_variable": "M_БРАТ_МАКСИМ",
+        "added_at": "2026-08-13T19:37:55+03:00",
+        "created_tau": 40
+      }
+    }
+  ],
+  "events": [
+    {
+      "uid": "E_00001",
+      "predicate": {
+        "uid": "REL_IS",
+        "raw_label": "IS",
+        "canonical_label": "IS",
+        "embedding": null,
+        "arity": 2,
+        "properties": {
+          "directional": false,
+          "symmetric": true,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {}
+      },
+      "arguments": {
+        "SUBJECT": {
+          "uid": "M_Я",
+          "role": "SUBJECT"
+        },
+        "OBJECT": {
+          "uid": "M_СЕРГЕЙ",
+          "role": "OBJECT"
+        }
+      },
+      "timestamp": null,
+      "confidence": 1.0,
+      "raw_span": "меня зовут сергей",
+      "metadata": {
+        "raw_relation": "зовут",
+        "normalization": "parser_hint",
+        "normalization_confidence": 1.0,
+        "added_at": "2026-08-13T19:35:57+03:00",
+        "created_tau": 6
+      }
+    },
+    {
+      "uid": "E_00004",
+      "predicate": {
+        "uid": "REL_HAVE",
+        "raw_label": "HAVE",
+        "canonical_label": "HAVE",
+        "embedding": null,
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": true
+        },
+        "metadata": {}
+      },
+      "arguments": {
+        "SUBJECT": {
+          "uid": "M_Я",
+          "role": "SUBJECT"
+        },
+        "OBJECT": {
+          "uid": "M_БРАТ_МАКСИМ",
+          "role": "OBJECT"
+        }
+      },
+      "timestamp": null,
+      "confidence": 1.0,
+      "raw_span": "у меня есть младший брат максим",
+      "metadata": {
+        "raw_relation": "есть",
+        "normalization": "parser_hint",
+        "normalization_confidence": 1.0,
+        "added_at": "2026-08-13T19:35:57+03:00",
+        "created_tau": 6
+      }
+    },
+    {
+      "uid": "E_00006",
+      "predicate": {
+        "uid": "REL_STUDY_AT",
+        "raw_label": "учусь",
+        "canonical_label": "STUDY_AT",
+        "embedding": null,
+        "arity": 3,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 1.0,
+          "normalization_strategy": "parser_new_relation",
+          "created_by_normalizer": true
+        }
+      },
+      "arguments": {
+        "SUBJECT": {
+          "uid": "M_Я",
+          "role": "SUBJECT"
+        },
+        "OBJECT": {
+          "uid": "M_НИЯУ_МИФИ",
+          "role": "OBJECT"
+        },
+        "LOCATION": {
+          "uid": "M_МОСКВА",
+          "role": "LOCATION"
+        }
+      },
+      "timestamp": null,
+      "confidence": 1.0,
+      "raw_span": "я учусь в вузе НИЯУ МИФИ в Москве",
+      "metadata": {
+        "raw_relation": "учусь",
+        "normalization": "parser_new_relation",
+        "normalization_confidence": 1.0,
+        "added_at": "2026-08-13T19:35:57+03:00",
+        "created_tau": 6
+      }
+    },
+    {
+      "uid": "E_00010",
+      "predicate": {
+        "uid": "REL_IS",
+        "raw_label": "IS",
+        "canonical_label": "IS",
+        "embedding": null,
+        "arity": 2,
+        "properties": {
+          "directional": false,
+          "symmetric": true,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {}
+      },
+      "arguments": {
+        "SUBJECT": {
+          "uid": "M_РОМАН_ДУШКИН",
+          "role": "SUBJECT"
+        },
+        "OBJECT": {
+          "uid": "M_ПРЕПОДАВАТЕЛЬ",
+          "role": "OBJECT"
+        },
+        "LOCATION": {
+          "uid": "M_КАФЕДРА_22",
+          "role": "LOCATION"
+        }
+      },
+      "timestamp": null,
+      "confidence": 1.0,
+      "raw_span": "где главным преподавателем на кафедре 22 является Роман Душкин",
+      "metadata": {
+        "raw_relation": "является",
+        "normalization": "parser_hint",
+        "normalization_confidence": 1.0,
+        "added_at": "2026-08-13T19:35:57+03:00",
+        "created_tau": 6
+      }
+    },
+    {
+      "uid": "E_00015",
+      "predicate": {
+        "uid": "REL_ENROLL_IN_COLLEGE",
+        "raw_label": "поступает в колледж",
+        "canonical_label": "ENROLL_IN_COLLEGE",
+        "embedding": null,
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 1.0,
+          "normalization_strategy": "parser_new_relation",
+          "created_by_normalizer": true
+        }
+      },
+      "arguments": {
+        "SUBJECT": {
+          "uid": "M_БРАТ",
+          "role": "SUBJECT"
+        },
+        "OBJECT": {
+          "uid": "M_КОЛЛЕДЖ",
+          "role": "OBJECT"
+        }
+      },
+      "timestamp": null,
+      "confidence": 1.0,
+      "raw_span": "мой брат сейчас поступает в колледж на програмиста",
+      "metadata": {
+        "raw_relation": "поступает в колледж",
+        "normalization": "parser_new_relation",
+        "normalization_confidence": 1.0,
+        "added_at": "2026-08-13T19:37:33+03:00",
+        "created_tau": 30
+      }
+    },
+    {
+      "uid": "E_00018",
+      "predicate": {
+        "uid": "REL_STUDY_AT",
+        "raw_label": "учусь",
+        "canonical_label": "STUDY_AT",
+        "embedding": null,
+        "arity": 3,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 1.0,
+          "normalization_strategy": "parser_new_relation",
+          "created_by_normalizer": true
+        }
+      },
+      "arguments": {
+        "SUBJECT": {
+          "uid": "M_БРАТ_МАКСИМ",
+          "role": "SUBJECT"
+        },
+        "LOCATION": {
+          "uid": "M_КОЛЛЕДЖ",
+          "role": "LOCATION"
+        }
+      },
+      "timestamp": null,
+      "confidence": 1.0,
+      "raw_span": "он учится в колледже",
+      "metadata": {
+        "raw_relation": "учится",
+        "normalization": "parser_hint",
+        "normalization_confidence": 1.0,
+        "added_at": "2026-08-13T19:37:55+03:00",
+        "created_tau": 40
+      }
+    }
+  ],
+  "state": {
+    "values": {},
+    "history": {},
+    "applied_events": [
+      "E_00001",
+      "E_00004",
+      "E_00006",
+      "E_00010",
+      "E_00015",
+      "E_00018"
+    ]
+  },
+  "state_transitions": []
+}

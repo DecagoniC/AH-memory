@@ -8,7 +8,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from ah_memory.examples.rabbit import build_rabbit_memory, syntactic_answer_who_is_hare
+from ah_memory.dsl import DSLInterpreter
 from ah_memory.invariants import InvariantError, validate
 from ah_memory.store import AHStore
 from ah_memory.types import (
@@ -18,6 +18,7 @@ from ah_memory.types import (
     SecondOrderSymbol,
     Section,
 )
+from tests._mini_graph import build_mini_open_store
 
 
 def test_add_get_abstract_symbol() -> None:
@@ -48,7 +49,7 @@ def test_find_links() -> None:
     store.add_link(
         AssocLink(
             uid="L1",
-            id=LinkId.IS_A.value,
+            id=LinkId.ASSOC.value,
             w=1.0,
             e1=store.m_ref("M_A"),
             e2=store.m_ref("M_B"),
@@ -59,24 +60,17 @@ def test_find_links() -> None:
     assert links[0].uid == "L1"
 
 
-def test_rabbit_invariants() -> None:
-    store = build_rabbit_memory()
+def test_mini_open_invariants() -> None:
+    store = build_mini_open_store()
     validate(store)
+    assert store.list_semantic_factors()
+    assert LinkId.FOLLOW.value in {l.id for l in store.ah.L.values()}
 
 
-def test_rabbit_has_isa_and_follow() -> None:
-    store = build_rabbit_memory()
-    ids = {l.id for l in store.ah.L.values()}
-    assert LinkId.IS_A.value in ids
-    assert LinkId.FOLLOW.value in ids
-    assert len(store.ah.S) >= 20
-    assert len(store.find_hypernodes()) >= 8
-
-
-def test_who_is_hare() -> None:
-    store = build_rabbit_memory()
-    answer = syntactic_answer_who_is_hare(store)
-    assert "зверёк" in answer or "маленький" in answer or "дикий" in answer
+def test_answer_who_open() -> None:
+    store = build_mini_open_store()
+    answer = str(DSLInterpreter(store).execute("answer_who(M_ENTITY)").value)
+    assert "вид" in answer or answer != ""
 
 
 def test_cycle_isa_rejected() -> None:

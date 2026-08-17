@@ -1,0 +1,50 @@
+{"uid": "document_000001", "text": "Vehicle является разновидностью Object.", "factor_uids": ["factor_000001"], "paraphrases": ["Vehicle — это Object."]}
+{"uid": "document_000002", "text": "Car является разновидностью Vehicle.", "factor_uids": ["factor_000002"], "paraphrases": ["Car — это Vehicle."]}
+{"uid": "document_000003", "text": "Sedan является разновидностью Car.", "factor_uids": ["factor_000003"], "paraphrases": ["Sedan — это Car."]}
+{"uid": "document_000004", "text": "SUV является разновидностью Car.", "factor_uids": ["factor_000004"], "paraphrases": ["SUV — это Car."]}
+{"uid": "document_000005", "text": "Motorcycle является разновидностью Vehicle.", "factor_uids": ["factor_000005"], "paraphrases": ["Motorcycle — это Vehicle."]}
+{"uid": "document_000006", "text": "Device является разновидностью Object.", "factor_uids": ["factor_000006"], "paraphrases": ["Device — это Object."]}
+{"uid": "document_000007", "text": "Computer является разновидностью Device.", "factor_uids": ["factor_000007"], "paraphrases": ["Computer — это Device."]}
+{"uid": "document_000008", "text": "Phone является разновидностью Device.", "factor_uids": ["factor_000008"], "paraphrases": ["Phone — это Device."]}
+{"uid": "document_000009", "text": "Employee является разновидностью Person.", "factor_uids": ["factor_000009"], "paraphrases": ["Employee — это Person."]}
+{"uid": "document_000010", "text": "Manager является разновидностью Person.", "factor_uids": ["factor_000010"], "paraphrases": ["Manager — это Person."]}
+{"uid": "document_000011", "text": "Engineer является разновидностью Person.", "factor_uids": ["factor_000011"], "paraphrases": ["Engineer — это Person."]}
+{"uid": "document_000012", "text": "Иван работает в Яндекс.", "factor_uids": ["factor_000012"], "paraphrases": ["Иван является сотрудником Яндекс.", "Иван трудится в компании Яндекс."]}
+{"uid": "document_000013", "text": "Пётр работает в Сбер.", "factor_uids": ["factor_000013"], "paraphrases": ["Пётр является сотрудником Сбер.", "Пётр трудится в компании Сбер."]}
+{"uid": "document_000014", "text": "Сбер находится в Санкт-Петербург.", "factor_uids": ["factor_000014"], "paraphrases": ["Сбер расположен в Санкт-Петербург."]}
+{"uid": "document_000015", "text": "Анна работает в Газпром.", "factor_uids": ["factor_000015"], "paraphrases": ["Анна является сотрудником Газпром.", "Анна трудится в компании Газпром."]}
+{"uid": "document_000016", "text": "Газпром находится в Казань.", "factor_uids": ["factor_000016"], "paraphrases": ["Газпром расположен в Казань."]}
+{"uid": "document_000017", "text": "Казань является частью Новосибирск.", "factor_uids": ["factor_000017"], "paraphrases": ["Казань входит в Новосибирск."]}
+{"uid": "document_000018", "text": "Мария работает в Ростех.", "factor_uids": ["factor_000018"], "paraphrases": ["Мария является сотрудником Ростех.", "Мария трудится в компании Ростех."]}
+{"uid": "document_000019", "text": "Сергей работает в Mail.", "factor_uids": ["factor_000019"], "paraphrases": ["Сергей является сотрудником Mail.", "Сергей трудится в компании Mail."]}
+{"uid": "document_000020", "text": "Mail находится в Екатеринбург.", "factor_uids": ["factor_000020"], "paraphrases": ["Mail расположен в Екатеринбург."]}
+{"uid": "document_000021", "text": "Ольга работает в Тинькофф.", "factor_uids": ["factor_000021"], "paraphrases": ["Ольга является сотрудником Тинькофф.", "Ольга трудится в компании Тинькофф."]}
+{"uid": "document_000022", "text": "Тинькофф находится в Владивосток.", "factor_uids": ["factor_000022"], "paraphrases": ["Тинькофф расположен в Владивосток."]}
+{"uid": "document_000023", "text": "Владивосток является частью Сочи.", "factor_uids": ["factor_000023"], "paraphrases": ["Владивосток входит в Сочи."]}
+{"uid": "document_000024", "text": "Алексей работает в ВТБ.", "factor_uids": ["factor_000024"], "paraphrases": ["Алексей является сотрудником ВТБ.", "Алексей трудится в компании ВТБ."]}
+{"uid": "document_000025", "text": "Елена работает в Роснефть.", "factor_uids": ["factor_000025"], "paraphrases": ["Елена является сотрудником Роснефть.", "Елена трудится в компании Роснефть."]}
+{"uid": "document_000026", "text": "Роснефть находится в Калининград.", "factor_uids": ["factor_000026"], "paraphrases": ["Роснефть расположен в Калининград."]}
+{"uid": "document_000027", "text": "Дмитрий работает в Касперский.", "factor_uids": ["factor_000027"], "paraphrases": ["Дмитрий является сотрудником Касперский.", "Дмитрий трудится в компании Касперский."]}
+{"uid": "document_000028", "text": "Касперский находится в Россия.", "factor_uids": ["factor_000028"], "paraphrases": ["Касперский расположен в Россия."]}
+{"uid": "document_000029", "text": "Россия является частью Германия.", "factor_uids": ["factor_000029"], "paraphrases": ["Россия входит в Германия."]}
+{"uid": "document_000030", "text": "Наталья работает в Ozon.", "factor_uids": ["factor_000030"], "paraphrases": ["Наталья является сотрудником Ozon.", "Наталья трудится в компании Ozon."]}
+{"uid": "document_000031", "text": "Андрей работает в Avito.", "factor_uids": ["factor_000031"], "paraphrases": ["Андрей является сотрудником Avito.", "Андрей трудится в компании Avito."]}
+{"uid": "document_000032", "text": "Avito находится в Франция.", "factor_uids": ["factor_000032"], "paraphrases": ["Avito расположен в Франция."]}
+{"uid": "document_000033", "text": "Екатерина работает в Wildberries.", "factor_uids": ["factor_000033"], "paraphrases": ["Екатерина является сотрудником Wildberries.", "Екатерина трудится в компании Wildberries."]}
+{"uid": "document_000034", "text": "Wildberries находится в Европа.", "factor_uids": ["factor_000034"], "paraphrases": ["Wildberries расположен в Европа."]}
+{"uid": "document_000035", "text": "Европа является частью Азия.", "factor_uids": ["factor_000035"], "paraphrases": ["Европа входит в Азия."]}
+{"uid": "document_000036", "text": "Михаил работает в МТС.", "factor_uids": ["factor_000036"], "paraphrases": ["Михаил является сотрудником МТС.", "Михаил трудится в компании МТС."]}
+{"uid": "document_000037", "text": "Татьяна работает в Билайн.", "factor_uids": ["factor_000037"], "paraphrases": ["Татьяна является сотрудником Билайн.", "Татьяна трудится в компании Билайн."]}
+{"uid": "document_000038", "text": "Билайн находится в Берлин.", "factor_uids": ["factor_000038"], "paraphrases": ["Билайн расположен в Берлин."]}
+{"uid": "document_000039", "text": "Николай работает в Мегафон.", "factor_uids": ["factor_000039"], "paraphrases": ["Николай является сотрудником Мегафон.", "Николай трудится в компании Мегафон."]}
+{"uid": "document_000040", "text": "Мегафон находится в Париж.", "factor_uids": ["factor_000040"], "paraphrases": ["Мегафон расположен в Париж."]}
+{"uid": "document_000041", "text": "Париж является частью Лондон.", "factor_uids": ["factor_000041"], "paraphrases": ["Париж входит в Лондон."]}
+{"uid": "document_000042", "text": "Ирина работает в Яндекс.", "factor_uids": ["factor_000042"], "paraphrases": ["Ирина является сотрудником Яндекс.", "Ирина трудится в компании Яндекс."]}
+{"uid": "document_000043", "text": "Владимир работает в Сбер.", "factor_uids": ["factor_000043"], "paraphrases": ["Владимир является сотрудником Сбер.", "Владимир трудится в компании Сбер."]}
+{"uid": "document_000044", "text": "Сбер находится в Москва-2.", "factor_uids": ["factor_000044"], "paraphrases": ["Сбер расположен в Москва-2."]}
+{"uid": "document_000045", "text": "Светлана работает в Газпром.", "factor_uids": ["factor_000045"], "paraphrases": ["Светлана является сотрудником Газпром.", "Светлана трудится в компании Газпром."]}
+{"uid": "document_000046", "text": "Газпром находится в Санкт-Петербург-2.", "factor_uids": ["factor_000046"], "paraphrases": ["Газпром расположен в Санкт-Петербург-2."]}
+{"uid": "document_000047", "text": "Санкт-Петербург-2 является частью Казань-2.", "factor_uids": ["factor_000047"], "paraphrases": ["Санкт-Петербург-2 входит в Казань-2."]}
+{"uid": "document_000048", "text": "Павел работает в Ростех.", "factor_uids": ["factor_000048"], "paraphrases": ["Павел является сотрудником Ростех.", "Павел трудится в компании Ростех."]}
+{"uid": "document_000049", "text": "Юлия работает в Mail.", "factor_uids": ["factor_000049"], "paraphrases": ["Юлия является сотрудником Mail.", "Юлия трудится в компании Mail."]}
+{"uid": "document_000050", "text": "Mail находится в Новосибирск-2.", "factor_uids": ["factor_000050"], "paraphrases": ["Mail расположен в Новосибирск-2."]}

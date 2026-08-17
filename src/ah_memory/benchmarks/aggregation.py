@@ -22,6 +22,7 @@ from ah_memory.relation_normalizer import (
     RelationNormalizer,
 )
 from ah_memory.semantic_activation import ActivationEngine, PropagationTrace
+from ah_memory.state_engine import StateEngine, StateOperation, TransitionRule
 from ah_memory.store import AHStore
 from ah_memory.transform import Transform
 
@@ -41,6 +42,12 @@ _FIXED = {
     "купила": "PURCHASE",
     "продал": "SELL",
     "продала": "SELL",
+}
+_NORMALIZED = {
+    **_FIXED,
+    "приобрёл": "PURCHASE",
+    "приобрел": "PURCHASE",
+    "реализовал": "SELL",
 }
 _ENTITY_ALIASES = {
     "отец": "FATHER",
@@ -85,7 +92,7 @@ class BenchmarkEventExtractor:
         self.normalizer = RelationNormalizer(
             store.relations,
             (
-                ExactNormalizer(),
+                ExactNormalizer(_NORMALIZED),
                 EmbeddingNormalizer(similarity_threshold=0.35),
             ),
         )
@@ -172,7 +179,29 @@ def run_scenario(
         generator = RuleBasedParameterGenerator()
     else:
         generator = EmbeddingParameterGenerator(seed=42)
-    transform = Transform(store, parameter_generator=generator)
+    state_engine = StateEngine(
+        (
+            TransitionRule(
+                "PURCHASE",
+                (
+                    StateOperation("set", "OWNS:{SUBJECT}:{OBJECT}", True),
+                    StateOperation("set", "LAST_PURCHASE:{SUBJECT}", "{OBJECT}"),
+                    StateOperation(
+                        "append", "PURCHASE_HISTORY:{SUBJECT}", "{OBJECT}"
+                    ),
+                ),
+            ),
+            TransitionRule(
+                "SELL",
+                (StateOperation("set", "OWNS:{SUBJECT}:{OBJECT}", False),),
+            ),
+        )
+    )
+    transform = Transform(
+        store,
+        parameter_generator=generator,
+        state_engine=state_engine,
+    )
     candidates = [
         FactCandidate(
             predicate=event.canonical_relation,
@@ -376,11 +405,13 @@ def _state_accuracy(state, expected: dict[str, Any]) -> float:
     checks: list[bool] = []
     for owner, objects in (expected.get("owns") or {}).items():
         checks.extend(
-            state.owns(owner, object_uid) is bool(value)
+            bool(state.get(f"OWNS:{owner}:{object_uid}", False)) is bool(value)
             for object_uid, value in objects.items()
         )
     for owner, value in (expected.get("last_purchase") or {}).items():
-        checks.append(state.last_purchase(owner) == value)
+        checks.append(state.get(f"LAST_PURCHASE:{owner}") == value)
     for owner, values in (expected.get("purchase_history") or {}).items():
-        checks.append(state.purchase_history(owner) == list(values))
+        checks.append(
+            list(state.history.get(f"PURCHASE_HISTORY:{owner}", ())) == list(values)
+        )
     return sum(checks) / max(1, len(checks))

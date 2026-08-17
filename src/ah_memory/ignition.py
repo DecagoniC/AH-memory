@@ -13,11 +13,7 @@ from ah_memory.belief_propagation import (
     BeliefPropagation,
 )
 from ah_memory.competition import CompetitionParameters, competition_by_name
-from ah_memory.factor_graph import (
-    FactorGraph,
-    build_structural_factor_graph,
-    is_variable,
-)
+from ah_memory.factor_graph import FactorGraph, build_structural_factor_graph
 from ah_memory.hyperparams import HyperParams
 from ah_memory.potentials import PotentialParameters
 
@@ -261,14 +257,6 @@ class IgnitionEngine:
                     self.store.set_x(uid, float(value))
                 except Exception:
                     continue
-            for node in self.store.find_hypernodes():
-                values = [
-                    self.state.activation[f.target_uid]
-                    for f in node.fillers.values()
-                    if f.target_uid in self.state.activation
-                ]
-                if values:
-                    self.store.set_x(node.uid, sum(values) / len(values))
             self.store.ah.tau += 1
             tau = self.store.ah.tau
         else:
@@ -414,10 +402,3 @@ class IgnitionEngine:
                 link.w = self.hp.h(link.w, first, second)
                 updates += 1
         return updates
-
-
-def math_prod(xs: list[float]) -> float:
-    p = 1.0
-    for x in xs:
-        p *= x
-    return p

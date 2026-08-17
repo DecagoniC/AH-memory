@@ -1,0 +1,3481 @@
+{
+  "world_state": {
+    "person_000001": {
+      "owns": [
+        "object_000003",
+        "object_000001",
+        "object_000017"
+      ],
+      "works_for": "company_000008",
+      "location": "place_000011"
+    },
+    "person_000002": {
+      "owns": [
+        "object_000006",
+        "object_000014",
+        "object_000021"
+      ],
+      "works_for": "company_000003",
+      "location": "place_000011"
+    },
+    "person_000003": {
+      "owns": [
+        "object_000009",
+        "object_000007",
+        "object_000015"
+      ],
+      "works_for": "company_000009",
+      "location": "place_000008"
+    },
+    "person_000004": {
+      "owns": [
+        "object_000012"
+      ],
+      "works_for": "company_000004",
+      "location": "place_000009"
+    },
+    "person_000005": {
+      "owns": [
+        "object_000015",
+        "object_000013",
+        "object_000016"
+      ],
+      "works_for": "company_000005",
+      "location": "place_000017"
+    },
+    "person_000006": {
+      "owns": [
+        "object_000018"
+      ],
+      "works_for": "company_000006",
+      "location": "place_000011"
+    },
+    "person_000007": {
+      "owns": [
+        "object_000021",
+        "object_000019",
+        "object_900010",
+        "object_900008"
+      ],
+      "works_for": "company_000015",
+      "location": "place_000017"
+    },
+    "person_000008": {
+      "owns": [
+        "object_000024",
+        "object_900004"
+      ],
+      "works_for": "company_000008",
+      "location": "place_000003"
+    },
+    "person_000009": {
+      "owns": [
+        "object_900002",
+        "object_000025",
+        "object_900005"
+      ],
+      "works_for": "company_000015",
+      "location": "place_000016"
+    },
+    "person_000010": {
+      "owns": [
+        "object_900005",
+        "object_900012"
+      ],
+      "works_for": "company_000010",
+      "location": "place_000015"
+    },
+    "person_000011": {
+      "owns": [
+        "object_900008",
+        "object_900006",
+        "object_900007"
+      ],
+      "works_for": "company_000011",
+      "location": null
+    },
+    "person_000012": {
+      "owns": [
+        "object_900011",
+        "object_000015"
+      ],
+      "works_for": "company_000012",
+      "location": "place_000008"
+    },
+    "person_000013": {
+      "owns": [
+        "object_000001",
+        "object_900012",
+        "object_900005",
+        "object_000013",
+        "object_000010"
+      ],
+      "works_for": "company_000008",
+      "location": "place_000011"
+    },
+    "person_000014": {
+      "owns": [
+        "object_000004",
+        "object_900005",
+        "object_000022"
+      ],
+      "works_for": "company_000014",
+      "location": null
+    },
+    "person_000015": {
+      "owns": [
+        "object_000007",
+        "object_000005",
+        "object_900004",
+        "object_900006",
+        "object_000021"
+      ],
+      "works_for": "company_000002",
+      "location": "place_000003"
+    },
+    "person_000016": {
+      "owns": [],
+      "works_for": "company_000001",
+      "location": null
+    },
+    "person_000017": {
+      "owns": [],
+      "works_for": "company_000002",
+      "location": null
+    },
+    "person_000018": {
+      "owns": [
+        "object_000001",
+        "object_900010"
+      ],
+      "works_for": "company_000003",
+      "location": "place_000007"
+    },
+    "person_000019": {
+      "owns": [
+        "object_900012",
+        "object_000023"
+      ],
+      "works_for": "company_000007",
+      "location": "place_000018"
+    },
+    "person_000020": {
+      "owns": [
+        "object_000010",
+        "object_000015",
+        "object_000016"
+      ],
+      "works_for": "company_000011",
+      "location": "place_000003"
+    },
+    "person_000021": {
+      "owns": [],
+      "works_for": "company_000007",
+      "location": null
+    },
+    "person_000022": {
+      "owns": [
+        "object_900010",
+        "object_000025"
+      ],
+      "works_for": "company_000004",
+      "location": "place_000018"
+    },
+    "person_000023": {
+      "owns": [],
+      "works_for": "company_000005",
+      "location": null
+    },
+    "person_000024": {
+      "owns": [
+        "object_000011",
+        "object_000021"
+      ],
+      "works_for": "company_000009",
+      "location": null
+    },
+    "person_000025": {
+      "owns": [],
+      "works_for": "company_000011",
+      "location": "place_000009"
+    },
+    "person_000030": {
+      "owns": [],
+      "works_for": "company_000006",
+      "location": "place_000020"
+    },
+    "person_000028": {
+      "owns": [
+        "object_900006"
+      ],
+      "works_for": "company_000006",
+      "location": "place_000019"
+    },
+    "person_000029": {
+      "owns": [
+        "object_900013"
+      ],
+      "works_for": "company_000003",
+      "location": null
+    },
+    "person_000026": {
+      "owns": [
+        "object_000016"
+      ],
+      "works_for": "company_000010",
+      "location": null
+    },
+    "person_000027": {
+      "owns": [
+        "object_900011"
+      ],
+      "works_for": null,
+      "location": null
+    }
+  },
+  "queries": [
+    {
+      "query_id": "q_000001",
+      "question": "Какой объект сейчас принадлежит Иван?",
+      "answer": "BMW",
+      "answer_uid": "object_000001",
+      "answer_type": "entity",
+      "category": "temporal",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000061",
+        "factor_000062",
+        "factor_000063",
+        "factor_000064",
+        "factor_000065",
+        "factor_000066",
+        "factor_000067",
+        "factor_000068",
+        "factor_000069",
+        "factor_000070",
+        "factor_000071"
+      ],
+      "required_nodes": [
+        "person_000001",
+        "object_000001"
+      ],
+      "distractor_factor_uids": [
+        "factor_000576",
+        "factor_000577",
+        "factor_000578"
+      ],
+      "seed_uids": [
+        "person_000001"
+      ]
+    },
+    {
+      "query_id": "q_000002",
+      "question": "Где находится компания, в которой работает Пётр?",
+      "answer": "Санкт-Петербург",
+      "answer_uid": "place_000002",
+      "answer_type": "entity",
+      "category": "multi_hop",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000013",
+        "factor_000014"
+      ],
+      "required_nodes": [
+        "person_000002",
+        "company_000002",
+        "place_000002"
+      ],
+      "distractor_factor_uids": [
+        "factor_000504",
+        "factor_000505",
+        "factor_000506"
+      ],
+      "seed_uids": [
+        "person_000002"
+      ]
+    },
+    {
+      "query_id": "q_000003",
+      "question": "Является ли Vehicle разновидностью Object?",
+      "answer": "да",
+      "answer_uid": "object_900002",
+      "answer_type": "boolean",
+      "category": "hierarchy",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000001"
+      ],
+      "required_nodes": [
+        "object_900001",
+        "object_900002"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "object_900001"
+      ]
+    },
+    {
+      "query_id": "q_000004",
+      "question": "Почему произошёл Сделка?",
+      "answer": "Отчёт",
+      "answer_uid": "document_000001",
+      "answer_type": "entity",
+      "category": "causal",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000212"
+      ],
+      "required_nodes": [
+        "event_000002",
+        "document_000001"
+      ],
+      "distractor_factor_uids": [
+        "factor_000621",
+        "factor_000622",
+        "factor_000623"
+      ],
+      "seed_uids": [
+        "event_000002"
+      ]
+    },
+    {
+      "query_id": "q_000005",
+      "question": "Какие объекты принадлежат Иван?",
+      "answer": "Opel-2",
+      "answer_uid": "object_000017",
+      "answer_type": "entity",
+      "category": "aggregation",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000062",
+        "factor_000064",
+        "factor_000066",
+        "factor_000068",
+        "factor_000070",
+        "factor_000500"
+      ],
+      "required_nodes": [
+        "person_000001",
+        "object_000003",
+        "object_000001",
+        "object_000017"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "person_000001"
+      ]
+    },
+    {
+      "query_id": "q_000006",
+      "question": "Учитывая порядок сделок, чем владеет Иван после всех операций?",
+      "answer": "BMW",
+      "answer_uid": "object_000001",
+      "answer_type": "entity",
+      "category": "contradiction",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000061",
+        "factor_000062",
+        "factor_000063",
+        "factor_000064",
+        "factor_000065",
+        "factor_000066",
+        "factor_000067",
+        "factor_000068",
+        "factor_000069",
+        "factor_000070",
+        "factor_000071"
+      ],
+      "required_nodes": [
+        "person_000001",
+        "object_000001"
+      ],
+      "distractor_factor_uids": [
+        "factor_000576",
+        "factor_000577",
+        "factor_000578"
+      ],
+      "seed_uids": [
+        "person_000001"
+      ]
+    },
+    {
+      "query_id": "q_000007",
+      "question": "В какой компании работает Иван?",
+      "answer": "Яндекс",
+      "answer_uid": "company_000001",
+      "answer_type": "entity",
+      "category": "distractor",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000012"
+      ],
+      "required_nodes": [
+        "person_000001",
+        "company_000001"
+      ],
+      "distractor_factor_uids": [
+        "factor_000501",
+        "factor_000502",
+        "factor_000503"
+      ],
+      "seed_uids": [
+        "person_000001"
+      ]
+    },
+    {
+      "query_id": "q_000008",
+      "question": "В какой компании работает Иван?",
+      "answer": "Яндекс",
+      "answer_uid": "company_000001",
+      "answer_type": "entity",
+      "category": "direct",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000012"
+      ],
+      "required_nodes": [
+        "person_000001",
+        "company_000001"
+      ],
+      "distractor_factor_uids": [
+        "factor_000501",
+        "factor_000502",
+        "factor_000503"
+      ],
+      "seed_uids": [
+        "person_000001"
+      ]
+    },
+    {
+      "query_id": "q_000009",
+      "question": "Какой объект сейчас принадлежит Пётр?",
+      "answer": "Ноутбук",
+      "answer_uid": "object_000006",
+      "answer_type": "entity",
+      "category": "temporal",
+      "required_depth": 5,
+      "proof_path": [
+        "factor_000072",
+        "factor_000073",
+        "factor_000074",
+        "factor_000075",
+        "factor_000076",
+        "factor_000077",
+        "factor_000078",
+        "factor_000079",
+        "factor_000080"
+      ],
+      "required_nodes": [
+        "person_000002",
+        "object_000006"
+      ],
+      "distractor_factor_uids": [
+        "factor_000579",
+        "factor_000580",
+        "factor_000581"
+      ],
+      "seed_uids": [
+        "person_000002"
+      ]
+    },
+    {
+      "query_id": "q_000010",
+      "question": "В какой сущности заканчивается цепочка от Анна длины 3?",
+      "answer": "Новосибирск",
+      "answer_uid": "place_000004",
+      "answer_type": "entity",
+      "category": "multi_hop",
+      "required_depth": 3,
+      "proof_path": [
+        "factor_000015",
+        "factor_000016",
+        "factor_000017"
+      ],
+      "required_nodes": [
+        "person_000003",
+        "company_000003",
+        "place_000003",
+        "place_000004"
+      ],
+      "distractor_factor_uids": [
+        "factor_000507",
+        "factor_000508",
+        "factor_000509"
+      ],
+      "seed_uids": [
+        "person_000003"
+      ]
+    },
+    {
+      "query_id": "q_000011",
+      "question": "Является ли Car разновидностью Vehicle?",
+      "answer": "да",
+      "answer_uid": "object_900001",
+      "answer_type": "boolean",
+      "category": "hierarchy",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000002"
+      ],
+      "required_nodes": [
+        "object_900003",
+        "object_900001"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "object_900003"
+      ]
+    },
+    {
+      "query_id": "q_000012",
+      "question": "Почему произошёл Переезд?",
+      "answer": "Контракт",
+      "answer_uid": "document_000002",
+      "answer_type": "entity",
+      "category": "causal",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000213"
+      ],
+      "required_nodes": [
+        "event_000003",
+        "document_000002"
+      ],
+      "distractor_factor_uids": [
+        "factor_000624",
+        "factor_000625",
+        "factor_000626"
+      ],
+      "seed_uids": [
+        "event_000003"
+      ]
+    },
+    {
+      "query_id": "q_000013",
+      "question": "Какие объекты принадлежат Пётр?",
+      "answer": "Телефон-2",
+      "answer_uid": "object_000021",
+      "answer_type": "entity",
+      "category": "aggregation",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000073",
+        "factor_000075",
+        "factor_000077",
+        "factor_000079",
+        "factor_000360",
+        "factor_000461"
+      ],
+      "required_nodes": [
+        "person_000002",
+        "object_000006",
+        "object_000014",
+        "object_000021"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "person_000002"
+      ]
+    },
+    {
+      "query_id": "q_000014",
+      "question": "Учитывая порядок сделок, чем владеет Анна после всех операций?",
+      "answer": "Телефон",
+      "answer_uid": "object_000007",
+      "answer_type": "entity",
+      "category": "contradiction",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000081",
+        "factor_000082",
+        "factor_000083",
+        "factor_000084",
+        "factor_000085",
+        "factor_000086",
+        "factor_000087",
+        "factor_000088",
+        "factor_000089",
+        "factor_000090",
+        "factor_000091"
+      ],
+      "required_nodes": [
+        "person_000003",
+        "object_000007"
+      ],
+      "distractor_factor_uids": [
+        "factor_000582",
+        "factor_000583",
+        "factor_000584"
+      ],
+      "seed_uids": [
+        "person_000003"
+      ]
+    },
+    {
+      "query_id": "q_000015",
+      "question": "В какой компании работает Пётр?",
+      "answer": "Сбер",
+      "answer_uid": "company_000002",
+      "answer_type": "entity",
+      "category": "distractor",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000013"
+      ],
+      "required_nodes": [
+        "person_000002",
+        "company_000002"
+      ],
+      "distractor_factor_uids": [
+        "factor_000504",
+        "factor_000505",
+        "factor_000506"
+      ],
+      "seed_uids": [
+        "person_000002"
+      ]
+    },
+    {
+      "query_id": "q_000016",
+      "question": "В какой компании работает Мария?",
+      "answer": "Ростех",
+      "answer_uid": "company_000004",
+      "answer_type": "entity",
+      "category": "direct",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000018"
+      ],
+      "required_nodes": [
+        "person_000004",
+        "company_000004"
+      ],
+      "distractor_factor_uids": [
+        "factor_000510",
+        "factor_000511",
+        "factor_000512"
+      ],
+      "seed_uids": [
+        "person_000004"
+      ]
+    },
+    {
+      "query_id": "q_000017",
+      "question": "Какой объект сейчас принадлежит Анна?",
+      "answer": "Телефон",
+      "answer_uid": "object_000007",
+      "answer_type": "entity",
+      "category": "temporal",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000081",
+        "factor_000082",
+        "factor_000083",
+        "factor_000084",
+        "factor_000085",
+        "factor_000086",
+        "factor_000087",
+        "factor_000088",
+        "factor_000089",
+        "factor_000090",
+        "factor_000091"
+      ],
+      "required_nodes": [
+        "person_000003",
+        "object_000007"
+      ],
+      "distractor_factor_uids": [
+        "factor_000582",
+        "factor_000583",
+        "factor_000584"
+      ],
+      "seed_uids": [
+        "person_000003"
+      ]
+    },
+    {
+      "query_id": "q_000018",
+      "question": "Где находится компания, в которой работает Сергей?",
+      "answer": "Екатеринбург",
+      "answer_uid": "place_000005",
+      "answer_type": "entity",
+      "category": "multi_hop",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000019",
+        "factor_000020"
+      ],
+      "required_nodes": [
+        "person_000005",
+        "company_000005",
+        "place_000005"
+      ],
+      "distractor_factor_uids": [
+        "factor_000513",
+        "factor_000514",
+        "factor_000515"
+      ],
+      "seed_uids": [
+        "person_000005"
+      ]
+    },
+    {
+      "query_id": "q_000019",
+      "question": "Является ли Sedan разновидностью Car?",
+      "answer": "да",
+      "answer_uid": "object_900003",
+      "answer_type": "boolean",
+      "category": "hierarchy",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000003"
+      ],
+      "required_nodes": [
+        "object_900004",
+        "object_900003"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "object_900004"
+      ]
+    },
+    {
+      "query_id": "q_000020",
+      "question": "Почему произошёл Встреча?",
+      "answer": "Письмо",
+      "answer_uid": "document_000003",
+      "answer_type": "entity",
+      "category": "causal",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000214"
+      ],
+      "required_nodes": [
+        "event_000004",
+        "document_000003"
+      ],
+      "distractor_factor_uids": [
+        "factor_000627",
+        "factor_000628",
+        "factor_000629"
+      ],
+      "seed_uids": [
+        "event_000004"
+      ]
+    },
+    {
+      "query_id": "q_000021",
+      "question": "Какие объекты принадлежат Анна?",
+      "answer": "BMW-2",
+      "answer_uid": "object_000015",
+      "answer_type": "entity",
+      "category": "aggregation",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000082",
+        "factor_000084",
+        "factor_000086",
+        "factor_000088",
+        "factor_000090",
+        "factor_000448"
+      ],
+      "required_nodes": [
+        "person_000003",
+        "object_000009",
+        "object_000007",
+        "object_000015"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "person_000003"
+      ]
+    },
+    {
+      "query_id": "q_000022",
+      "question": "Учитывая порядок сделок, чем владеет Сергей после всех операций?",
+      "answer": "Велосипед",
+      "answer_uid": "object_000013",
+      "answer_type": "entity",
+      "category": "contradiction",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000101",
+        "factor_000102",
+        "factor_000103",
+        "factor_000104",
+        "factor_000105",
+        "factor_000106",
+        "factor_000107",
+        "factor_000108",
+        "factor_000109",
+        "factor_000110",
+        "factor_000111"
+      ],
+      "required_nodes": [
+        "person_000005",
+        "object_000013"
+      ],
+      "distractor_factor_uids": [
+        "factor_000588",
+        "factor_000589",
+        "factor_000590"
+      ],
+      "seed_uids": [
+        "person_000005"
+      ]
+    },
+    {
+      "query_id": "q_000023",
+      "question": "В какой компании работает Анна?",
+      "answer": "Газпром",
+      "answer_uid": "company_000003",
+      "answer_type": "entity",
+      "category": "distractor",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000015"
+      ],
+      "required_nodes": [
+        "person_000003",
+        "company_000003"
+      ],
+      "distractor_factor_uids": [
+        "factor_000507",
+        "factor_000508",
+        "factor_000509"
+      ],
+      "seed_uids": [
+        "person_000003"
+      ]
+    },
+    {
+      "query_id": "q_000024",
+      "question": "В какой компании работает Алексей?",
+      "answer": "ВТБ",
+      "answer_uid": "company_000007",
+      "answer_type": "entity",
+      "category": "direct",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000024"
+      ],
+      "required_nodes": [
+        "person_000007",
+        "company_000007"
+      ],
+      "distractor_factor_uids": [
+        "factor_000519",
+        "factor_000520",
+        "factor_000521"
+      ],
+      "seed_uids": [
+        "person_000007"
+      ]
+    },
+    {
+      "query_id": "q_000025",
+      "question": "Какой объект сейчас принадлежит Мария?",
+      "answer": "Мотоцикл",
+      "answer_uid": "object_000012",
+      "answer_type": "entity",
+      "category": "temporal",
+      "required_depth": 5,
+      "proof_path": [
+        "factor_000092",
+        "factor_000093",
+        "factor_000094",
+        "factor_000095",
+        "factor_000096",
+        "factor_000097",
+        "factor_000098",
+        "factor_000099",
+        "factor_000100"
+      ],
+      "required_nodes": [
+        "person_000004",
+        "object_000012"
+      ],
+      "distractor_factor_uids": [
+        "factor_000585",
+        "factor_000586",
+        "factor_000587"
+      ],
+      "seed_uids": [
+        "person_000004"
+      ]
+    },
+    {
+      "query_id": "q_000026",
+      "question": "В какой сущности заканчивается цепочка от Ольга длины 3?",
+      "answer": "Сочи",
+      "answer_uid": "place_000007",
+      "answer_type": "entity",
+      "category": "multi_hop",
+      "required_depth": 3,
+      "proof_path": [
+        "factor_000021",
+        "factor_000022",
+        "factor_000023"
+      ],
+      "required_nodes": [
+        "person_000006",
+        "company_000006",
+        "place_000006",
+        "place_000007"
+      ],
+      "distractor_factor_uids": [
+        "factor_000516",
+        "factor_000517",
+        "factor_000518"
+      ],
+      "seed_uids": [
+        "person_000006"
+      ]
+    },
+    {
+      "query_id": "q_000027",
+      "question": "Является ли SUV разновидностью Car?",
+      "answer": "да",
+      "answer_uid": "object_900003",
+      "answer_type": "boolean",
+      "category": "hierarchy",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000004"
+      ],
+      "required_nodes": [
+        "object_900005",
+        "object_900003"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "object_900005"
+      ]
+    },
+    {
+      "query_id": "q_000028",
+      "question": "Почему произошёл Авария?",
+      "answer": "Записка",
+      "answer_uid": "document_000004",
+      "answer_type": "entity",
+      "category": "causal",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000215"
+      ],
+      "required_nodes": [
+        "event_000005",
+        "document_000004"
+      ],
+      "distractor_factor_uids": [
+        "factor_000630",
+        "factor_000631",
+        "factor_000632"
+      ],
+      "seed_uids": [
+        "event_000005"
+      ]
+    },
+    {
+      "query_id": "q_000029",
+      "question": "Какие объекты принадлежат Мария?",
+      "answer": "Мотоцикл",
+      "answer_uid": "object_000012",
+      "answer_type": "entity",
+      "category": "aggregation",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000092",
+        "factor_000093",
+        "factor_000095",
+        "factor_000097",
+        "factor_000099"
+      ],
+      "required_nodes": [
+        "person_000004",
+        "object_000012"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "person_000004"
+      ]
+    },
+    {
+      "query_id": "q_000030",
+      "question": "Учитывая порядок сделок, чем владеет Алексей после всех операций?",
+      "answer": "Lada-2",
+      "answer_uid": "object_000019",
+      "answer_type": "entity",
+      "category": "contradiction",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000121",
+        "factor_000122",
+        "factor_000123",
+        "factor_000124",
+        "factor_000125",
+        "factor_000126",
+        "factor_000127",
+        "factor_000128",
+        "factor_000129",
+        "factor_000130",
+        "factor_000131"
+      ],
+      "required_nodes": [
+        "person_000007",
+        "object_000019"
+      ],
+      "distractor_factor_uids": [
+        "factor_000594",
+        "factor_000595",
+        "factor_000596"
+      ],
+      "seed_uids": [
+        "person_000007"
+      ]
+    },
+    {
+      "query_id": "q_000031",
+      "question": "В какой компании работает Мария?",
+      "answer": "Ростех",
+      "answer_uid": "company_000004",
+      "answer_type": "entity",
+      "category": "distractor",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000018"
+      ],
+      "required_nodes": [
+        "person_000004",
+        "company_000004"
+      ],
+      "distractor_factor_uids": [
+        "factor_000510",
+        "factor_000511",
+        "factor_000512"
+      ],
+      "seed_uids": [
+        "person_000004"
+      ]
+    },
+    {
+      "query_id": "q_000032",
+      "question": "В какой компании работает Наталья?",
+      "answer": "Ozon",
+      "answer_uid": "company_000010",
+      "answer_type": "entity",
+      "category": "direct",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000030"
+      ],
+      "required_nodes": [
+        "person_000010",
+        "company_000010"
+      ],
+      "distractor_factor_uids": [
+        "factor_000528",
+        "factor_000529",
+        "factor_000530"
+      ],
+      "seed_uids": [
+        "person_000010"
+      ]
+    },
+    {
+      "query_id": "q_000033",
+      "question": "Какой объект сейчас принадлежит Сергей?",
+      "answer": "Велосипед",
+      "answer_uid": "object_000013",
+      "answer_type": "entity",
+      "category": "temporal",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000101",
+        "factor_000102",
+        "factor_000103",
+        "factor_000104",
+        "factor_000105",
+        "factor_000106",
+        "factor_000107",
+        "factor_000108",
+        "factor_000109",
+        "factor_000110",
+        "factor_000111"
+      ],
+      "required_nodes": [
+        "person_000005",
+        "object_000013"
+      ],
+      "distractor_factor_uids": [
+        "factor_000588",
+        "factor_000589",
+        "factor_000590"
+      ],
+      "seed_uids": [
+        "person_000005"
+      ]
+    },
+    {
+      "query_id": "q_000034",
+      "question": "Где находится компания, в которой работает Елена?",
+      "answer": "Калининград",
+      "answer_uid": "place_000008",
+      "answer_type": "entity",
+      "category": "multi_hop",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000025",
+        "factor_000026"
+      ],
+      "required_nodes": [
+        "person_000008",
+        "company_000008",
+        "place_000008"
+      ],
+      "distractor_factor_uids": [
+        "factor_000522",
+        "factor_000523",
+        "factor_000524"
+      ],
+      "seed_uids": [
+        "person_000008"
+      ]
+    },
+    {
+      "query_id": "q_000035",
+      "question": "Является ли Motorcycle разновидностью Vehicle?",
+      "answer": "да",
+      "answer_uid": "object_900001",
+      "answer_type": "boolean",
+      "category": "hierarchy",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000005"
+      ],
+      "required_nodes": [
+        "object_900006",
+        "object_900001"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "object_900006"
+      ]
+    },
+    {
+      "query_id": "q_000036",
+      "question": "Почему произошёл Презентация?",
+      "answer": "Протокол",
+      "answer_uid": "document_000005",
+      "answer_type": "entity",
+      "category": "causal",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000216"
+      ],
+      "required_nodes": [
+        "event_000006",
+        "document_000005"
+      ],
+      "distractor_factor_uids": [
+        "factor_000633",
+        "factor_000634",
+        "factor_000635"
+      ],
+      "seed_uids": [
+        "event_000006"
+      ]
+    },
+    {
+      "query_id": "q_000037",
+      "question": "Какие объекты принадлежат Сергей?",
+      "answer": "Audi-2",
+      "answer_uid": "object_000016",
+      "answer_type": "entity",
+      "category": "aggregation",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000102",
+        "factor_000104",
+        "factor_000106",
+        "factor_000108",
+        "factor_000110",
+        "factor_000475"
+      ],
+      "required_nodes": [
+        "person_000005",
+        "object_000015",
+        "object_000013",
+        "object_000016"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "person_000005"
+      ]
+    },
+    {
+      "query_id": "q_000038",
+      "question": "Учитывая порядок сделок, чем владеет Дмитрий после всех операций?",
+      "answer": "Документ-2",
+      "answer_uid": "object_000025",
+      "answer_type": "entity",
+      "category": "contradiction",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000141",
+        "factor_000142",
+        "factor_000143",
+        "factor_000144",
+        "factor_000145",
+        "factor_000146",
+        "factor_000147",
+        "factor_000148",
+        "factor_000149",
+        "factor_000150",
+        "factor_000151"
+      ],
+      "required_nodes": [
+        "person_000009",
+        "object_000025"
+      ],
+      "distractor_factor_uids": [
+        "factor_000600",
+        "factor_000601",
+        "factor_000602"
+      ],
+      "seed_uids": [
+        "person_000009"
+      ]
+    },
+    {
+      "query_id": "q_000039",
+      "question": "В какой компании работает Сергей?",
+      "answer": "Mail",
+      "answer_uid": "company_000005",
+      "answer_type": "entity",
+      "category": "distractor",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000019"
+      ],
+      "required_nodes": [
+        "person_000005",
+        "company_000005"
+      ],
+      "distractor_factor_uids": [
+        "factor_000513",
+        "factor_000514",
+        "factor_000515"
+      ],
+      "seed_uids": [
+        "person_000005"
+      ]
+    },
+    {
+      "query_id": "q_000040",
+      "question": "В какой компании работает Михаил?",
+      "answer": "МТС",
+      "answer_uid": "company_000013",
+      "answer_type": "entity",
+      "category": "direct",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000036"
+      ],
+      "required_nodes": [
+        "person_000013",
+        "company_000013"
+      ],
+      "distractor_factor_uids": [
+        "factor_000537",
+        "factor_000538",
+        "factor_000539"
+      ],
+      "seed_uids": [
+        "person_000013"
+      ]
+    },
+    {
+      "query_id": "q_000041",
+      "question": "Какой объект сейчас принадлежит Ольга?",
+      "answer": "Toyota-2",
+      "answer_uid": "object_000018",
+      "answer_type": "entity",
+      "category": "temporal",
+      "required_depth": 5,
+      "proof_path": [
+        "factor_000112",
+        "factor_000113",
+        "factor_000114",
+        "factor_000115",
+        "factor_000116",
+        "factor_000117",
+        "factor_000118",
+        "factor_000119",
+        "factor_000120"
+      ],
+      "required_nodes": [
+        "person_000006",
+        "object_000018"
+      ],
+      "distractor_factor_uids": [
+        "factor_000591",
+        "factor_000592",
+        "factor_000593"
+      ],
+      "seed_uids": [
+        "person_000006"
+      ]
+    },
+    {
+      "query_id": "q_000042",
+      "question": "В какой сущности заканчивается цепочка от Дмитрий длины 3?",
+      "answer": "Германия",
+      "answer_uid": "place_000010",
+      "answer_type": "entity",
+      "category": "multi_hop",
+      "required_depth": 3,
+      "proof_path": [
+        "factor_000027",
+        "factor_000028",
+        "factor_000029"
+      ],
+      "required_nodes": [
+        "person_000009",
+        "company_000009",
+        "place_000009",
+        "place_000010"
+      ],
+      "distractor_factor_uids": [
+        "factor_000525",
+        "factor_000526",
+        "factor_000527"
+      ],
+      "seed_uids": [
+        "person_000009"
+      ]
+    },
+    {
+      "query_id": "q_000043",
+      "question": "Является ли Device разновидностью Object?",
+      "answer": "да",
+      "answer_uid": "object_900002",
+      "answer_type": "boolean",
+      "category": "hierarchy",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000006"
+      ],
+      "required_nodes": [
+        "object_900007",
+        "object_900002"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "object_900007"
+      ]
+    },
+    {
+      "query_id": "q_000044",
+      "question": "Почему произошёл Конференция?",
+      "answer": "Справка",
+      "answer_uid": "document_000006",
+      "answer_type": "entity",
+      "category": "causal",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000217"
+      ],
+      "required_nodes": [
+        "event_000007",
+        "document_000006"
+      ],
+      "distractor_factor_uids": [
+        "factor_000636",
+        "factor_000637",
+        "factor_000638"
+      ],
+      "seed_uids": [
+        "event_000007"
+      ]
+    },
+    {
+      "query_id": "q_000045",
+      "question": "Какие объекты принадлежат Ольга?",
+      "answer": "Toyota-2",
+      "answer_uid": "object_000018",
+      "answer_type": "entity",
+      "category": "aggregation",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000112",
+        "factor_000113",
+        "factor_000115",
+        "factor_000117",
+        "factor_000119"
+      ],
+      "required_nodes": [
+        "person_000006",
+        "object_000018"
+      ],
+      "distractor_factor_uids": [],
+      "seed_uids": [
+        "person_000006"
+      ]
+    },
+    {
+      "query_id": "q_000046",
+      "question": "Учитывая порядок сделок, чем владеет Андрей после всех операций?",
+      "answer": "Motorcycle",
+      "answer_uid": "object_900006",
+      "answer_type": "entity",
+      "category": "contradiction",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000161",
+        "factor_000162",
+        "factor_000163",
+        "factor_000164",
+        "factor_000165",
+        "factor_000166",
+        "factor_000167",
+        "factor_000168",
+        "factor_000169",
+        "factor_000170",
+        "factor_000171"
+      ],
+      "required_nodes": [
+        "person_000011",
+        "object_900006"
+      ],
+      "distractor_factor_uids": [
+        "factor_000606",
+        "factor_000607",
+        "factor_000608"
+      ],
+      "seed_uids": [
+        "person_000011"
+      ]
+    },
+    {
+      "query_id": "q_000047",
+      "question": "В какой компании работает Ольга?",
+      "answer": "Тинькофф",
+      "answer_uid": "company_000006",
+      "answer_type": "entity",
+      "category": "distractor",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000021"
+      ],
+      "required_nodes": [
+        "person_000006",
+        "company_000006"
+      ],
+      "distractor_factor_uids": [
+        "factor_000516",
+        "factor_000517",
+        "factor_000518"
+      ],
+      "seed_uids": [
+        "person_000006"
+      ]
+    },
+    {
+      "query_id": "q_000048",
+      "question": "В какой компании работает Ирина?",
+      "answer": "Яндекс",
+      "answer_uid": "company_000001",
+      "answer_type": "entity",
+      "category": "direct",
+      "required_depth": 1,
+      "proof_path": [
+        "factor_000042"
+      ],
+      "required_nodes": [
+        "person_000016",
+        "company_000001"
+      ],
+      "distractor_factor_uids": [
+        "factor_000546",
+        "factor_000547",
+        "factor_000548"
+      ],
+      "seed_uids": [
+        "person_000016"
+      ]
+    },
+    {
+      "query_id": "q_000049",
+      "question": "Какой объект сейчас принадлежит Алексей?",
+      "answer": "Lada-2",
+      "answer_uid": "object_000019",
+      "answer_type": "entity",
+      "category": "temporal",
+      "required_depth": 6,
+      "proof_path": [
+        "factor_000121",
+        "factor_000122",
+        "factor_000123",
+        "factor_000124",
+        "factor_000125",
+        "factor_000126",
+        "factor_000127",
+        "factor_000128",
+        "factor_000129",
+        "factor_000130",
+        "factor_000131"
+      ],
+      "required_nodes": [
+        "person_000007",
+        "object_000019"
+      ],
+      "distractor_factor_uids": [
+        "factor_000594",
+        "factor_000595",
+        "factor_000596"
+      ],
+      "seed_uids": [
+        "person_000007"
+      ]
+    },
+    {
+      "query_id": "q_000050",
+      "question": "Где находится компания, в которой работает Андрей?",
+      "answer": "Франция",
+      "answer_uid": "place_000011",
+      "answer_type": "entity",
+      "category": "multi_hop",
+      "required_depth": 2,
+      "proof_path": [
+        "factor_000031",
+        "factor_000032"
+      ],
+      "required_nodes": [
+        "person_000011",
+        "company_000011",
+        "place_000011"
+      ],
+      "distractor_factor_uids": [
+        "factor_000531",
+        "factor_000532",
+        "factor_000533"
+      ],
+      "seed_uids": [
+        "person_000011"
+      ]
+    }
+  ],
+  "proof_chains": [
+    {
+      "kind": "multi_hop",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000012"
+      ],
+      "nodes": [
+        "person_000001",
+        "company_000001"
+      ],
+      "answer_uid": "company_000001",
+      "seed_uid": "person_000001",
+      "distractor_factor_uids": [
+        "factor_000501",
+        "factor_000502",
+        "factor_000503"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 2,
+      "factor_uids": [
+        "factor_000013",
+        "factor_000014"
+      ],
+      "nodes": [
+        "person_000002",
+        "company_000002",
+        "place_000002"
+      ],
+      "answer_uid": "place_000002",
+      "seed_uid": "person_000002",
+      "distractor_factor_uids": [
+        "factor_000504",
+        "factor_000505",
+        "factor_000506"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 3,
+      "factor_uids": [
+        "factor_000015",
+        "factor_000016",
+        "factor_000017"
+      ],
+      "nodes": [
+        "person_000003",
+        "company_000003",
+        "place_000003",
+        "place_000004"
+      ],
+      "answer_uid": "place_000004",
+      "seed_uid": "person_000003",
+      "distractor_factor_uids": [
+        "factor_000507",
+        "factor_000508",
+        "factor_000509"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000018"
+      ],
+      "nodes": [
+        "person_000004",
+        "company_000004"
+      ],
+      "answer_uid": "company_000004",
+      "seed_uid": "person_000004",
+      "distractor_factor_uids": [
+        "factor_000510",
+        "factor_000511",
+        "factor_000512"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 2,
+      "factor_uids": [
+        "factor_000019",
+        "factor_000020"
+      ],
+      "nodes": [
+        "person_000005",
+        "company_000005",
+        "place_000005"
+      ],
+      "answer_uid": "place_000005",
+      "seed_uid": "person_000005",
+      "distractor_factor_uids": [
+        "factor_000513",
+        "factor_000514",
+        "factor_000515"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 3,
+      "factor_uids": [
+        "factor_000021",
+        "factor_000022",
+        "factor_000023"
+      ],
+      "nodes": [
+        "person_000006",
+        "company_000006",
+        "place_000006",
+        "place_000007"
+      ],
+      "answer_uid": "place_000007",
+      "seed_uid": "person_000006",
+      "distractor_factor_uids": [
+        "factor_000516",
+        "factor_000517",
+        "factor_000518"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000024"
+      ],
+      "nodes": [
+        "person_000007",
+        "company_000007"
+      ],
+      "answer_uid": "company_000007",
+      "seed_uid": "person_000007",
+      "distractor_factor_uids": [
+        "factor_000519",
+        "factor_000520",
+        "factor_000521"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 2,
+      "factor_uids": [
+        "factor_000025",
+        "factor_000026"
+      ],
+      "nodes": [
+        "person_000008",
+        "company_000008",
+        "place_000008"
+      ],
+      "answer_uid": "place_000008",
+      "seed_uid": "person_000008",
+      "distractor_factor_uids": [
+        "factor_000522",
+        "factor_000523",
+        "factor_000524"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 3,
+      "factor_uids": [
+        "factor_000027",
+        "factor_000028",
+        "factor_000029"
+      ],
+      "nodes": [
+        "person_000009",
+        "company_000009",
+        "place_000009",
+        "place_000010"
+      ],
+      "answer_uid": "place_000010",
+      "seed_uid": "person_000009",
+      "distractor_factor_uids": [
+        "factor_000525",
+        "factor_000526",
+        "factor_000527"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000030"
+      ],
+      "nodes": [
+        "person_000010",
+        "company_000010"
+      ],
+      "answer_uid": "company_000010",
+      "seed_uid": "person_000010",
+      "distractor_factor_uids": [
+        "factor_000528",
+        "factor_000529",
+        "factor_000530"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 2,
+      "factor_uids": [
+        "factor_000031",
+        "factor_000032"
+      ],
+      "nodes": [
+        "person_000011",
+        "company_000011",
+        "place_000011"
+      ],
+      "answer_uid": "place_000011",
+      "seed_uid": "person_000011",
+      "distractor_factor_uids": [
+        "factor_000531",
+        "factor_000532",
+        "factor_000533"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 3,
+      "factor_uids": [
+        "factor_000033",
+        "factor_000034",
+        "factor_000035"
+      ],
+      "nodes": [
+        "person_000012",
+        "company_000012",
+        "place_000012",
+        "place_000013"
+      ],
+      "answer_uid": "place_000013",
+      "seed_uid": "person_000012",
+      "distractor_factor_uids": [
+        "factor_000534",
+        "factor_000535",
+        "factor_000536"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000036"
+      ],
+      "nodes": [
+        "person_000013",
+        "company_000013"
+      ],
+      "answer_uid": "company_000013",
+      "seed_uid": "person_000013",
+      "distractor_factor_uids": [
+        "factor_000537",
+        "factor_000538",
+        "factor_000539"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 2,
+      "factor_uids": [
+        "factor_000037",
+        "factor_000038"
+      ],
+      "nodes": [
+        "person_000014",
+        "company_000014",
+        "place_000014"
+      ],
+      "answer_uid": "place_000014",
+      "seed_uid": "person_000014",
+      "distractor_factor_uids": [
+        "factor_000540",
+        "factor_000541",
+        "factor_000542"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 3,
+      "factor_uids": [
+        "factor_000039",
+        "factor_000040",
+        "factor_000041"
+      ],
+      "nodes": [
+        "person_000015",
+        "company_000015",
+        "place_000015",
+        "place_000016"
+      ],
+      "answer_uid": "place_000016",
+      "seed_uid": "person_000015",
+      "distractor_factor_uids": [
+        "factor_000543",
+        "factor_000544",
+        "factor_000545"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000042"
+      ],
+      "nodes": [
+        "person_000016",
+        "company_000001"
+      ],
+      "answer_uid": "company_000001",
+      "seed_uid": "person_000016",
+      "distractor_factor_uids": [
+        "factor_000546",
+        "factor_000547",
+        "factor_000548"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 2,
+      "factor_uids": [
+        "factor_000043",
+        "factor_000044"
+      ],
+      "nodes": [
+        "person_000017",
+        "company_000002",
+        "place_000017"
+      ],
+      "answer_uid": "place_000017",
+      "seed_uid": "person_000017",
+      "distractor_factor_uids": [
+        "factor_000549",
+        "factor_000550",
+        "factor_000551"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 3,
+      "factor_uids": [
+        "factor_000045",
+        "factor_000046",
+        "factor_000047"
+      ],
+      "nodes": [
+        "person_000018",
+        "company_000003",
+        "place_000018",
+        "place_000019"
+      ],
+      "answer_uid": "place_000019",
+      "seed_uid": "person_000018",
+      "distractor_factor_uids": [
+        "factor_000552",
+        "factor_000553",
+        "factor_000554"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000048"
+      ],
+      "nodes": [
+        "person_000019",
+        "company_000004"
+      ],
+      "answer_uid": "company_000004",
+      "seed_uid": "person_000019",
+      "distractor_factor_uids": [
+        "factor_000555",
+        "factor_000556",
+        "factor_000557"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 2,
+      "factor_uids": [
+        "factor_000049",
+        "factor_000050"
+      ],
+      "nodes": [
+        "person_000020",
+        "company_000005",
+        "place_000020"
+      ],
+      "answer_uid": "place_000020",
+      "seed_uid": "person_000020",
+      "distractor_factor_uids": [
+        "factor_000558",
+        "factor_000559",
+        "factor_000560"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 3,
+      "factor_uids": [
+        "factor_000051",
+        "factor_000052",
+        "factor_000053"
+      ],
+      "nodes": [
+        "person_000021",
+        "company_000006",
+        "place_000001",
+        "place_000002"
+      ],
+      "answer_uid": "place_000002",
+      "seed_uid": "person_000021",
+      "distractor_factor_uids": [
+        "factor_000561",
+        "factor_000562",
+        "factor_000563"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000054"
+      ],
+      "nodes": [
+        "person_000022",
+        "company_000007"
+      ],
+      "answer_uid": "company_000007",
+      "seed_uid": "person_000022",
+      "distractor_factor_uids": [
+        "factor_000564",
+        "factor_000565",
+        "factor_000566"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 2,
+      "factor_uids": [
+        "factor_000055",
+        "factor_000056"
+      ],
+      "nodes": [
+        "person_000023",
+        "company_000008",
+        "place_000003"
+      ],
+      "answer_uid": "place_000003",
+      "seed_uid": "person_000023",
+      "distractor_factor_uids": [
+        "factor_000567",
+        "factor_000568",
+        "factor_000569"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 3,
+      "factor_uids": [
+        "factor_000057",
+        "factor_000058",
+        "factor_000059"
+      ],
+      "nodes": [
+        "person_000024",
+        "company_000009",
+        "place_000004",
+        "place_000005"
+      ],
+      "answer_uid": "place_000005",
+      "seed_uid": "person_000024",
+      "distractor_factor_uids": [
+        "factor_000570",
+        "factor_000571",
+        "factor_000572"
+      ]
+    },
+    {
+      "kind": "multi_hop",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000060"
+      ],
+      "nodes": [
+        "person_000025",
+        "company_000010"
+      ],
+      "answer_uid": "company_000010",
+      "seed_uid": "person_000025",
+      "distractor_factor_uids": [
+        "factor_000573",
+        "factor_000574",
+        "factor_000575"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 6,
+      "factor_uids": [
+        "factor_000061",
+        "factor_000062",
+        "factor_000063",
+        "factor_000064",
+        "factor_000065",
+        "factor_000066",
+        "factor_000067",
+        "factor_000068",
+        "factor_000069",
+        "factor_000070",
+        "factor_000071"
+      ],
+      "nodes": [
+        "person_000001",
+        "object_000003"
+      ],
+      "answer_uid": "object_000003",
+      "seed_uid": "person_000001",
+      "person_uid": "person_000001",
+      "final_owns": [
+        "object_000003",
+        "object_000001"
+      ],
+      "distractor_factor_uids": [
+        "factor_000576",
+        "factor_000577",
+        "factor_000578"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 5,
+      "factor_uids": [
+        "factor_000072",
+        "factor_000073",
+        "factor_000074",
+        "factor_000075",
+        "factor_000076",
+        "factor_000077",
+        "factor_000078",
+        "factor_000079",
+        "factor_000080"
+      ],
+      "nodes": [
+        "person_000002",
+        "object_000006"
+      ],
+      "answer_uid": "object_000006",
+      "seed_uid": "person_000002",
+      "person_uid": "person_000002",
+      "final_owns": [
+        "object_000006"
+      ],
+      "distractor_factor_uids": [
+        "factor_000579",
+        "factor_000580",
+        "factor_000581"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 6,
+      "factor_uids": [
+        "factor_000081",
+        "factor_000082",
+        "factor_000083",
+        "factor_000084",
+        "factor_000085",
+        "factor_000086",
+        "factor_000087",
+        "factor_000088",
+        "factor_000089",
+        "factor_000090",
+        "factor_000091"
+      ],
+      "nodes": [
+        "person_000003",
+        "object_000009"
+      ],
+      "answer_uid": "object_000009",
+      "seed_uid": "person_000003",
+      "person_uid": "person_000003",
+      "final_owns": [
+        "object_000009",
+        "object_000007"
+      ],
+      "distractor_factor_uids": [
+        "factor_000582",
+        "factor_000583",
+        "factor_000584"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 5,
+      "factor_uids": [
+        "factor_000092",
+        "factor_000093",
+        "factor_000094",
+        "factor_000095",
+        "factor_000096",
+        "factor_000097",
+        "factor_000098",
+        "factor_000099",
+        "factor_000100"
+      ],
+      "nodes": [
+        "person_000004",
+        "object_000012"
+      ],
+      "answer_uid": "object_000012",
+      "seed_uid": "person_000004",
+      "person_uid": "person_000004",
+      "final_owns": [
+        "object_000012"
+      ],
+      "distractor_factor_uids": [
+        "factor_000585",
+        "factor_000586",
+        "factor_000587"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 6,
+      "factor_uids": [
+        "factor_000101",
+        "factor_000102",
+        "factor_000103",
+        "factor_000104",
+        "factor_000105",
+        "factor_000106",
+        "factor_000107",
+        "factor_000108",
+        "factor_000109",
+        "factor_000110",
+        "factor_000111"
+      ],
+      "nodes": [
+        "person_000005",
+        "object_000015"
+      ],
+      "answer_uid": "object_000015",
+      "seed_uid": "person_000005",
+      "person_uid": "person_000005",
+      "final_owns": [
+        "object_000015",
+        "object_000013"
+      ],
+      "distractor_factor_uids": [
+        "factor_000588",
+        "factor_000589",
+        "factor_000590"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 5,
+      "factor_uids": [
+        "factor_000112",
+        "factor_000113",
+        "factor_000114",
+        "factor_000115",
+        "factor_000116",
+        "factor_000117",
+        "factor_000118",
+        "factor_000119",
+        "factor_000120"
+      ],
+      "nodes": [
+        "person_000006",
+        "object_000018"
+      ],
+      "answer_uid": "object_000018",
+      "seed_uid": "person_000006",
+      "person_uid": "person_000006",
+      "final_owns": [
+        "object_000018"
+      ],
+      "distractor_factor_uids": [
+        "factor_000591",
+        "factor_000592",
+        "factor_000593"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 6,
+      "factor_uids": [
+        "factor_000121",
+        "factor_000122",
+        "factor_000123",
+        "factor_000124",
+        "factor_000125",
+        "factor_000126",
+        "factor_000127",
+        "factor_000128",
+        "factor_000129",
+        "factor_000130",
+        "factor_000131"
+      ],
+      "nodes": [
+        "person_000007",
+        "object_000021"
+      ],
+      "answer_uid": "object_000021",
+      "seed_uid": "person_000007",
+      "person_uid": "person_000007",
+      "final_owns": [
+        "object_000021",
+        "object_000019"
+      ],
+      "distractor_factor_uids": [
+        "factor_000594",
+        "factor_000595",
+        "factor_000596"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 5,
+      "factor_uids": [
+        "factor_000132",
+        "factor_000133",
+        "factor_000134",
+        "factor_000135",
+        "factor_000136",
+        "factor_000137",
+        "factor_000138",
+        "factor_000139",
+        "factor_000140"
+      ],
+      "nodes": [
+        "person_000008",
+        "object_000024"
+      ],
+      "answer_uid": "object_000024",
+      "seed_uid": "person_000008",
+      "person_uid": "person_000008",
+      "final_owns": [
+        "object_000024"
+      ],
+      "distractor_factor_uids": [
+        "factor_000597",
+        "factor_000598",
+        "factor_000599"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 6,
+      "factor_uids": [
+        "factor_000141",
+        "factor_000142",
+        "factor_000143",
+        "factor_000144",
+        "factor_000145",
+        "factor_000146",
+        "factor_000147",
+        "factor_000148",
+        "factor_000149",
+        "factor_000150",
+        "factor_000151"
+      ],
+      "nodes": [
+        "person_000009",
+        "object_900002"
+      ],
+      "answer_uid": "object_900002",
+      "seed_uid": "person_000009",
+      "person_uid": "person_000009",
+      "final_owns": [
+        "object_900002",
+        "object_000025"
+      ],
+      "distractor_factor_uids": [
+        "factor_000600",
+        "factor_000601",
+        "factor_000602"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 5,
+      "factor_uids": [
+        "factor_000152",
+        "factor_000153",
+        "factor_000154",
+        "factor_000155",
+        "factor_000156",
+        "factor_000157",
+        "factor_000158",
+        "factor_000159",
+        "factor_000160"
+      ],
+      "nodes": [
+        "person_000010",
+        "object_900005"
+      ],
+      "answer_uid": "object_900005",
+      "seed_uid": "person_000010",
+      "person_uid": "person_000010",
+      "final_owns": [
+        "object_900005"
+      ],
+      "distractor_factor_uids": [
+        "factor_000603",
+        "factor_000604",
+        "factor_000605"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 6,
+      "factor_uids": [
+        "factor_000161",
+        "factor_000162",
+        "factor_000163",
+        "factor_000164",
+        "factor_000165",
+        "factor_000166",
+        "factor_000167",
+        "factor_000168",
+        "factor_000169",
+        "factor_000170",
+        "factor_000171"
+      ],
+      "nodes": [
+        "person_000011",
+        "object_900008"
+      ],
+      "answer_uid": "object_900008",
+      "seed_uid": "person_000011",
+      "person_uid": "person_000011",
+      "final_owns": [
+        "object_900008",
+        "object_900006"
+      ],
+      "distractor_factor_uids": [
+        "factor_000606",
+        "factor_000607",
+        "factor_000608"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 5,
+      "factor_uids": [
+        "factor_000172",
+        "factor_000173",
+        "factor_000174",
+        "factor_000175",
+        "factor_000176",
+        "factor_000177",
+        "factor_000178",
+        "factor_000179",
+        "factor_000180"
+      ],
+      "nodes": [
+        "person_000012",
+        "object_900011"
+      ],
+      "answer_uid": "object_900011",
+      "seed_uid": "person_000012",
+      "person_uid": "person_000012",
+      "final_owns": [
+        "object_900011"
+      ],
+      "distractor_factor_uids": [
+        "factor_000609",
+        "factor_000610",
+        "factor_000611"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 6,
+      "factor_uids": [
+        "factor_000181",
+        "factor_000182",
+        "factor_000183",
+        "factor_000184",
+        "factor_000185",
+        "factor_000186",
+        "factor_000187",
+        "factor_000188",
+        "factor_000189",
+        "factor_000190",
+        "factor_000191"
+      ],
+      "nodes": [
+        "person_000013",
+        "object_000001"
+      ],
+      "answer_uid": "object_000001",
+      "seed_uid": "person_000013",
+      "person_uid": "person_000013",
+      "final_owns": [
+        "object_000001",
+        "object_900012"
+      ],
+      "distractor_factor_uids": [
+        "factor_000612",
+        "factor_000613",
+        "factor_000614"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 5,
+      "factor_uids": [
+        "factor_000192",
+        "factor_000193",
+        "factor_000194",
+        "factor_000195",
+        "factor_000196",
+        "factor_000197",
+        "factor_000198",
+        "factor_000199",
+        "factor_000200"
+      ],
+      "nodes": [
+        "person_000014",
+        "object_000004"
+      ],
+      "answer_uid": "object_000004",
+      "seed_uid": "person_000014",
+      "person_uid": "person_000014",
+      "final_owns": [
+        "object_000004"
+      ],
+      "distractor_factor_uids": [
+        "factor_000615",
+        "factor_000616",
+        "factor_000617"
+      ]
+    },
+    {
+      "kind": "temporal",
+      "depth": 6,
+      "factor_uids": [
+        "factor_000201",
+        "factor_000202",
+        "factor_000203",
+        "factor_000204",
+        "factor_000205",
+        "factor_000206",
+        "factor_000207",
+        "factor_000208",
+        "factor_000209",
+        "factor_000210",
+        "factor_000211"
+      ],
+      "nodes": [
+        "person_000015",
+        "object_000007"
+      ],
+      "answer_uid": "object_000007",
+      "seed_uid": "person_000015",
+      "person_uid": "person_000015",
+      "final_owns": [
+        "object_000007",
+        "object_000005"
+      ],
+      "distractor_factor_uids": [
+        "factor_000618",
+        "factor_000619",
+        "factor_000620"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000212"
+      ],
+      "nodes": [
+        "document_000001",
+        "event_000002"
+      ],
+      "answer_uid": "document_000001",
+      "seed_uid": "event_000002",
+      "distractor_factor_uids": [
+        "factor_000621",
+        "factor_000622",
+        "factor_000623"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000213"
+      ],
+      "nodes": [
+        "document_000002",
+        "event_000003"
+      ],
+      "answer_uid": "document_000002",
+      "seed_uid": "event_000003",
+      "distractor_factor_uids": [
+        "factor_000624",
+        "factor_000625",
+        "factor_000626"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000214"
+      ],
+      "nodes": [
+        "document_000003",
+        "event_000004"
+      ],
+      "answer_uid": "document_000003",
+      "seed_uid": "event_000004",
+      "distractor_factor_uids": [
+        "factor_000627",
+        "factor_000628",
+        "factor_000629"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000215"
+      ],
+      "nodes": [
+        "document_000004",
+        "event_000005"
+      ],
+      "answer_uid": "document_000004",
+      "seed_uid": "event_000005",
+      "distractor_factor_uids": [
+        "factor_000630",
+        "factor_000631",
+        "factor_000632"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000216"
+      ],
+      "nodes": [
+        "document_000005",
+        "event_000006"
+      ],
+      "answer_uid": "document_000005",
+      "seed_uid": "event_000006",
+      "distractor_factor_uids": [
+        "factor_000633",
+        "factor_000634",
+        "factor_000635"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000217"
+      ],
+      "nodes": [
+        "document_000006",
+        "event_000007"
+      ],
+      "answer_uid": "document_000006",
+      "seed_uid": "event_000007",
+      "distractor_factor_uids": [
+        "factor_000636",
+        "factor_000637",
+        "factor_000638"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000218"
+      ],
+      "nodes": [
+        "document_000007",
+        "event_000008"
+      ],
+      "answer_uid": "document_000007",
+      "seed_uid": "event_000008",
+      "distractor_factor_uids": [
+        "factor_000639",
+        "factor_000640",
+        "factor_000641"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000219"
+      ],
+      "nodes": [
+        "document_000008",
+        "event_000009"
+      ],
+      "answer_uid": "document_000008",
+      "seed_uid": "event_000009",
+      "distractor_factor_uids": [
+        "factor_000642",
+        "factor_000643",
+        "factor_000644"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000220"
+      ],
+      "nodes": [
+        "document_000009",
+        "event_000010"
+      ],
+      "answer_uid": "document_000009",
+      "seed_uid": "event_000010",
+      "distractor_factor_uids": [
+        "factor_000645",
+        "factor_000646",
+        "factor_000647"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000221"
+      ],
+      "nodes": [
+        "document_000010",
+        "event_000011"
+      ],
+      "answer_uid": "document_000010",
+      "seed_uid": "event_000011",
+      "distractor_factor_uids": [
+        "factor_000648",
+        "factor_000649",
+        "factor_000650"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000222"
+      ],
+      "nodes": [
+        "document_000001",
+        "event_000012"
+      ],
+      "answer_uid": "document_000001",
+      "seed_uid": "event_000012",
+      "distractor_factor_uids": [
+        "factor_000651",
+        "factor_000652",
+        "factor_000653"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000223"
+      ],
+      "nodes": [
+        "document_000002",
+        "event_000013"
+      ],
+      "answer_uid": "document_000002",
+      "seed_uid": "event_000013",
+      "distractor_factor_uids": [
+        "factor_000654",
+        "factor_000655",
+        "factor_000656"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000224"
+      ],
+      "nodes": [
+        "document_000003",
+        "event_000014"
+      ],
+      "answer_uid": "document_000003",
+      "seed_uid": "event_000014",
+      "distractor_factor_uids": [
+        "factor_000657",
+        "factor_000658",
+        "factor_000659"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000225"
+      ],
+      "nodes": [
+        "document_000004",
+        "event_000015"
+      ],
+      "answer_uid": "document_000004",
+      "seed_uid": "event_000015",
+      "distractor_factor_uids": [
+        "factor_000660",
+        "factor_000661",
+        "factor_000662"
+      ]
+    },
+    {
+      "kind": "causal",
+      "depth": 1,
+      "factor_uids": [
+        "factor_000226"
+      ],
+      "nodes": [
+        "document_000005",
+        "event_000016"
+      ],
+      "answer_uid": "document_000005",
+      "seed_uid": "event_000016",
+      "distractor_factor_uids": [
+        "factor_000663",
+        "factor_000664",
+        "factor_000665"
+      ]
+    }
+  ],
+  "factor_uids": [
+    "factor_000001",
+    "factor_000002",
+    "factor_000003",
+    "factor_000004",
+    "factor_000005",
+    "factor_000006",
+    "factor_000007",
+    "factor_000008",
+    "factor_000009",
+    "factor_000010",
+    "factor_000011",
+    "factor_000012",
+    "factor_000013",
+    "factor_000014",
+    "factor_000015",
+    "factor_000016",
+    "factor_000017",
+    "factor_000018",
+    "factor_000019",
+    "factor_000020",
+    "factor_000021",
+    "factor_000022",
+    "factor_000023",
+    "factor_000024",
+    "factor_000025",
+    "factor_000026",
+    "factor_000027",
+    "factor_000028",
+    "factor_000029",
+    "factor_000030",
+    "factor_000031",
+    "factor_000032",
+    "factor_000033",
+    "factor_000034",
+    "factor_000035",
+    "factor_000036",
+    "factor_000037",
+    "factor_000038",
+    "factor_000039",
+    "factor_000040",
+    "factor_000041",
+    "factor_000042",
+    "factor_000043",
+    "factor_000044",
+    "factor_000045",
+    "factor_000046",
+    "factor_000047",
+    "factor_000048",
+    "factor_000049",
+    "factor_000050",
+    "factor_000051",
+    "factor_000052",
+    "factor_000053",
+    "factor_000054",
+    "factor_000055",
+    "factor_000056",
+    "factor_000057",
+    "factor_000058",
+    "factor_000059",
+    "factor_000060",
+    "factor_000061",
+    "factor_000062",
+    "factor_000063",
+    "factor_000064",
+    "factor_000065",
+    "factor_000066",
+    "factor_000067",
+    "factor_000068",
+    "factor_000069",
+    "factor_000070",
+    "factor_000071",
+    "factor_000072",
+    "factor_000073",
+    "factor_000074",
+    "factor_000075",
+    "factor_000076",
+    "factor_000077",
+    "factor_000078",
+    "factor_000079",
+    "factor_000080",
+    "factor_000081",
+    "factor_000082",
+    "factor_000083",
+    "factor_000084",
+    "factor_000085",
+    "factor_000086",
+    "factor_000087",
+    "factor_000088",
+    "factor_000089",
+    "factor_000090",
+    "factor_000091",
+    "factor_000092",
+    "factor_000093",
+    "factor_000094",
+    "factor_000095",
+    "factor_000096",
+    "factor_000097",
+    "factor_000098",
+    "factor_000099",
+    "factor_000100",
+    "factor_000101",
+    "factor_000102",
+    "factor_000103",
+    "factor_000104",
+    "factor_000105",
+    "factor_000106",
+    "factor_000107",
+    "factor_000108",
+    "factor_000109",
+    "factor_000110",
+    "factor_000111",
+    "factor_000112",
+    "factor_000113",
+    "factor_000114",
+    "factor_000115",
+    "factor_000116",
+    "factor_000117",
+    "factor_000118",
+    "factor_000119",
+    "factor_000120",
+    "factor_000121",
+    "factor_000122",
+    "factor_000123",
+    "factor_000124",
+    "factor_000125",
+    "factor_000126",
+    "factor_000127",
+    "factor_000128",
+    "factor_000129",
+    "factor_000130",
+    "factor_000131",
+    "factor_000132",
+    "factor_000133",
+    "factor_000134",
+    "factor_000135",
+    "factor_000136",
+    "factor_000137",
+    "factor_000138",
+    "factor_000139",
+    "factor_000140",
+    "factor_000141",
+    "factor_000142",
+    "factor_000143",
+    "factor_000144",
+    "factor_000145",
+    "factor_000146",
+    "factor_000147",
+    "factor_000148",
+    "factor_000149",
+    "factor_000150",
+    "factor_000151",
+    "factor_000152",
+    "factor_000153",
+    "factor_000154",
+    "factor_000155",
+    "factor_000156",
+    "factor_000157",
+    "factor_000158",
+    "factor_000159",
+    "factor_000160",
+    "factor_000161",
+    "factor_000162",
+    "factor_000163",
+    "factor_000164",
+    "factor_000165",
+    "factor_000166",
+    "factor_000167",
+    "factor_000168",
+    "factor_000169",
+    "factor_000170",
+    "factor_000171",
+    "factor_000172",
+    "factor_000173",
+    "factor_000174",
+    "factor_000175",
+    "factor_000176",
+    "factor_000177",
+    "factor_000178",
+    "factor_000179",
+    "factor_000180",
+    "factor_000181",
+    "factor_000182",
+    "factor_000183",
+    "factor_000184",
+    "factor_000185",
+    "factor_000186",
+    "factor_000187",
+    "factor_000188",
+    "factor_000189",
+    "factor_000190",
+    "factor_000191",
+    "factor_000192",
+    "factor_000193",
+    "factor_000194",
+    "factor_000195",
+    "factor_000196",
+    "factor_000197",
+    "factor_000198",
+    "factor_000199",
+    "factor_000200",
+    "factor_000201",
+    "factor_000202",
+    "factor_000203",
+    "factor_000204",
+    "factor_000205",
+    "factor_000206",
+    "factor_000207",
+    "factor_000208",
+    "factor_000209",
+    "factor_000210",
+    "factor_000211",
+    "factor_000212",
+    "factor_000213",
+    "factor_000214",
+    "factor_000215",
+    "factor_000216",
+    "factor_000217",
+    "factor_000218",
+    "factor_000219",
+    "factor_000220",
+    "factor_000221",
+    "factor_000222",
+    "factor_000223",
+    "factor_000224",
+    "factor_000225",
+    "factor_000226",
+    "factor_000227",
+    "factor_000228",
+    "factor_000229",
+    "factor_000230",
+    "factor_000231",
+    "factor_000232",
+    "factor_000233",
+    "factor_000234",
+    "factor_000235",
+    "factor_000236",
+    "factor_000237",
+    "factor_000238",
+    "factor_000239",
+    "factor_000240",
+    "factor_000241",
+    "factor_000242",
+    "factor_000243",
+    "factor_000244",
+    "factor_000245",
+    "factor_000246",
+    "factor_000247",
+    "factor_000248",
+    "factor_000249",
+    "factor_000250",
+    "factor_000251",
+    "factor_000252",
+    "factor_000253",
+    "factor_000254",
+    "factor_000255",
+    "factor_000256",
+    "factor_000257",
+    "factor_000258",
+    "factor_000259",
+    "factor_000260",
+    "factor_000261",
+    "factor_000262",
+    "factor_000263",
+    "factor_000264",
+    "factor_000265",
+    "factor_000266",
+    "factor_000267",
+    "factor_000268",
+    "factor_000269",
+    "factor_000270",
+    "factor_000271",
+    "factor_000272",
+    "factor_000273",
+    "factor_000274",
+    "factor_000275",
+    "factor_000276",
+    "factor_000277",
+    "factor_000278",
+    "factor_000279",
+    "factor_000280",
+    "factor_000281",
+    "factor_000282",
+    "factor_000283",
+    "factor_000284",
+    "factor_000285",
+    "factor_000286",
+    "factor_000287",
+    "factor_000288",
+    "factor_000289",
+    "factor_000290",
+    "factor_000291",
+    "factor_000292",
+    "factor_000293",
+    "factor_000294",
+    "factor_000295",
+    "factor_000296",
+    "factor_000297",
+    "factor_000298",
+    "factor_000299",
+    "factor_000300",
+    "factor_000301",
+    "factor_000302",
+    "factor_000303",
+    "factor_000304",
+    "factor_000305",
+    "factor_000306",
+    "factor_000307",
+    "factor_000308",
+    "factor_000309",
+    "factor_000310",
+    "factor_000311",
+    "factor_000312",
+    "factor_000313",
+    "factor_000314",
+    "factor_000315",
+    "factor_000316",
+    "factor_000317",
+    "factor_000318",
+    "factor_000319",
+    "factor_000320",
+    "factor_000321",
+    "factor_000322",
+    "factor_000323",
+    "factor_000324",
+    "factor_000325",
+    "factor_000326",
+    "factor_000327",
+    "factor_000328",
+    "factor_000329",
+    "factor_000330",
+    "factor_000331",
+    "factor_000332",
+    "factor_000333",
+    "factor_000334",
+    "factor_000335",
+    "factor_000336",
+    "factor_000337",
+    "factor_000338",
+    "factor_000339",
+    "factor_000340",
+    "factor_000341",
+    "factor_000342",
+    "factor_000343",
+    "factor_000344",
+    "factor_000345",
+    "factor_000346",
+    "factor_000347",
+    "factor_000348",
+    "factor_000349",
+    "factor_000350",
+    "factor_000351",
+    "factor_000352",
+    "factor_000353",
+    "factor_000354",
+    "factor_000355",
+    "factor_000356",
+    "factor_000357",
+    "factor_000358",
+    "factor_000359",
+    "factor_000360",
+    "factor_000361",
+    "factor_000362",
+    "factor_000363",
+    "factor_000364",
+    "factor_000365",
+    "factor_000366",
+    "factor_000367",
+    "factor_000368",
+    "factor_000369",
+    "factor_000370",
+    "factor_000371",
+    "factor_000372",
+    "factor_000373",
+    "factor_000374",
+    "factor_000375",
+    "factor_000376",
+    "factor_000377",
+    "factor_000378",
+    "factor_000379",
+    "factor_000380",
+    "factor_000381",
+    "factor_000382",
+    "factor_000383",
+    "factor_000384",
+    "factor_000385",
+    "factor_000386",
+    "factor_000387",
+    "factor_000388",
+    "factor_000389",
+    "factor_000390",
+    "factor_000391",
+    "factor_000392",
+    "factor_000393",
+    "factor_000394",
+    "factor_000395",
+    "factor_000396",
+    "factor_000397",
+    "factor_000398",
+    "factor_000399",
+    "factor_000400",
+    "factor_000401",
+    "factor_000402",
+    "factor_000403",
+    "factor_000404",
+    "factor_000405",
+    "factor_000406",
+    "factor_000407",
+    "factor_000408",
+    "factor_000409",
+    "factor_000410",
+    "factor_000411",
+    "factor_000412",
+    "factor_000413",
+    "factor_000414",
+    "factor_000415",
+    "factor_000416",
+    "factor_000417",
+    "factor_000418",
+    "factor_000419",
+    "factor_000420",
+    "factor_000421",
+    "factor_000422",
+    "factor_000423",
+    "factor_000424",
+    "factor_000425",
+    "factor_000426",
+    "factor_000427",
+    "factor_000428",
+    "factor_000429",
+    "factor_000430",
+    "factor_000431",
+    "factor_000432",
+    "factor_000433",
+    "factor_000434",
+    "factor_000435",
+    "factor_000436",
+    "factor_000437",
+    "factor_000438",
+    "factor_000439",
+    "factor_000440",
+    "factor_000441",
+    "factor_000442",
+    "factor_000443",
+    "factor_000444",
+    "factor_000445",
+    "factor_000446",
+    "factor_000447",
+    "factor_000448",
+    "factor_000449",
+    "factor_000450",
+    "factor_000451",
+    "factor_000452",
+    "factor_000453",
+    "factor_000454",
+    "factor_000455",
+    "factor_000456",
+    "factor_000457",
+    "factor_000458",
+    "factor_000459",
+    "factor_000460",
+    "factor_000461",
+    "factor_000462",
+    "factor_000463",
+    "factor_000464",
+    "factor_000465",
+    "factor_000466",
+    "factor_000467",
+    "factor_000468",
+    "factor_000469",
+    "factor_000470",
+    "factor_000471",
+    "factor_000472",
+    "factor_000473",
+    "factor_000474",
+    "factor_000475",
+    "factor_000476",
+    "factor_000477",
+    "factor_000478",
+    "factor_000479",
+    "factor_000480",
+    "factor_000481",
+    "factor_000482",
+    "factor_000483",
+    "factor_000484",
+    "factor_000485",
+    "factor_000486",
+    "factor_000487",
+    "factor_000488",
+    "factor_000489",
+    "factor_000490",
+    "factor_000491",
+    "factor_000492",
+    "factor_000493",
+    "factor_000494",
+    "factor_000495",
+    "factor_000496",
+    "factor_000497",
+    "factor_000498",
+    "factor_000499",
+    "factor_000500"
+  ],
+  "entity_uids": [
+    "person_000001",
+    "person_000002",
+    "person_000003",
+    "person_000004",
+    "person_000005",
+    "person_000006",
+    "person_000007",
+    "person_000008",
+    "person_000009",
+    "person_000010",
+    "person_000011",
+    "person_000012",
+    "person_000013",
+    "person_000014",
+    "person_000015",
+    "person_000016",
+    "person_000017",
+    "person_000018",
+    "person_000019",
+    "person_000020",
+    "person_000021",
+    "person_000022",
+    "person_000023",
+    "person_000024",
+    "person_000025",
+    "person_000026",
+    "person_000027",
+    "person_000028",
+    "person_000029",
+    "person_000030",
+    "company_000001",
+    "company_000002",
+    "company_000003",
+    "company_000004",
+    "company_000005",
+    "company_000006",
+    "company_000007",
+    "company_000008",
+    "company_000009",
+    "company_000010",
+    "company_000011",
+    "company_000012",
+    "company_000013",
+    "company_000014",
+    "company_000015",
+    "place_000001",
+    "place_000002",
+    "place_000003",
+    "place_000004",
+    "place_000005",
+    "place_000006",
+    "place_000007",
+    "place_000008",
+    "place_000009",
+    "place_000010",
+    "place_000011",
+    "place_000012",
+    "place_000013",
+    "place_000014",
+    "place_000015",
+    "place_000016",
+    "place_000017",
+    "place_000018",
+    "place_000019",
+    "place_000020",
+    "object_000001",
+    "object_000002",
+    "object_000003",
+    "object_000004",
+    "object_000005",
+    "object_000006",
+    "object_000007",
+    "object_000008",
+    "object_000009",
+    "object_000010",
+    "object_000011",
+    "object_000012",
+    "object_000013",
+    "object_000014",
+    "object_000015",
+    "object_000016",
+    "object_000017",
+    "object_000018",
+    "object_000019",
+    "object_000020",
+    "object_000021",
+    "object_000022",
+    "object_000023",
+    "object_000024",
+    "object_000025",
+    "document_000001",
+    "document_000002",
+    "document_000003",
+    "document_000004",
+    "document_000005",
+    "document_000006",
+    "document_000007",
+    "document_000008",
+    "document_000009",
+    "document_000010",
+    "event_000001",
+    "event_000002",
+    "event_000003",
+    "event_000004",
+    "event_000005",
+    "event_000006",
+    "event_000007",
+    "event_000008",
+    "event_000009",
+    "event_000010",
+    "event_000011",
+    "event_000012",
+    "event_000013",
+    "event_000014",
+    "event_000015",
+    "event_000016",
+    "event_000017",
+    "event_000018",
+    "event_000019",
+    "event_000020",
+    "event_000021",
+    "event_000022",
+    "event_000023",
+    "event_000024",
+    "event_000025",
+    "event_000026",
+    "event_000027",
+    "event_000028",
+    "event_000029",
+    "event_000030",
+    "event_000031",
+    "event_000032",
+    "event_000033",
+    "event_000034",
+    "event_000035",
+    "event_000036",
+    "event_000037",
+    "event_000038",
+    "event_000039",
+    "event_000040",
+    "event_000041",
+    "event_000042",
+    "event_000043",
+    "event_000044",
+    "event_000045",
+    "event_000046",
+    "event_000047",
+    "event_000048",
+    "event_000049",
+    "event_000050",
+    "object_900001",
+    "object_900002",
+    "object_900003",
+    "object_900004",
+    "object_900005",
+    "object_900006",
+    "object_900007",
+    "object_900008",
+    "object_900009",
+    "object_900010",
+    "object_900011",
+    "object_900012",
+    "object_900013"
+  ]
+}

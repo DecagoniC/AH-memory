@@ -1,6 +1,8 @@
 """FastAPI web UI: chat + graph dump + live AH vs RAG compare."""
 from __future__ import annotations
 
+import tempfile
+import time
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Literal
@@ -14,10 +16,8 @@ from ah_memory.agent import Agent
 from ah_memory.baselines.vanilla_rag import VanillaRAG
 from ah_memory.compare import CompareEngine
 from ah_memory.config import LlmProvider, load_config
-from ah_memory.corpus import build_encyclopedia
 from ah_memory.deepseek import DeepSeekClient, DeepSeekHybridPerception
 from ah_memory.dialogue import DialogueAgent
-from ah_memory.examples.rabbit import build_rabbit_memory
 from ah_memory.factor_parameters import (
     EmbeddingParameterGenerator,
     FixedParameterGenerator,
@@ -31,7 +31,25 @@ from ah_memory.relation_normalizer import (
     ExactNormalizer,
     RelationNormalizer,
 )
+from ah_memory.semantic_activation import (
+    DecayActivation,
+    LinearActivation,
+    SaturatingReLUActivation,
+    SigmoidActivation,
+)
 from ah_memory.store import AHStore
+from ah_memory.synthetic import (
+    SyntheticGraphConfig,
+    SyntheticGraphGenerator,
+    export_zip,
+    get_preset,
+    ingest_world,
+    proof_view,
+    run_benchmark,
+)
+from ah_memory.synthetic.config import DEFAULT_RELATION_TYPES, merge_config
+from ah_memory.synthetic.ingest import IngestResult
+from ah_memory.synthetic.ground_truth import SyntheticWorld
 
 STATIC = Path(__file__).parent / "static"
 cfg = load_config()
@@ -71,22 +89,40 @@ def _make_chat_client(provider: LlmProvider | None = None) -> tuple[Any | None, 
     return None, "rules"
 
 
-def _store_for_preload(mode: str) -> AHStore:
-    mode = (mode or "empty").strip().lower()
-    if mode == "encyclopedia":
-        store, _ = build_encyclopedia()
-        return store
-    if mode == "rabbit":
-        return build_rabbit_memory()
+def _empty_store() -> AHStore:
     store = AHStore()
     store.clear()
     return store
 
 
+def _build_identity(store: AHStore):
+    from ah_memory.identity import build_identity_service
+
+    embed = None
+    use_emb = bool(cfg.identity.use_embeddings)
+    if use_emb:
+        try:
+            from ah_memory.benchmarks.entity_resolution.resolvers import make_embed_fn
+
+            _name, embed, _dim = make_embed_fn(
+                cfg.embedding.model, dimensions=cfg.embedding.dimensions
+            )
+        except Exception:
+            use_emb = False
+            embed = None
+    return build_identity_service(
+        store,
+        enabled=cfg.identity.enabled,
+        use_embeddings=use_emb,
+        embed=embed,
+        safety_threshold=cfg.identity.safety_threshold,
+        margin=cfg.identity.margin,
+    )
+
+
 def _build_core(preload: str | None = None) -> Agent:
-    requested = preload or cfg.agent.preload
-    mode = requested if requested in {"empty", "rabbit", "encyclopedia"} else "empty"
-    store = _store_for_preload(mode)
+    del preload  # preload-режимы (rabbit/encyclopedia) сняты
+    store = _empty_store()
     semantics_mode = cfg.open_semantics.normalization_mode.lower()
     if semantics_mode == "learned":
         strategies = (
@@ -109,6 +145,7 @@ def _build_core(preload: str | None = None) -> Agent:
         perception=_make_perception(),
         relation_normalizer=RelationNormalizer(store.relations, strategies),
         parameter_generator=parameter_generator,
+        identity=_build_identity(store),
     )
 
 
@@ -144,6 +181,17 @@ agent = _build_core()
 dialogue = _build_dialogue(agent)
 comparer = _build_compare(agent)
 
+_synthetic_world: SyntheticWorld | None = None
+_synthetic_ingest: IngestResult | None = None
+_synthetic_report: dict[str, Any] | None = None
+_synthetic_zip: Path | None = None
+_ACTIVATION_FUNCS = {
+    "linear": LinearActivation,
+    "sigmoid": SigmoidActivation,
+    "relu": SaturatingReLUActivation,
+    "decay": DecayActivation,
+}
+
 
 class ChatIn(BaseModel):
     message: str = Field(min_length=1)
@@ -172,6 +220,25 @@ class ChatOut(BaseModel):
 
 class ProviderIn(BaseModel):
     provider: Literal["gigachat", "deepseek"]
+
+
+class SyntheticGenerateIn(BaseModel):
+    preset: str = "small"
+    num_entities: int | None = None
+    num_events: int | None = None
+    num_factors: int | None = None
+    max_hop_depth: int | None = None
+    distractor_ratio: float | None = None
+    num_queries: int | None = None
+    random_seed: int = 42
+    relation_types: list[str] | None = None
+
+
+class SyntheticBenchmarkIn(BaseModel):
+    limit: int | None = None
+    activation: Literal["linear", "sigmoid", "relu", "decay"] = "linear"
+    timesteps: int = 4
+    threshold: float = 0.05
 
 
 @app.get("/")
@@ -213,7 +280,7 @@ def health() -> dict[str, Any]:
         "open_semantics_mode": cfg.open_semantics.normalization_mode,
         "tau": agent.store.ah.tau,
         "history": len(dialogue.history),
-        "graph_size": len(agent.store.ah.S) + len(agent.store.ah.L) + len(agent.store.find_hypernodes()),
+        "graph_size": len(agent.store.ah.S) + len(agent.store.ah.L) + len(agent.store.semantic_factors),
         "|S|": len(agent.store.ah.S),
     }
 
@@ -364,30 +431,252 @@ def compare_m4() -> dict[str, Any]:
 def reset(preload: str = "empty") -> dict[str, Any]:
     """Пересборка агента; по умолчанию empty — чистый граф под ваши запросы."""
     global agent, dialogue, comparer, cfg, llm_provider
+    global _synthetic_world, _synthetic_ingest, _synthetic_report, _synthetic_zip
     cfg = load_config()
     llm_provider = cfg.agent.llm_provider
-    mode = (preload or "empty").strip().lower()
-    if mode not in {"empty", "rabbit", "encyclopedia"}:
-        mode = "empty"
-
-    agent = _build_core(mode)
+    agent = _build_core()
     dialogue = _build_dialogue(agent)
     dialogue.reset_history()
     comparer = _build_compare(agent)
     comparer.clear()
-
+    _synthetic_world = None
+    _synthetic_ingest = None
+    _synthetic_report = None
+    _synthetic_zip = None
     stats = dump_graph(
         agent.store,
         activation=agent.ignition.state.activation,
     )["stats"]
     return {
         "ok": True,
-        "preload": mode,
+        "preload": preload,
         "version": "0.4.4-merged",
         "llm_provider": llm_provider,
         "rag_backend": comparer.rag.backend,
         "corpus_chars": len(comparer.rag.corpus),
         "stats": stats,
+    }
+
+
+@app.post("/api/synthetic/generate")
+def synthetic_generate(body: SyntheticGenerateIn) -> dict[str, Any]:
+    global agent, dialogue
+    global _synthetic_world, _synthetic_ingest, _synthetic_report, _synthetic_zip
+    started = time.perf_counter()
+    try:
+        base = get_preset(body.preset)
+    except KeyError:
+        base = SyntheticGraphConfig(preset="custom", random_seed=body.random_seed)
+    overrides: dict[str, Any] = {
+        "random_seed": body.random_seed,
+        "preset": body.preset,
+    }
+    for key in (
+        "num_entities",
+        "num_events",
+        "num_factors",
+        "max_hop_depth",
+        "distractor_ratio",
+        "num_queries",
+    ):
+        value = getattr(body, key)
+        if value is not None:
+            overrides[key] = value
+    if body.relation_types:
+        overrides["relation_types"] = tuple(body.relation_types)
+    else:
+        overrides["relation_types"] = DEFAULT_RELATION_TYPES
+    config = merge_config(base, overrides)
+    world = SyntheticGraphGenerator(config).generate()
+    agent = _build_core("empty")
+    dialogue = _build_dialogue(agent)
+    dialogue.reset_history()
+    ingest = ingest_world(world, agent.store)
+    zip_path = Path(tempfile.gettempdir()) / f"ah_synthetic_{config.random_seed}.zip"
+    export_zip(world, zip_path)
+    _synthetic_world = world
+    _synthetic_ingest = ingest
+    _synthetic_report = None
+    _synthetic_zip = zip_path
+    summary = world.to_summary()
+    summary["generation_time_sec"] = round(
+        world.generation_time_sec + (time.perf_counter() - started - world.generation_time_sec),
+        4,
+    )
+    summary["ingest"] = ingest.to_dict()["stats"]
+    summary["graph_stats"] = dump_graph(
+        agent.store,
+        activation=agent.ignition.state.activation,
+    )["stats"]
+    return {"ok": True, **summary}
+
+
+@app.get("/api/synthetic/status")
+def synthetic_status() -> dict[str, Any]:
+    if _synthetic_world is None:
+        return {"ok": True, "ready": False}
+    return {
+        "ok": True,
+        "ready": True,
+        **_synthetic_world.to_summary(),
+        "benchmark": (
+            {
+                "aggregate": _synthetic_report.get("aggregate"),
+                "activation_name": _synthetic_report.get("activation_name"),
+            }
+            if _synthetic_report
+            else None
+        ),
+    }
+
+
+@app.post("/api/synthetic/benchmark")
+def synthetic_benchmark(body: SyntheticBenchmarkIn) -> dict[str, Any]:
+    global _synthetic_report
+    if _synthetic_world is None or _synthetic_ingest is None:
+        raise HTTPException(400, "synthetic graph is not generated")
+    fn_cls = _ACTIVATION_FUNCS.get(body.activation, LinearActivation)
+    report = run_benchmark(
+        agent.store,
+        _synthetic_world,
+        _synthetic_ingest,
+        limit=body.limit,
+        activation_function=fn_cls(),
+        timesteps=body.timesteps,
+        threshold=body.threshold,
+        activation_name=body.activation,
+    )
+    _synthetic_report = report.to_dict()
+    return {"ok": True, **_synthetic_report}
+
+
+@app.get("/api/synthetic/queries")
+def synthetic_queries() -> dict[str, Any]:
+    if _synthetic_world is None:
+        raise HTTPException(400, "synthetic graph is not generated")
+    results_by_id = {}
+    if _synthetic_report:
+        results_by_id = {
+            item["query_id"]: item for item in _synthetic_report.get("results") or []
+        }
+    items = []
+    for query in _synthetic_world.queries:
+        row = query.to_dict()
+        if query.query_id in results_by_id:
+            row["result"] = results_by_id[query.query_id]
+        items.append(row)
+    return {"ok": True, "queries": items}
+
+
+@app.get("/api/synthetic/query/{query_id}")
+def synthetic_query_detail(query_id: str) -> dict[str, Any]:
+    if _synthetic_world is None:
+        raise HTTPException(400, "synthetic graph is not generated")
+    detail = None
+    if _synthetic_report:
+        detail = next(
+            (
+                item
+                for item in _synthetic_report.get("results") or []
+                if item.get("query_id") == query_id
+            ),
+            None,
+        )
+    try:
+        view = proof_view(
+            _synthetic_world,
+            query_id,
+            ingest=_synthetic_ingest,
+        )
+    except KeyError as exc:
+        raise HTTPException(404, f"unknown query: {query_id}") from exc
+    return {"ok": True, "proof": view, "result": detail}
+
+
+@app.get("/api/synthetic/proof/{query_id}")
+def synthetic_proof(query_id: str) -> dict[str, Any]:
+    if _synthetic_world is None:
+        raise HTTPException(400, "synthetic graph is not generated")
+    try:
+        view = proof_view(
+            _synthetic_world,
+            query_id,
+            ingest=_synthetic_ingest,
+        )
+    except KeyError as exc:
+        raise HTTPException(404, f"unknown query: {query_id}") from exc
+    highlight = [
+        node["ah_uid"] for node in view["nodes"] if node.get("ah_uid")
+    ]
+    for step in view["steps"]:
+        if step.get("ah_factor_uid"):
+            highlight.append(step["ah_factor_uid"])
+    return {"ok": True, "proof": view, "highlight": highlight}
+
+
+@app.get("/api/synthetic/download")
+def synthetic_download() -> FileResponse:
+    if _synthetic_zip is None or not _synthetic_zip.exists():
+        raise HTTPException(400, "synthetic dataset is not available")
+    return FileResponse(
+        path=str(_synthetic_zip),
+        filename=_synthetic_zip.name,
+        media_type="application/zip",
+    )
+
+
+_er_report: dict[str, Any] | None = None
+
+
+class EntityResolutionIn(BaseModel):
+    embedding_model: str | None = None
+    dimensions: int | None = None
+    resolver: Literal["exact", "morphology", "embedding", "hybrid"] | None = None
+    run_activation: bool = True
+
+
+@app.post("/api/entity-resolution/benchmark")
+def entity_resolution_benchmark(body: EntityResolutionIn) -> dict[str, Any]:
+    """Run EntityResolutionBenchmark (separate from synthetic aggregation)."""
+    global _er_report
+    from ah_memory.benchmarks.entity_resolution.resolvers import (
+        default_resolvers,
+        make_embed_fn,
+    )
+    from ah_memory.benchmarks.entity_resolution.runner import (
+        run_entity_resolution_benchmark,
+    )
+
+    model = body.embedding_model or cfg.embedding.model
+    dims = body.dimensions or cfg.embedding.dimensions
+    name, embed_fn, dims = make_embed_fn(model, dimensions=dims)
+    resolvers = default_resolvers(embed_fn, dimensions=dims)
+    if body.resolver:
+        resolvers = {body.resolver: resolvers[body.resolver]}
+    report = run_entity_resolution_benchmark(
+        output_dir="results/entity_resolution",
+        embedding_name=name,
+        embed_fn=embed_fn,
+        dimensions=dims,
+        run_activation=body.run_activation,
+        resolvers=resolvers,
+    )
+    _er_report = report
+    return {"ok": True, **report}
+
+
+@app.get("/api/entity-resolution/status")
+def entity_resolution_status() -> dict[str, Any]:
+    if _er_report is None:
+        return {"ok": False, "ready": False}
+    return {
+        "ok": True,
+        "ready": True,
+        "dataset": _er_report.get("dataset"),
+        "cases": _er_report.get("cases"),
+        "embedding": _er_report.get("embedding"),
+        "resolvers": _er_report.get("resolvers"),
+        "threshold_sweep": _er_report.get("threshold_sweep"),
     }
 
 

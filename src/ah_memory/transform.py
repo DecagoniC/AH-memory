@@ -1,7 +1,13 @@
-"""Deterministic Transform: FactCandidate → AH ops. No domain hardcode."""
+"""Transform: FactCandidate → open relations (Event + semantic Factor).
+
+Только open-path: Event + semantic Factor, без legacy T/N.
+Identity (если передан) мержит mention в существующий bare UID до ensure_*.
+"""
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from ah_memory.factor_graph import Factor, FactorKind
 from ah_memory.factor_parameters import (
@@ -9,7 +15,7 @@ from ah_memory.factor_parameters import (
     RuleBasedParameterGenerator,
 )
 from ah_memory.hyperparams import HyperParams
-from ah_memory.perception import PREDICATES, FactCandidate, PerceptionResult, slug_uid
+from ah_memory.perception import FactCandidate, PerceptionResult, slug_uid
 from ah_memory.relation_normalizer import ExactNormalizer, RelationNormalizer
 from ah_memory.relations import (
     Event,
@@ -21,26 +27,17 @@ from ah_memory.relations import (
 )
 from ah_memory.state_engine import StateEngine, default_state_engine
 from ah_memory.store import AHStore
-from ah_memory.templates import ensure_template
-from ah_memory.types import AssocLink, Hyperlink, LinkId, Role, Section
+from ah_memory.types import AssocLink, LinkId, Section
 
 
-PRED_TO_TEMPLATE = {
-    "CREATE": "T_CREATE",
-    "IS": "T_IS",
-    "LIVE_IN": "T_LIVE_IN",
-    "BE_BORN": "T_BE_BORN",
-    "HAVE": "T_HAVE",
-    "RUN": "T_RUN",
-    "BE_COLORED": "T_COLOR",
-    "CAUSE_EVENT": "T_CAUSE",
-    "USE": "T_USE",
-    "MOVE": "T_MOVE",
-}
+def _now_iso() -> str:
+    return datetime.now().astimezone().isoformat(timespec="seconds")
 
 
 @dataclass
 class IngestReport:
+    """Что получилось после apply: созданные факторы, seeds, ошибки."""
+
     created_n: list[str] = field(default_factory=list)
     seed_uids: list[str] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
@@ -61,6 +58,8 @@ class Transform:
         relation_normalizer: RelationNormalizer | None = None,
         parameter_generator: FactorParameterGenerator | None = None,
         state_engine: StateEngine | None = None,
+        identity=None,
+        dedup_semantic_factors: bool = True,
     ) -> None:
         self.store = store
         self.hp = hp or HyperParams()
@@ -72,53 +71,37 @@ class Transform:
             parameter_generator or RuleBasedParameterGenerator()
         )
         self.state_engine = state_engine or default_state_engine()
+        self.identity = identity
+        self.dedup_semantic_factors = dedup_semantic_factors
 
     def apply(self, perception: PerceptionResult, section: Section = Section.C) -> IngestReport:
+        del section  # open events не кладутся в C/P/H
         report = IngestReport()
+        compound_heads = self._compound_role_heads(perception)
         for tok in perception.seed_tokens:
-            uid = slug_uid(tok)
-            if uid in PREDICATES or uid in PRED_TO_TEMPLATE:
+            tok_slug = slug_uid(tok)
+            if tok_slug in compound_heads:
+                continue
+            uid = self._resolve_bare(tok)
+            if self.store.get_relation(uid) is not None:
                 continue
             m_uid = self._m_uid(uid)
-            self.store.ensure_abstract(uid, {tok.lower() if tok == tok.lower() else uid.lower()})
-            s = self.store.ah.S.get(uid)
-            if s is not None:
-                forms = s.R.setdefault("TEXT", set())
-                forms.add(tok.lower())
+            surface = tok.lower().replace("ё", "е")
+            self.store.ensure_abstract(uid, {surface})
             self.store.ensure_m(m_uid, _label_from_uid(uid))
+            if self.identity is not None:
+                self.identity.attach_alias(uid, surface)
             report.seed_uids.append(uid)
             report.seed_uids.append(m_uid)
 
         for cand in perception.candidates:
             try:
                 normalized = self._normalize_candidate(cand)
-                legacy_predicate = (
-                    cand.predicate.upper()
-                    if cand.predicate.upper() in PRED_TO_TEMPLATE
-                    else normalized.canonical_label
-                )
-                if legacy_predicate in PRED_TO_TEMPLATE:
-                    legacy_candidate = FactCandidate(
-                        predicate=legacy_predicate,
-                        roles=dict(cand.roles),
-                        raw_span=cand.raw_span,
-                        confidence=cand.confidence,
-                        raw_relation=cand.raw_relation or cand.predicate,
-                        canonical_relation=normalized.canonical_label,
-                    )
-                    n_uid = self._ingest_candidate(legacy_candidate, section)
-                    self._record_semantic(
-                        legacy_candidate,
-                        normalized,
-                        legacy_source_uid=n_uid,
-                    )
-                else:
-                    n_uid = self._ingest_open_candidate(cand, normalized)
-                report.created_n.append(n_uid)
+                factor_uid = self._record_semantic(cand, normalized)
+                report.created_n.append(factor_uid)
             except Exception as exc:  # noqa: BLE001
                 report.skipped.append(f"{cand.predicate}:{exc}")
 
-        # mesh only within each N (see _ingest_candidate), not across bag-of-seeds
         report.perception = perception.to_graph_json()
         return report
 
@@ -152,19 +135,10 @@ class Transform:
         )
         return self.relation_normalizer.normalize(raw_relation, context)
 
-    def _ingest_open_candidate(
-        self,
-        candidate: FactCandidate,
-        normalized: NormalizedRelation,
-    ) -> str:
-        return self._record_semantic(candidate, normalized)
-
     def _record_semantic(
         self,
         candidate: FactCandidate,
         normalized: NormalizedRelation,
-        *,
-        legacy_source_uid: str | None = None,
     ) -> str:
         relation = self.store.get_relation(normalized.canonical_label)
         if relation is None:
@@ -173,14 +147,27 @@ class Transform:
             )
         arguments = {
             role.upper(): NodeRef(
-                uid=self._resolve_value(value),
+                uid=self._resolve_value(
+                    value,
+                    context=candidate.raw_span or candidate.raw_relation or "",
+                ),
                 role=role.upper(),
             )
             for role, value in candidate.roles.items()
         }
         if len(arguments) < 2:
             raise ValueError("open relation factor requires at least two arguments")
+        roles_map = {role: reference.uid for role, reference in arguments.items()}
+        duplicate = self._duplicate_semantic_factor_uid(
+            relation.canonical_label,
+            roles_map,
+            candidate.statement_type,
+        )
+        if duplicate is not None and self.dedup_semantic_factors:
+            return duplicate
         event_uid = self.store.new_uid("E")
+        added_at = _now_iso()
+        created_tau = self.store.ah.tau
         event = Event(
             uid=event_uid,
             predicate=relation,
@@ -192,19 +179,36 @@ class Transform:
                 "raw_relation": candidate.raw_relation or candidate.predicate,
                 "normalization": normalized.strategy,
                 "normalization_confidence": normalized.confidence,
+                "statement_type": candidate.statement_type,
+                "source": candidate.source,
+                "added_at": added_at,
+                "created_tau": created_tau,
             },
         )
         self.store.add_event(event)
-        variables = list(
+        role_variables = list(
             dict.fromkeys(reference.uid for reference in arguments.values())
         )
+        context_uid = self._conversation_anchor_uid()
+        variables = list(role_variables)
+        if context_uid and context_uid not in variables:
+            variables.append(context_uid)
         parameters = self.parameter_generator.generate(relation)
+        epistemic_scale = {
+            "decision": 1.0,
+            "assertion": 1.0,
+            "topic": 0.55,
+            "open_question": 0.5,
+            "proposal": 0.45,
+            "explanation": 0.4,
+        }[candidate.statement_type]
+        factor_weight = self.hp.initial_w * epistemic_scale
         factor_uid = f"SF::{event_uid}"
         factor = Factor(
             fid=factor_uid,
             kind=FactorKind.HYPER,
             variables=variables,
-            w=self.hp.initial_w,
+            w=factor_weight,
             roles={role: reference.uid for role, reference in arguments.items()},
             potential_key="semantic",
             source_uid=event_uid,
@@ -216,95 +220,103 @@ class Transform:
                 "event_uid": event_uid,
                 "raw_relation": candidate.raw_relation or candidate.predicate,
                 "canonical_relation": relation.canonical_label,
-                "legacy_source_uid": legacy_source_uid or "",
+                "statement_type": candidate.statement_type,
+                "source": candidate.source,
+                "context_uid": context_uid,
                 "source_variable": arguments.get(
                     "SUBJECT",
                     next(iter(arguments.values())),
                 ).uid,
+                "added_at": added_at,
+                "created_tau": created_tau,
             },
         )
         self.store.add_semantic_factor(factor)
-        next_state = self.state_engine.apply(self.store.state, event)
-        self.store.state = next_state
-        self.store.state_transitions.extend(
-            transition.to_dict()
-            for transition in self.state_engine.last_transitions
+        self._weave_assoc_mesh(role_variables, w=factor_weight)
+        self._bind_subject_surface(candidate.roles.get("SUBJECT"))
+        if candidate.statement_type in {"assertion", "decision"}:
+            next_state = self.state_engine.apply(self.store.state, event)
+            self.store.state = next_state
+            self.store.state_transitions.extend(
+                transition.to_dict()
+                for transition in self.state_engine.last_transitions
+            )
+        return factor_uid
+
+    def _conversation_anchor_uid(self) -> str | None:
+        """Use the first authoritative non-speaker entity as conversation scope."""
+        discourse_uids = {
+            "M_Я",
+            "M_МЫ",
+            "M_USER",
+            "M_ПОЛЬЗОВАТЕЛЬ",
+            "M_ДИАЛОГ",
+            "M_АССИСТЕНТ",
+        }
+        role_priority = (
+            "OBJECT",
+            "LOCATION",
+            "PURPOSE",
+            "TOOL",
+            "MATERIAL",
+            "WITH",
+            "SUBJECT",
         )
-        return legacy_source_uid or factor_uid
-
-    def _ingest_candidate(self, cand: FactCandidate, section: Section) -> str:
-        pred = cand.predicate.upper()
-        if pred not in PRED_TO_TEMPLATE:
-            raise ValueError(f"unknown predicate {pred}")
-        tpl_uid = ensure_template(self.store, pred)
-
-        fillers: dict[Role, object] = {}
-        for role_name, value in cand.roles.items():
-            role = Role(role_name)
-            target = self._resolve_value(value)
-            fillers[role] = self.store.m_ref(target)
-
-        tpl = self.store.get_template(tpl_uid)
-        slot_roles = {a.role for a in tpl.actants}
-        if Role.SUBJECT in slot_roles and Role.SUBJECT not in fillers:
-            raise ValueError("SUBJECT required")
-        if Role.OBJECT in slot_roles and Role.OBJECT not in fillers and pred not in {
-            "LIVE_IN",
-            "BE_BORN",
-            "RUN",
-            "MOVE",
-        }:
-            if Role.LOCATION not in fillers and Role.HOW_TO not in fillers:
-                raise ValueError("OBJECT/LOCATION required")
-
-        for existing in self.store.find_hypernodes():
-            if existing.template.target_uid != tpl_uid:
-                continue
-            if {r.value: f.target_uid for r, f in existing.fillers.items()} == {
-                r.value: f.target_uid for r, f in fillers.items()  # type: ignore[attr-defined]
+        for factor in self.store.list_semantic_factors():
+            if (factor.metadata or {}).get("statement_type") not in {
+                "assertion",
+                "decision",
             }:
-                # still ensure mesh exists for older nodes
-                self._weave_assoc_mesh(
-                    [f.target_uid for f in existing.fillers.values()],
-                    w=self.hp.initial_w,
-                )
-                return existing.uid
+                continue
+            for role in role_priority:
+                anchor = factor.roles.get(role)
+                if anchor and anchor not in discourse_uids:
+                    return anchor
+        return None
 
-        n_uid = self.store.new_uid(f"N_{pred}")
-        self.store.add_element(
-            section,
-            Hyperlink(
-                uid=n_uid,
-                w=self.hp.initial_w,
-                template=self.store.m_ref(tpl_uid),
-                fillers=fillers,  # type: ignore[arg-type]
-            ),
+    def _duplicate_semantic_factor_uid(
+        self,
+        canonical: str,
+        roles: dict[str, str],
+        statement_type: str,
+    ) -> str | None:
+        """Тот же canonical + те же роли уже в графе (user + assistant ingest)."""
+        key = tuple(sorted(roles.items()))
+        for factor in self.store.list_semantic_factors():
+            rel = factor.relation
+            if rel is None or rel.canonical_label != canonical:
+                continue
+            if (factor.metadata or {}).get("statement_type", "assertion") != statement_type:
+                continue
+            if tuple(sorted(factor.roles.items())) == key:
+                return str(getattr(factor, "fid", factor.uid))
+        return None
+
+    def _bind_subject_surface(self, subj: str | None) -> None:
+        if not subj:
+            return
+        s_uid = slug_uid(subj[2:] if subj.startswith("M_") else subj)
+        m_uid = self._m_uid(s_uid)
+        if s_uid not in self.store.ah.S:
+            return
+        if any(
+            l.id in {LinkId.ASSOC.value, LinkId.BIND.value}
+            and {l.e1.target_uid, l.e2.target_uid} == {m_uid, s_uid}
+            for l in self.store.ah.L.values()
+        ):
+            return
+        self.store.add_link(
+            AssocLink(
+                uid=self.store.new_uid("L_BIND"),
+                id=LinkId.BIND.value,
+                w=1.0,
+                e1=self.store.m_ref(m_uid),
+                e2=self.store.s_ref(s_uid),
+            )
         )
-        actant_ms = [f.target_uid for f in fillers.values()]  # type: ignore[attr-defined]
-        self._weave_assoc_mesh(actant_ms, w=self.hp.initial_w)
-
-        subj = cand.roles.get("SUBJECT")
-        if subj:
-            s_uid = slug_uid(subj[2:] if subj.startswith("M_") else subj)
-            m_uid = self._m_uid(s_uid)
-            if s_uid in self.store.ah.S and not any(
-                l.id in {LinkId.ASSOC.value, LinkId.BIND.value}
-                and {l.e1.target_uid, l.e2.target_uid} == {m_uid, s_uid}
-                for l in self.store.ah.L.values()
-            ):
-                self.store.add_link(
-                    AssocLink(
-                        uid=self.store.new_uid("L_BIND"),
-                        id=LinkId.BIND.value,
-                        w=1.0,
-                        e1=self.store.m_ref(m_uid),
-                        e2=self.store.s_ref(s_uid),
-                    )
-                )
-        return n_uid
 
     def _weave_assoc_mesh(self, m_uids: list[str], *, w: float) -> None:
-        """Complete ASSOC graph among distinct m-actants (shared micro-theme)."""
+        """ASSOC между актантами одного факта (микротема для ignition)."""
         uniq: list[str] = []
         seen: set[str] = set()
         for u in m_uids:
@@ -335,12 +347,35 @@ class Transform:
                     )
                 )
 
-    def _resolve_value(self, value: str) -> str:
+    def _compound_role_heads(self, perception: PerceptionResult) -> set[str]:
+        """Head token of multi-word role fillers — не материализовать отдельный seed."""
+        heads: set[str] = set()
+        for cand in perception.candidates:
+            for val in cand.roles.values():
+                raw = val[2:] if str(val).startswith("M_") else str(val)
+                norm = raw.lower().replace("ё", "е").strip()
+                parts = [p for p in re.split(r"[\s_]+", norm) if p]
+                if len(parts) >= 2:
+                    heads.add(slug_uid(parts[0]))
+        return heads
+
+    def _resolve_bare(self, value: str, context: str | None = None) -> str:
         raw = value[2:] if str(value).startswith("M_") else str(value)
-        uid = slug_uid(raw)
+        if self.identity is not None and self.identity.enabled:
+            hit = self.identity.resolve_bare_uid(raw, context=context)
+            if hit:
+                return hit if not hit.startswith("M_") else hit[2:]
+        return slug_uid(raw)
+
+    def _resolve_value(self, value: str, context: str | None = None) -> str:
+        raw = value[2:] if str(value).startswith("M_") else str(value)
+        uid = self._resolve_bare(raw, context=context)
         m_uid = self._m_uid(uid)
-        self.store.ensure_abstract(uid, {raw.lower()})
+        surface = raw.lower().replace("ё", "е")
+        self.store.ensure_abstract(uid, {surface})
         self.store.ensure_m(m_uid, _label_from_uid(uid))
+        if self.identity is not None:
+            self.identity.attach_alias(uid, surface)
         return m_uid
 
     @staticmethod

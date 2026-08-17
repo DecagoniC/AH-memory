@@ -11,9 +11,10 @@ from ah_memory.config import DeepSeekConfig, load_config
 from ah_memory.eval.gold import rabbit_gold
 from ah_memory.eval.m4 import GoldItem, M4Report, evaluate_m4
 from ah_memory.examples.rabbit import RABBIT_TEXT, build_rabbit_memory
+from ah_memory.factor_graph import Factor
 from ah_memory.perception import _is_question, _norm
 from ah_memory.store import AHStore
-from ah_memory.types import Hyperlink, Section
+from ah_memory.types import Section
 
 
 @dataclass
@@ -33,12 +34,16 @@ class CompareTurn:
 
 
 def facts_to_corpus(store: AHStore) -> list[str]:
-    """Человекочитаемые факты из гиперсвязей → чанки для RAG."""
+    """Человекочитаемые факты из semantic factors / events → чанки для RAG."""
     lines: list[str] = []
-    for n in store.find_hypernodes():
-        line = _fmt_hyperlink(store, n)
+    for factor in store.list_semantic_factors():
+        line = _fmt_factor(store, factor)
         if line:
             lines.append(line)
+    for event in store.list_events():
+        span = (event.raw_span or "").strip()
+        if span and span not in lines:
+            lines.append(span)
     return lines
 
 
@@ -74,33 +79,35 @@ def build_live_corpus(
     return "\n\n".join(uniq) if uniq else "Корпус пуст."
 
 
-def _fmt_hyperlink(store: AHStore, n: Hyperlink) -> str | None:
+def _label_of(store: AHStore, uid: str) -> str:
+    bare = uid[2:] if uid.startswith("M_") else uid
     try:
-        tpl = store.get_template(n.template.target_uid)
-        pred = tpl.predicate.target_uid
+        m = store.get_symbol(uid if uid.startswith("M_") else f"M_{bare}")
+        for p in m.Pr:
+            if p.name == "label" and p.value:
+                return p.value
     except Exception:
+        pass
+    if bare in store.ah.S:
+        forms = store.ah.S[bare].R.get("TEXT") or set()
+        if forms:
+            return next(iter(forms))
+    return bare.replace("_", " ").lower()
+
+
+def _fmt_factor(store: AHStore, factor: Factor) -> str | None:
+    pred = (
+        factor.relation.canonical_label.upper()
+        if factor.relation is not None
+        else ""
+    )
+    if not pred:
         return None
-
-    def lab(uid: str) -> str:
-        bare = uid[2:] if uid.startswith("M_") else uid
-        try:
-            m = store.get_symbol(uid if uid.startswith("M_") else f"M_{bare}")
-            for p in m.Pr:
-                if p.name == "label" and p.value:
-                    return p.value
-        except Exception:
-            pass
-        if bare in store.ah.S:
-            forms = store.ah.S[bare].R.get("TEXT") or set()
-            if forms:
-                return next(iter(forms))
-        return bare.replace("_", " ").lower()
-
-    roles = {r.value: lab(f.target_uid) for r, f in n.fillers.items()}
+    roles = {role: _label_of(store, uid) for role, uid in factor.roles.items()}
     subj = roles.get("SUBJECT", "?")
-    if pred == "IS" and "OBJECT" in roles:
+    if pred in {"IS", "IS_A"} and "OBJECT" in roles:
         return f"{subj} — {roles['OBJECT']}"
-    if pred == "LIVE_IN" and "LOCATION" in roles:
+    if pred in {"LIVE_IN", "LIVEIN"} and "LOCATION" in roles:
         return f"{subj} учится/обитает в {roles['LOCATION']}"
     if pred == "HAVE" and "OBJECT" in roles:
         return f"у {subj} есть {roles['OBJECT']}"
@@ -276,16 +283,15 @@ def _probe_question(fact_text: str) -> str:
 def _summarize_ingest(agent: Agent, created: list[str]) -> str:
     if not created:
         return ""
+    by_uid = {factor.uid: factor for factor in agent.store.list_semantic_factors()}
     bits: list[str] = []
     for uid in created[:12]:
-        try:
-            raw = agent.store.get_hypernode(uid)
-            line = _fmt_hyperlink(agent.store, raw)
+        factor = by_uid.get(uid)
+        if factor is not None:
+            line = _fmt_factor(agent.store, factor)
             if line:
                 bits.append(line)
                 continue
-        except Exception:
-            pass
         try:
             m = agent.store.get_symbol(uid if uid.startswith("M_") else f"M_{uid}")
             for p in m.Pr:

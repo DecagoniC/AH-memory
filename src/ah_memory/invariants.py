@@ -1,10 +1,10 @@
 """Structural invariants for Junior acceptance."""
 from __future__ import annotations
 
-from collections import defaultdict, deque
+from collections import defaultdict
 
 from ah_memory.store import AHStore, iter_follow_edges, iter_is_a_edges
-from ah_memory.types import Hyperlink, MRef, Property, SRef, SecondOrderSymbol
+from ah_memory.types import MRef, Property, SRef
 
 
 class InvariantError(Exception):
@@ -20,7 +20,7 @@ def _has_cycle(edges: list[tuple[str, str]]) -> bool:
         adj[a].append(b)
         nodes.add(a)
         nodes.add(b)
-    state: dict[str, int] = {n: 0 for n in nodes}  # 0=unseen,1=stack,2=done
+    state: dict[str, int] = {n: 0 for n in nodes}
 
     def dfs(u: str) -> bool:
         state[u] = 1
@@ -66,32 +66,14 @@ def _refs_typed(store: AHStore) -> list[str]:
     for link in store.ah.L.values():
         check_ref(link.e1, f"link {link.uid}.e1")
         check_ref(link.e2, f"link {link.uid}.e2")
-
-    for e in store.ah.all_hyper().values():
-        if isinstance(e, Hyperlink):
-            check_ref(e.template, f"N {e.uid}.template")
-            for role, filler in e.fillers.items():
-                check_ref(filler, f"N {e.uid}.{role}")
-        elif isinstance(e, SecondOrderSymbol):
-            continue
-        else:
-            for attr in ("operands", "items", "predicate"):
-                val = getattr(e, attr, None)
-                if isinstance(val, list):
-                    for i, r in enumerate(val):
-                        check_ref(r, f"{getattr(e, 'uid', '?')}.{attr}[{i}]")
-                elif val is not None:
-                    check_ref(val, f"{getattr(e, 'uid', '?')}.{attr}")
     return issues
 
 
 def validate(store: AHStore) -> None:
     issues: list[str] = []
-    is_a = list(iter_is_a_edges(store))
-    follow = list(iter_follow_edges(store))
-    if _has_cycle(is_a):
+    if _has_cycle(list(iter_is_a_edges(store))):
         issues.append("cycle in IS-A hierarchy")
-    if _has_cycle(follow):
+    if _has_cycle(list(iter_follow_edges(store))):
         issues.append("cycle in FOLLOW (H)")
     issues.extend(_property_names_unique(store))
     issues.extend(_refs_typed(store))
@@ -100,19 +82,3 @@ def validate(store: AHStore) -> None:
             issues.append(f"R partition violated for {s.uid}")
     if issues:
         raise InvariantError(issues)
-
-
-def reachable_from(roots: set[str], edges: list[tuple[str, str]]) -> set[str]:
-    adj: dict[str, list[str]] = defaultdict(list)
-    for a, b in edges:
-        adj[a].append(b)
-        adj[b].append(a)
-    seen = set(roots)
-    q = deque(roots)
-    while q:
-        u = q.popleft()
-        for v in adj[u]:
-            if v not in seen:
-                seen.add(v)
-                q.append(v)
-    return seen

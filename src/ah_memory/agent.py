@@ -1,4 +1,8 @@
-"""Cognitive agent loop: perceive → transform → ignite → answer."""
+"""Agent: perceive → transform → ignite → (опц.) ответить из графа.
+
+Оркестратор без LLM-диалога (диалог — dialogue.DialogueAgent поверх Agent).
+Читать после transform/identity; ignition — чёрный ящик «посеяли UID → тики».
+"""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
@@ -10,16 +14,16 @@ from ah_memory.ignition import ActivationSeed, IgnitionEngine, TickTrace
 from ah_memory.perception import PerceptionBackend, PerceptionResult, SeedPerception, FactCandidate
 from ah_memory.store import AHStore
 from ah_memory.transform import IngestReport, Transform
-from ah_memory.types import Role, Section
+from ah_memory.types import Section
 
 
 def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
-    """Keep only confident structural facts from chat replies (drop greetings / fluff)."""
+    """Из ответа ассистента — только уверенные proposals/explanations."""
     from ah_memory.morph import is_nounish, sanitize_roles, seeds_from_roles
 
     kept: list[FactCandidate] = []
     for c in perc.candidates:
-        if c.confidence < 0.85:
+        if c.confidence < 0.75 or c.statement_type not in {"proposal", "explanation"}:
             continue
         roles = sanitize_roles(c.roles)
         if roles is None:
@@ -40,6 +44,8 @@ def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
                 c.confidence,
                 raw_relation=c.raw_relation,
                 canonical_relation=c.canonical_relation,
+                statement_type=c.statement_type,
+                source="assistant",
             )
         )
     seeds = seeds_from_roles(kept)
@@ -51,6 +57,8 @@ def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
 
 @dataclass
 class AgentReply:
+    """Ответ ask/step + трасса активации для UI."""
+
     answer: str
     trace_uids: list[str]
     traces: list[TickTrace] = field(default_factory=list)
@@ -61,6 +69,9 @@ class AgentReply:
 
 
 class Agent:
+    # ── Сборка пайплайна ─────────────────────────────────────────────────────
+    # perception → Transform(+identity) → IgnitionEngine; dsl — эвристики ответа.
+
     def __init__(
         self,
         store: AHStore | None = None,
@@ -70,6 +81,7 @@ class Agent:
         relation_normalizer=None,
         parameter_generator=None,
         state_engine=None,
+        identity=None,
     ) -> None:
         self.store = store or AHStore()
         self.hp = hp or HyperParams()
@@ -80,17 +92,28 @@ class Agent:
             relation_normalizer=relation_normalizer,
             parameter_generator=parameter_generator,
             state_engine=state_engine,
+            identity=identity,
         )
         self.ignition = IgnitionEngine(self.store, self.hp)
         self.dsl = DSLInterpreter(self.store)
 
-    def ingest(self, text: str, section: Section = Section.C, *, source: str = "user") -> IngestReport:
-        """Perceive → materialize S/m seeds + N factors."""
-        perc = self.perception.parse(text, list(self.ignition.wm.contents()))
+    def ingest(
+        self,
+        text: str,
+        section: Section = Section.C,
+        *,
+        source: str = "user",
+        perception: PerceptionResult | None = None,
+    ) -> IngestReport:
+        """Текст → граф (+ короткий прогон активации по новым seeds)."""
+        if perception is None:
+            perc = self.perception.parse(text, list(self.ignition.wm.contents()))
+        else:
+            perc = perception
         if source == "assistant":
             perc = _filter_assistant_perception(perc)
         report = self.transform.apply(perc, section=section)
-        # activate only role-bearing seeds (report.seed_uids already from perception.seed_tokens)
+        # Зачем: новые символы сразу «подогреть», чтобы следующий ask их видел в WM.
         seeds = [
             ActivationSeed(uid=u, delta_x=self.hp.seed_delta) for u in report.seed_uids
         ]
@@ -100,8 +123,18 @@ class Agent:
         collect(self.store, self.hp)
         return report
 
-    def ask(self, question: str, ticks: int = 6) -> AgentReply:
-        perc = self.perception.parse(question, list(self.ignition.wm.contents()))
+    def ask(
+        self,
+        question: str,
+        ticks: int = 6,
+        *,
+        perception: PerceptionResult | None = None,
+    ) -> AgentReply:
+        # Зачем: не писать вопрос как факт, а найти UID по seeds → ignition → compose.
+        if perception is None:
+            perc = self.perception.parse(question, list(self.ignition.wm.contents()))
+        else:
+            perc = perception
         seeds: list[ActivationSeed] = []
         seen: set[str] = set()
         for u in perc.seed_tokens:
@@ -153,7 +186,7 @@ class Agent:
         )
 
     def step_message(self, text: str, ticks: int = 3) -> AgentReply:
-        """Continuous perception cycle (bonus track)."""
+        """Один шаг цикла: вопрос → ask, иначе → ingest."""
         perc = self.perception.parse(text, list(self.ignition.wm.contents()))
         if perc.kind == "question" and not perc.candidates:
             return self.ask(text, ticks=ticks)
@@ -178,6 +211,7 @@ class Agent:
         *,
         answer: str = "",
     ) -> dict:
+        # Зачем: единый JSON для web/dialogue — узлы, факторы, events, state.
         requested = set(activated_nodes)
         semantic_factor_ids = set(self.store.semantic_factors)
         actual_nodes = [
@@ -243,6 +277,7 @@ class Agent:
     def _compose_answer(
         self, question: str, seeds: list[str], trace: list[str]
     ) -> tuple[str, list[str]]:
+        # Эвристический ответ без LLM (кто/где/роли факторов + labels активированных M).
         q = question.lower()
         subjects = self._resolve_subjects(seeds + trace)
         support: list[str] = []
@@ -256,44 +291,54 @@ class Agent:
             return "неизвестно", []
         if "где" in q or "обита" in q:
             for subj in subjects:
-                for n in self.store.find_roles(Role.SUBJECT, subj):
-                    loc = n.fillers.get(Role.LOCATION)
+                for factor in self.store.list_semantic_factors():
+                    if factor.roles.get("SUBJECT") != subj:
+                        continue
+                    loc = factor.roles.get("LOCATION")
                     if loc:
-                        support.extend([subj, n.uid, loc.target_uid])
-                        return f"location:{loc.target_uid}", support
+                        support.extend([subj, factor.uid, loc])
+                        return f"location:{loc}", support
         if "цвет" in q or "шерст" in q:
-            for n in self.store.find_hypernodes():
-                try:
-                    pred = self.store.get_template(n.template.target_uid).predicate.target_uid
-                except Exception:
+            for factor in self.store.list_semantic_factors():
+                pred = (
+                    factor.relation.canonical_label.upper()
+                    if factor.relation is not None
+                    else ""
+                )
+                if pred not in {"BE_COLORED", "COLORED", "HAS_COLOR"}:
                     continue
-                if pred != "BE_COLORED":
-                    continue
-                obj = n.fillers.get(Role.OBJECT)
-                time_r = n.fillers.get(Role.TIME)
+                obj = factor.roles.get("OBJECT")
+                time_r = factor.roles.get("TIME")
                 if not obj:
                     continue
-                if "зим" in q and time_r and "WINTER" not in time_r.target_uid.upper():
+                if "зим" in q and time_r and "WINTER" not in time_r.upper():
                     continue
-                if "лет" in q and time_r and "SUMMER" not in time_r.target_uid.upper():
+                if "лет" in q and time_r and "SUMMER" not in time_r.upper():
                     continue
-                support.extend([n.uid, obj.target_uid] + ([time_r.target_uid] if time_r else []))
-                return f"color:{obj.target_uid}", support
+                support.extend([factor.uid, obj] + ([time_r] if time_r else []))
+                return f"color:{obj}", support
         if "почему" in q or "быстр" in q:
             for subj in subjects:
-                for n in self.store.find_roles(Role.SUBJECT, subj):
-                    obj = n.fillers.get(Role.OBJECT)
-                    cause = n.fillers.get(Role.CAUSE)
-                    try:
-                        pred = self.store.get_template(n.template.target_uid).predicate.target_uid
-                    except Exception:
-                        pred = ""
-                    if pred == "HAVE" and obj and "LEG" in obj.target_uid.upper():
-                        support.extend([subj, n.uid, obj.target_uid])
-                        return f"cause:{obj.target_uid}", support
+                for factor in self.store.list_semantic_factors():
+                    if factor.roles.get("SUBJECT") != subj:
+                        continue
+                    obj = factor.roles.get("OBJECT")
+                    cause = factor.roles.get("CAUSE")
+                    how = factor.roles.get("HOW-TO")
+                    pred = (
+                        factor.relation.canonical_label.upper()
+                        if factor.relation is not None
+                        else ""
+                    )
                     if cause:
-                        support.extend([subj, n.uid, cause.target_uid])
-                        return f"cause:{cause.target_uid}", support
+                        support.extend([subj, factor.uid, cause])
+                        return f"cause:{cause}", support
+                    if how:
+                        support.extend([subj, factor.uid, how])
+                        return f"cause:{how}", support
+                    if pred == "HAVE" and obj:
+                        support.extend([subj, factor.uid, obj])
+                        return f"cause:{obj}", support
         labels: list[str] = []
         for uid in trace:
             try:

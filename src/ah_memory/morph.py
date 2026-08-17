@@ -21,7 +21,6 @@ STOP = {
     "этот", "эта", "эти", "тот", "та", "те", "там", "тут", "здесь", "куда", "откуда",
     "очень", "можно", "нужно", "надо", "есть", "будет", "быть", "был", "была", "были",
     "привет", "пока", "спасибо", "пожалуйста", "отлично", "хорошо", "ладно", "кстати",
-    "младший", "старший",  # kinship adj — keep брат/имя as head, drop bare adj seeds
     "the", "a", "an", "of", "to", "in", "is", "are", "was", "were", "be", "and", "or",
     "who", "what", "when", "where", "why", "how", "can", "may", "if", "then",
 }
@@ -109,16 +108,13 @@ def lemma(word: str) -> str:
     return nf
 
 
-def pos_of(word: str) -> str | None:
-    w = _norm(word)
-    if not w or w.isdigit():
-        return "NUMR" if w.isdigit() else None
-    if re.fullmatch(r"[a-z0-9_\-]+", w):
-        return "LATN"
-    return _parse(w).tag.POS
-
-
 _PRONOUNS = frozenset({"я", "мы", "ты"})
+
+
+def _is_acronym(word: str) -> bool:
+    """Короткие аббревиатуры (днд, dnd, bmw) — pymorphy не знает, но это сущности."""
+    w = _norm(word)
+    return 2 <= len(w) <= 8 and w.isalpha()
 
 
 def is_entity_token(word: str, *, allow_pronoun: bool = False) -> bool:
@@ -131,6 +127,8 @@ def is_entity_token(word: str, *, allow_pronoun: bool = False) -> bool:
     if w in STOP or len(w) < 2:
         return False
     if w.isdigit():
+        return True
+    if _is_acronym(w):
         return True
     # latin / digit tokens stay as-is (stable UIDs)
     if re.fullmatch(r"[a-z0-9_\-]+", w):
@@ -152,6 +150,8 @@ def is_nounish(word: str, *, allow_pronoun: bool = False) -> bool:
     w = _norm(word)
     if not w or w in STOP:
         return False
+    if _is_acronym(w):
+        return True
     if w.isdigit() or re.fullmatch(r"[a-z0-9_\-]+", w):
         return True
     p = _parse(w)
@@ -166,10 +166,16 @@ def is_nounish(word: str, *, allow_pronoun: bool = False) -> bool:
 
 def slug_uid(token: str) -> str:
     """Surface / multiword → UPPER_SNAKE lemma UID."""
-    t = _norm(token).replace("—", "-").replace("–", "-")
+    t = _norm(token).replace("—", "-").replace("–", "-").replace("&", "")
     parts = [p for p in re.split(r"[^a-zа-я0-9]+", t) if p]
     if not parts:
         return "UNK"
+    if len(parts) > 1 and all(len(p) == 1 for p in parts):
+        compact = "".join(parts)
+        if _is_acronym(compact):
+            return compact.upper()
+    if len(parts) == 1 and _is_acronym(parts[0]):
+        return parts[0].upper()
     lemmas: list[str] = []
     for p in parts:
         lem = lemma(p)
@@ -253,7 +259,7 @@ def sanitize_roles(roles: dict[str, str]) -> dict[str, str] | None:
         if uid_too_wide(bare):
             return None
         parts = [p for p in re.split(r"[_\s]+", bare.lower()) if p]
-        if role in {"SUBJECT", "OBJECT", "LOCATION", "TOOL", "MATERIAL"}:
+        if role in {"SUBJECT", "OBJECT", "LOCATION", "TOOL", "MATERIAL", "WITH"}:
             allow_p = role == "SUBJECT"
             if bare.isdigit() or (re.fullmatch(r"[A-Za-z0-9_]+", bare) and "_" not in bare and len(bare) <= 8):
                 # years / short latin codes
@@ -264,7 +270,7 @@ def sanitize_roles(roles: dict[str, str]) -> dict[str, str] | None:
             if head is None:
                 return None
             # OBJECT/LOCATION must be nounish (drop pure adjectives like СЕРЬЁЗНЫЙ)
-            if role in {"OBJECT", "LOCATION", "TOOL", "MATERIAL"}:
+            if role in {"OBJECT", "LOCATION", "TOOL", "MATERIAL", "WITH"}:
                 if not any(is_nounish(p, allow_pronoun=False) for p in head.lower().split("_")):
                     return None
             out[role] = head

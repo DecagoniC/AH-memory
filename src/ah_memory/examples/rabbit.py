@@ -1,10 +1,10 @@
-"""Эталон «заяц»: явные FactCandidate (монография), без доменного хардкода в парсере."""
+"""Эталон «заяц» для M4-бенчмарка: явные FactCandidate, без шаблонов T/N."""
 from __future__ import annotations
 
 from ah_memory.perception import FactCandidate, PerceptionResult
 from ah_memory.store import AHStore
 from ah_memory.transform import Transform
-from ah_memory.types import AssocLink, ElementList, LinkId, Property, Role, Section
+from ah_memory.types import AssocLink, LinkId, Property, SecondOrderSymbol, Section
 
 
 RABBIT_TEXT = (
@@ -94,21 +94,18 @@ def build_rabbit_memory() -> AHStore:
         )
 
     if "EP_LESSON_1" not in store.ah.H:
-        nodes = [n.uid for n in store.find_hypernodes()][:2]
         store.add_element(
             Section.H,
-            ElementList(
+            SecondOrderSymbol(
                 uid="EP_LESSON_1",
-                items=[store.m_ref(u) for u in nodes] or [store.m_ref("M_HARE")],
                 Pr=[Property(name="label", value="Урок: кто такой заяц")],
                 Mt=[Property(name="kind", value="Episode")],
             ),
         )
         store.add_element(
             Section.H,
-            ElementList(
+            SecondOrderSymbol(
                 uid="EP_LESSON_2",
-                items=[store.m_ref("M_HARE")],
                 Pr=[Property(name="label", value="Урок: линька")],
                 Mt=[Property(name="kind", value="Episode")],
             ),
@@ -127,31 +124,24 @@ def build_rabbit_memory() -> AHStore:
 
 def extracted_fact_keys(store: AHStore) -> set[str]:
     keys: set[str] = set()
-    for n in store.find_hypernodes():
-        try:
-            tpl = store.get_template(n.template.target_uid)
-            pred = tpl.predicate.target_uid
-        except Exception:
-            continue
-        subj = n.fillers.get(Role.SUBJECT)
-        obj = n.fillers.get(Role.OBJECT)
-        if pred == "IS" and subj and obj:
-            s = subj.target_uid.replace("M_", "")
-            o = obj.target_uid.replace("M_", "")
-            keys.add(f"IS:{s}:{o}")
-        if pred == "LIVE_IN" and subj:
-            s = subj.target_uid.replace("M_", "")
-            keys.add(f"LIVE_IN:{s}")
+    for factor in store.list_semantic_factors():
+        pred = (
+            factor.relation.canonical_label.upper()
+            if factor.relation is not None
+            else ""
+        )
+        subj = (factor.roles.get("SUBJECT") or "").replace("M_", "")
+        obj = (factor.roles.get("OBJECT") or "").replace("M_", "")
+        if pred in {"IS", "IS_A"} and subj and obj:
+            keys.add(f"IS:{subj}:{obj}")
+        if pred in {"LIVE_IN", "LIVEIN"} and subj:
+            keys.add(f"LIVE_IN:{subj}")
         if pred == "HAVE" and subj and obj:
-            s = subj.target_uid.replace("M_", "")
-            o = obj.target_uid.replace("M_", "")
-            keys.add(f"HAVE:{s}:{o}")
+            keys.add(f"HAVE:{subj}:{obj}")
         if pred == "RUN" and subj:
-            keys.add(f"RUN:{subj.target_uid.replace('M_', '')}")
-        if pred == "BE_COLORED" and subj and obj:
-            s = subj.target_uid.replace("M_", "")
-            o = obj.target_uid.replace("M_", "")
-            keys.add(f"BE_COLORED:{s}:{o}")
+            keys.add(f"RUN:{subj}")
+        if pred in {"BE_COLORED", "COLORED", "HAS_COLOR"} and subj and obj:
+            keys.add(f"BE_COLORED:{subj}:{obj}")
     return keys
 
 

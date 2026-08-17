@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from ah_memory.belief_propagation import BeliefPropagation
-from ah_memory.examples.rabbit import build_rabbit_memory
 from ah_memory.factor_graph import Factor, FactorGraph, FactorKind
 from ah_memory.ignition import IgnitionEngine
 from ah_memory.types import Property
+from tests._mini_graph import build_mini_open_store
 
 
 def _pair_graph() -> FactorGraph:
@@ -58,7 +58,7 @@ def test_counterfactual_logit_contribution_mode() -> None:
 
 
 def test_ignition_reuses_topology_until_structure_changes() -> None:
-    store = build_rabbit_memory()
+    store = build_mini_open_store()
     engine = IgnitionEngine(store)
     graph = engine.graph
     engine.tick()
@@ -71,7 +71,7 @@ def test_ignition_reuses_topology_until_structure_changes() -> None:
 
 
 def test_tau_and_properties_do_not_invalidate_topology_revision() -> None:
-    store = build_rabbit_memory()
+    store = build_mini_open_store()
     revision = store.ah.revision
     store.ah.tau += 1
     uid = next(

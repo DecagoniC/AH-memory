@@ -1,0 +1,1859 @@
+{
+  "dataset": "entity_resolution_v2",
+  "symbols": [
+    {
+      "uid": "s_001",
+      "name": "Юлия",
+      "aliases": [
+        "Юля",
+        "Yuliya",
+        "Yulia",
+        "yuliya",
+        "Юлия "
+      ],
+      "kind": "person",
+      "context_cues": []
+    },
+    {
+      "uid": "s_002",
+      "name": "Антон",
+      "aliases": [],
+      "kind": "person",
+      "context_cues": []
+    },
+    {
+      "uid": "s_005",
+      "name": "Мария",
+      "aliases": [
+        "Маша"
+      ],
+      "kind": "person",
+      "context_cues": []
+    },
+    {
+      "uid": "s_006",
+      "name": "Сергей",
+      "aliases": [
+        "Серёжа",
+        "Сережа"
+      ],
+      "kind": "person",
+      "context_cues": []
+    },
+    {
+      "uid": "s_003",
+      "name": "Москва",
+      "aliases": [
+        "Moskva",
+        "moskva"
+      ],
+      "kind": "place",
+      "context_cues": []
+    },
+    {
+      "uid": "s_004",
+      "name": "Санкт-Петербург",
+      "aliases": [
+        "Петербург",
+        "Питер",
+        "Санкт Петербург",
+        "санкт  петербург",
+        "St Petersburg"
+      ],
+      "kind": "place",
+      "context_cues": []
+    },
+    {
+      "uid": "s_007",
+      "name": "Казань",
+      "aliases": [],
+      "kind": "place",
+      "context_cues": []
+    },
+    {
+      "uid": "s_010",
+      "name": "автомобиль",
+      "aliases": [
+        "авто",
+        "машина"
+      ],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_011",
+      "name": "врач",
+      "aliases": [
+        "доктор"
+      ],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_012",
+      "name": "покупка",
+      "aliases": [
+        "приобретение"
+      ],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_013",
+      "name": "ноутбук",
+      "aliases": [
+        "ноут",
+        "лэптоп"
+      ],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_014",
+      "name": "телефон",
+      "aliases": [
+        "смартфон",
+        "мобильник"
+      ],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_020",
+      "name": "мотоцикл",
+      "aliases": [
+        "байк"
+      ],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_021",
+      "name": "велосипед",
+      "aliases": [
+        "велик"
+      ],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_022",
+      "name": "пациент",
+      "aliases": [],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_023",
+      "name": "медсестра",
+      "aliases": [],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_030",
+      "name": "BMW",
+      "aliases": [
+        "bmw",
+        "Bmw",
+        " BMW "
+      ],
+      "kind": "brand",
+      "context_cues": []
+    },
+    {
+      "uid": "s_031",
+      "name": "Audi",
+      "aliases": [
+        "audi",
+        "AUDI"
+      ],
+      "kind": "brand",
+      "context_cues": []
+    },
+    {
+      "uid": "s_032",
+      "name": "Opel",
+      "aliases": [],
+      "kind": "brand",
+      "context_cues": []
+    },
+    {
+      "uid": "s_040",
+      "name": "транспорт",
+      "aliases": [],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_041",
+      "name": "медицина",
+      "aliases": [],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_050",
+      "name": "Иван",
+      "aliases": [],
+      "kind": "person",
+      "context_cues": [
+        "москва",
+        "москве",
+        "москвы"
+      ]
+    },
+    {
+      "uid": "s_051",
+      "name": "Иван",
+      "aliases": [],
+      "kind": "person",
+      "context_cues": [
+        "казань",
+        "казани",
+        "казанью"
+      ]
+    },
+    {
+      "uid": "s_052",
+      "name": "Анна",
+      "aliases": [],
+      "kind": "person",
+      "context_cues": [
+        "берлин",
+        "берлине"
+      ]
+    },
+    {
+      "uid": "s_053",
+      "name": "Анна",
+      "aliases": [],
+      "kind": "person",
+      "context_cues": [
+        "париж",
+        "париже"
+      ]
+    },
+    {
+      "uid": "s_054",
+      "name": "Берлин",
+      "aliases": [],
+      "kind": "place",
+      "context_cues": []
+    },
+    {
+      "uid": "s_055",
+      "name": "Париж",
+      "aliases": [],
+      "kind": "place",
+      "context_cues": []
+    },
+    {
+      "uid": "s_056",
+      "name": "Нью-Йорк",
+      "aliases": [
+        "New York",
+        "нью йорк",
+        "NewYork"
+      ],
+      "kind": "place",
+      "context_cues": []
+    },
+    {
+      "uid": "s_057",
+      "name": "Toyota",
+      "aliases": [
+        "toyota",
+        "TOYOTA"
+      ],
+      "kind": "brand",
+      "context_cues": []
+    },
+    {
+      "uid": "s_058",
+      "name": "Lada",
+      "aliases": [
+        "lada",
+        "ЛАДА"
+      ],
+      "kind": "brand",
+      "context_cues": []
+    },
+    {
+      "uid": "s_059",
+      "name": "инженер",
+      "aliases": [],
+      "kind": "concept",
+      "context_cues": []
+    },
+    {
+      "uid": "s_060",
+      "name": "программист",
+      "aliases": [],
+      "kind": "concept",
+      "context_cues": []
+    }
+  ],
+  "graph_facts": [
+    {
+      "subject": "s_001",
+      "relation": "LIVES_IN",
+      "object": "s_003"
+    },
+    {
+      "subject": "s_001",
+      "relation": "WORKS_FOR",
+      "object": "s_011"
+    },
+    {
+      "subject": "s_002",
+      "relation": "PURCHASE",
+      "object": "s_030"
+    },
+    {
+      "subject": "s_002",
+      "relation": "SELL",
+      "object": "s_030"
+    },
+    {
+      "subject": "s_002",
+      "relation": "PURCHASE",
+      "object": "s_032"
+    },
+    {
+      "subject": "s_005",
+      "relation": "LIVES_IN",
+      "object": "s_007"
+    },
+    {
+      "subject": "s_006",
+      "relation": "PURCHASE",
+      "object": "s_013"
+    },
+    {
+      "subject": "s_006",
+      "relation": "PURCHASE",
+      "object": "s_014"
+    },
+    {
+      "subject": "s_010",
+      "relation": "IS_A",
+      "object": "s_040"
+    },
+    {
+      "subject": "s_011",
+      "relation": "PART_OF",
+      "object": "s_041"
+    },
+    {
+      "subject": "s_050",
+      "relation": "LIVES_IN",
+      "object": "s_003"
+    },
+    {
+      "subject": "s_051",
+      "relation": "LIVES_IN",
+      "object": "s_007"
+    },
+    {
+      "subject": "s_052",
+      "relation": "LIVES_IN",
+      "object": "s_054"
+    },
+    {
+      "subject": "s_053",
+      "relation": "LIVES_IN",
+      "object": "s_055"
+    }
+  ],
+  "cases_total": 90,
+  "cases_by_type": {
+    "AMBIGUOUS": 6,
+    "CONTEXTUAL": 6,
+    "HOLD_OUT": 11,
+    "MORPHOLOGY": 27,
+    "NEGATIVE": 20,
+    "SEMANTIC_NEAR": 2,
+    "SURFACE": 10,
+    "SYNONYM": 8
+  },
+  "cases": [
+    {
+      "case_id": "morph_yulia_01",
+      "mention": "Юли",
+      "target_uid": "s_001",
+      "candidate_uids": [
+        "s_001",
+        "s_002",
+        "s_003"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_yulia_02",
+      "mention": "Юлию",
+      "target_uid": "s_001",
+      "candidate_uids": [
+        "s_001",
+        "s_002",
+        "s_003"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_yulia_03",
+      "mention": "Юлией",
+      "target_uid": "s_001",
+      "candidate_uids": [
+        "s_001",
+        "s_002",
+        "s_003"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_yulia_04",
+      "mention": "Юлии",
+      "target_uid": "s_001",
+      "candidate_uids": [
+        "s_001",
+        "s_002",
+        "s_003"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_yulia_05",
+      "mention": "Юле",
+      "target_uid": "s_001",
+      "candidate_uids": [
+        "s_001",
+        "s_002",
+        "s_003"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_moscow_01",
+      "mention": "Москве",
+      "target_uid": "s_003",
+      "candidate_uids": [
+        "s_003",
+        "s_004",
+        "s_001"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_moscow_02",
+      "mention": "Москву",
+      "target_uid": "s_003",
+      "candidate_uids": [
+        "s_003",
+        "s_004",
+        "s_001"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_moscow_03",
+      "mention": "Москвы",
+      "target_uid": "s_003",
+      "candidate_uids": [
+        "s_003",
+        "s_004",
+        "s_001"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_moscow_04",
+      "mention": "Москвой",
+      "target_uid": "s_003",
+      "candidate_uids": [
+        "s_003",
+        "s_004",
+        "s_001"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_car_01",
+      "mention": "автомобиля",
+      "target_uid": "s_010",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_021"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_car_02",
+      "mention": "автомобилем",
+      "target_uid": "s_010",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_021"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_car_03",
+      "mention": "автомобилю",
+      "target_uid": "s_010",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_021"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_car_04",
+      "mention": "автомобиле",
+      "target_uid": "s_010",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_021"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_anton_01",
+      "mention": "Антона",
+      "target_uid": "s_002",
+      "candidate_uids": [
+        "s_002",
+        "s_001",
+        "s_003"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_anton_02",
+      "mention": "Антону",
+      "target_uid": "s_002",
+      "candidate_uids": [
+        "s_002",
+        "s_001",
+        "s_003"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_anton_03",
+      "mention": "Антоном",
+      "target_uid": "s_002",
+      "candidate_uids": [
+        "s_002",
+        "s_001",
+        "s_003"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_anton_04",
+      "mention": "Антоне",
+      "target_uid": "s_002",
+      "candidate_uids": [
+        "s_002",
+        "s_001",
+        "s_003"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_maria_01",
+      "mention": "Марии",
+      "target_uid": "s_005",
+      "candidate_uids": [
+        "s_005",
+        "s_001",
+        "s_002"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_maria_02",
+      "mention": "Марию",
+      "target_uid": "s_005",
+      "candidate_uids": [
+        "s_005",
+        "s_001",
+        "s_002"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_maria_03",
+      "mention": "Машей",
+      "target_uid": "s_005",
+      "candidate_uids": [
+        "s_005",
+        "s_001",
+        "s_002"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_maria_04",
+      "mention": "Маше",
+      "target_uid": "s_005",
+      "candidate_uids": [
+        "s_005",
+        "s_001",
+        "s_002"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_sergey_01",
+      "mention": "Сергея",
+      "target_uid": "s_006",
+      "candidate_uids": [
+        "s_006",
+        "s_002",
+        "s_005"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_sergey_02",
+      "mention": "Сергею",
+      "target_uid": "s_006",
+      "candidate_uids": [
+        "s_006",
+        "s_002",
+        "s_005"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_sergey_03",
+      "mention": "Сергеем",
+      "target_uid": "s_006",
+      "candidate_uids": [
+        "s_006",
+        "s_002",
+        "s_005"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_kazan_01",
+      "mention": "Казани",
+      "target_uid": "s_007",
+      "candidate_uids": [
+        "s_007",
+        "s_003",
+        "s_004"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_kazan_02",
+      "mention": "Казань",
+      "target_uid": "s_007",
+      "candidate_uids": [
+        "s_007",
+        "s_003",
+        "s_004"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "morph_kazan_03",
+      "mention": "Казанью",
+      "target_uid": "s_007",
+      "candidate_uids": [
+        "s_007",
+        "s_003",
+        "s_004"
+      ],
+      "case_type": "MORPHOLOGY",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "easy",
+      "notes": ""
+    },
+    {
+      "case_id": "syn_001",
+      "mention": "машина",
+      "target_uid": "s_010",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_021"
+      ],
+      "case_type": "SYNONYM",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "syn_002",
+      "mention": "доктор",
+      "target_uid": "s_011",
+      "candidate_uids": [
+        "s_011",
+        "s_022",
+        "s_023"
+      ],
+      "case_type": "SYNONYM",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "syn_003",
+      "mention": "приобретение",
+      "target_uid": "s_012",
+      "candidate_uids": [
+        "s_012",
+        "s_010",
+        "s_011"
+      ],
+      "case_type": "SYNONYM",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "syn_004",
+      "mention": "автомашина",
+      "target_uid": "s_010",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_013"
+      ],
+      "case_type": "SYNONYM",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "syn_005",
+      "mention": "ноут",
+      "target_uid": "s_013",
+      "candidate_uids": [
+        "s_013",
+        "s_014",
+        "s_010"
+      ],
+      "case_type": "SYNONYM",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "syn_006",
+      "mention": "смартфон",
+      "target_uid": "s_014",
+      "candidate_uids": [
+        "s_014",
+        "s_013",
+        "s_010"
+      ],
+      "case_type": "SYNONYM",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "syn_007",
+      "mention": "Питер",
+      "target_uid": "s_004",
+      "candidate_uids": [
+        "s_004",
+        "s_003",
+        "s_007"
+      ],
+      "case_type": "SYNONYM",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "syn_008",
+      "mention": "Маша",
+      "target_uid": "s_005",
+      "candidate_uids": [
+        "s_005",
+        "s_001",
+        "s_002"
+      ],
+      "case_type": "SYNONYM",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "neg_001",
+      "mention": "мотоцикл",
+      "target_uid": "s_020",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_021"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_010"
+    },
+    {
+      "case_id": "neg_002",
+      "mention": "пациент",
+      "target_uid": "s_022",
+      "candidate_uids": [
+        "s_011",
+        "s_022",
+        "s_023"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_011"
+    },
+    {
+      "case_id": "neg_003",
+      "mention": "Санкт-Петербург",
+      "target_uid": "s_004",
+      "candidate_uids": [
+        "s_003",
+        "s_004"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_003"
+    },
+    {
+      "case_id": "neg_004",
+      "mention": "Audi",
+      "target_uid": "s_031",
+      "candidate_uids": [
+        "s_030",
+        "s_031",
+        "s_032"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_030"
+    },
+    {
+      "case_id": "neg_005",
+      "mention": "велосипед",
+      "target_uid": "s_021",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_021"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_010"
+    },
+    {
+      "case_id": "neg_006",
+      "mention": "медсестра",
+      "target_uid": "s_023",
+      "candidate_uids": [
+        "s_011",
+        "s_022",
+        "s_023"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_011"
+    },
+    {
+      "case_id": "near_001",
+      "mention": "мотоцикл",
+      "target_uid": "s_020",
+      "candidate_uids": [
+        "s_010",
+        "s_020"
+      ],
+      "case_type": "SEMANTIC_NEAR",
+      "expected_relation": "DIFFERENT_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_010"
+    },
+    {
+      "case_id": "near_002",
+      "mention": "пациент",
+      "target_uid": "s_022",
+      "candidate_uids": [
+        "s_011",
+        "s_022"
+      ],
+      "case_type": "SEMANTIC_NEAR",
+      "expected_relation": "DIFFERENT_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_011"
+    },
+    {
+      "case_id": "neg_force_001",
+      "mention": "мотоцикл",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_010"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_010"
+    },
+    {
+      "case_id": "neg_force_002",
+      "mention": "пациент",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_011"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_011"
+    },
+    {
+      "case_id": "neg_force_003",
+      "mention": "Санкт-Петербург",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_003"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_003"
+    },
+    {
+      "case_id": "neg_force_004",
+      "mention": "Audi",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_030"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_030"
+    },
+    {
+      "case_id": "ctx_001",
+      "mention": "Юли",
+      "target_uid": "s_001",
+      "candidate_uids": [
+        "s_001",
+        "s_002",
+        "s_003"
+      ],
+      "case_type": "CONTEXTUAL",
+      "expected_relation": "SAME_ENTITY",
+      "context": "Юли позвонил Антон",
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "ctx_002",
+      "mention": "машине",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_010",
+        "s_030",
+        "s_032"
+      ],
+      "case_type": "CONTEXTUAL",
+      "expected_relation": "SAME_CONCEPT",
+      "context": "Антон сейчас ездит на машине",
+      "difficulty": "hard",
+      "notes": "experimental_ownership_not_required"
+    },
+    {
+      "case_id": "ctx_003",
+      "mention": "Юлию",
+      "target_uid": "s_001",
+      "candidate_uids": [
+        "s_001",
+        "s_002",
+        "s_003"
+      ],
+      "case_type": "CONTEXTUAL",
+      "expected_relation": "SAME_ENTITY",
+      "context": "Где сейчас живёт Юлию?",
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "ctx_004",
+      "mention": "Маше",
+      "target_uid": "s_005",
+      "candidate_uids": [
+        "s_005",
+        "s_001",
+        "s_007"
+      ],
+      "case_type": "CONTEXTUAL",
+      "expected_relation": "SAME_ENTITY",
+      "context": "В каком городе живёт Маше?",
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "ctx_005",
+      "mention": "ноут",
+      "target_uid": "s_013",
+      "candidate_uids": [
+        "s_013",
+        "s_014",
+        "s_010"
+      ],
+      "case_type": "CONTEXTUAL",
+      "expected_relation": "SAME_CONCEPT",
+      "context": "Какой ноут купил Сергей?",
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "ctx_006",
+      "mention": "Питере",
+      "target_uid": "s_004",
+      "candidate_uids": [
+        "s_004",
+        "s_003",
+        "s_007"
+      ],
+      "case_type": "CONTEXTUAL",
+      "expected_relation": "SAME_ENTITY",
+      "context": "Кто работает в Питере?",
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "amb_001",
+      "mention": "Иван",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_050",
+        "s_051"
+      ],
+      "case_type": "AMBIGUOUS",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "ambiguous_without_context"
+    },
+    {
+      "case_id": "amb_002",
+      "mention": "Иван",
+      "target_uid": "s_050",
+      "candidate_uids": [
+        "s_050",
+        "s_051"
+      ],
+      "case_type": "AMBIGUOUS",
+      "expected_relation": "SAME_ENTITY",
+      "context": "Иван живёт в Москве",
+      "difficulty": "hard",
+      "notes": ""
+    },
+    {
+      "case_id": "amb_003",
+      "mention": "Иван",
+      "target_uid": "s_051",
+      "candidate_uids": [
+        "s_050",
+        "s_051"
+      ],
+      "case_type": "AMBIGUOUS",
+      "expected_relation": "SAME_ENTITY",
+      "context": "Иван работает в Казани",
+      "difficulty": "hard",
+      "notes": ""
+    },
+    {
+      "case_id": "amb_004",
+      "mention": "Анна",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_052",
+        "s_053"
+      ],
+      "case_type": "AMBIGUOUS",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "ambiguous_without_context"
+    },
+    {
+      "case_id": "amb_005",
+      "mention": "Анна",
+      "target_uid": "s_052",
+      "candidate_uids": [
+        "s_052",
+        "s_053"
+      ],
+      "case_type": "AMBIGUOUS",
+      "expected_relation": "SAME_ENTITY",
+      "context": "Анна переехала в Берлин",
+      "difficulty": "hard",
+      "notes": ""
+    },
+    {
+      "case_id": "amb_006",
+      "mention": "Анна",
+      "target_uid": "s_053",
+      "candidate_uids": [
+        "s_052",
+        "s_053"
+      ],
+      "case_type": "AMBIGUOUS",
+      "expected_relation": "SAME_ENTITY",
+      "context": "Анна учится в Париже",
+      "difficulty": "hard",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_001",
+      "mention": "Yuliya",
+      "target_uid": "s_001",
+      "candidate_uids": [
+        "s_001",
+        "s_002",
+        "s_005"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_002",
+      "mention": "yulia",
+      "target_uid": "s_001",
+      "candidate_uids": [
+        "s_001",
+        "s_002"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_003",
+      "mention": "bmw",
+      "target_uid": "s_030",
+      "candidate_uids": [
+        "s_030",
+        "s_031",
+        "s_057"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_004",
+      "mention": " BMW ",
+      "target_uid": "s_030",
+      "candidate_uids": [
+        "s_030",
+        "s_031"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_005",
+      "mention": "Санкт Петербург",
+      "target_uid": "s_004",
+      "candidate_uids": [
+        "s_004",
+        "s_003",
+        "s_056"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_006",
+      "mention": "санкт  петербург",
+      "target_uid": "s_004",
+      "candidate_uids": [
+        "s_004",
+        "s_003"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_007",
+      "mention": "New York",
+      "target_uid": "s_056",
+      "candidate_uids": [
+        "s_056",
+        "s_003",
+        "s_004"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_008",
+      "mention": "нью йорк",
+      "target_uid": "s_056",
+      "candidate_uids": [
+        "s_056",
+        "s_003",
+        "s_004"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_009",
+      "mention": "Moskva",
+      "target_uid": "s_003",
+      "candidate_uids": [
+        "s_003",
+        "s_004",
+        "s_056"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "surf_010",
+      "mention": "audi",
+      "target_uid": "s_031",
+      "candidate_uids": [
+        "s_031",
+        "s_030",
+        "s_057"
+      ],
+      "case_type": "SURFACE",
+      "expected_relation": "SAME_ENTITY",
+      "context": null,
+      "difficulty": "medium",
+      "notes": ""
+    },
+    {
+      "case_id": "hneg_001",
+      "mention": "Toyota",
+      "target_uid": "s_057",
+      "candidate_uids": [
+        "s_057",
+        "s_030",
+        "s_031"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_030"
+    },
+    {
+      "case_id": "hneg_002",
+      "mention": "Lada",
+      "target_uid": "s_058",
+      "candidate_uids": [
+        "s_058",
+        "s_057",
+        "s_030"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_057"
+    },
+    {
+      "case_id": "hneg_003",
+      "mention": "инженер",
+      "target_uid": "s_059",
+      "candidate_uids": [
+        "s_059",
+        "s_011",
+        "s_060"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_011"
+    },
+    {
+      "case_id": "hneg_004",
+      "mention": "программист",
+      "target_uid": "s_060",
+      "candidate_uids": [
+        "s_060",
+        "s_059",
+        "s_011"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_059"
+    },
+    {
+      "case_id": "hneg_005",
+      "mention": "Нью-Йорк",
+      "target_uid": "s_056",
+      "candidate_uids": [
+        "s_056",
+        "s_003",
+        "s_004"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_003"
+    },
+    {
+      "case_id": "hneg_006",
+      "mention": "Берлин",
+      "target_uid": "s_054",
+      "candidate_uids": [
+        "s_054",
+        "s_055",
+        "s_003"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "must_not_merge_with=s_055"
+    },
+    {
+      "case_id": "hneg_force_001",
+      "mention": "Toyota",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_030"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_030"
+    },
+    {
+      "case_id": "hneg_force_002",
+      "mention": "инженер",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_011"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_011"
+    },
+    {
+      "case_id": "hneg_force_003",
+      "mention": "Нью-Йорк",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_003"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_003"
+    },
+    {
+      "case_id": "hneg_force_004",
+      "mention": "программист",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_011"
+      ],
+      "case_type": "NEGATIVE",
+      "expected_relation": "DIFFERENT_ENTITY",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_011"
+    },
+    {
+      "case_id": "hold_001",
+      "mention": "легковушка",
+      "target_uid": "s_010",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_021"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "hold_out_not_in_lexicon"
+    },
+    {
+      "case_id": "hold_002",
+      "mention": "тачка",
+      "target_uid": "s_010",
+      "candidate_uids": [
+        "s_010",
+        "s_020",
+        "s_057"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "hold_out_not_in_lexicon"
+    },
+    {
+      "case_id": "hold_003",
+      "mention": "эскулап",
+      "target_uid": "s_011",
+      "candidate_uids": [
+        "s_011",
+        "s_022",
+        "s_059"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "hold_out_not_in_lexicon"
+    },
+    {
+      "case_id": "hold_004",
+      "mention": "гаджет",
+      "target_uid": "s_014",
+      "candidate_uids": [
+        "s_014",
+        "s_013",
+        "s_010"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "hold_out_not_in_lexicon"
+    },
+    {
+      "case_id": "hold_005",
+      "mention": "ультрабук",
+      "target_uid": "s_013",
+      "candidate_uids": [
+        "s_013",
+        "s_014",
+        "s_010"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "hold_out_not_in_lexicon"
+    },
+    {
+      "case_id": "hold_006",
+      "mention": "автолюбительский транспорт",
+      "target_uid": "s_010",
+      "candidate_uids": [
+        "s_010",
+        "s_040",
+        "s_020"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "hold_out_not_in_lexicon"
+    },
+    {
+      "case_id": "hold_007",
+      "mention": "медик",
+      "target_uid": "s_011",
+      "candidate_uids": [
+        "s_011",
+        "s_023",
+        "s_022"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "hold_out_not_in_lexicon"
+    },
+    {
+      "case_id": "hold_008",
+      "mention": "сотовый",
+      "target_uid": "s_014",
+      "candidate_uids": [
+        "s_014",
+        "s_013"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "SAME_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "hold_out_not_in_lexicon"
+    },
+    {
+      "case_id": "hold_neg_001",
+      "mention": "легковушка",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_020"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "DIFFERENT_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_020"
+    },
+    {
+      "case_id": "hold_neg_002",
+      "mention": "эскулап",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_022"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "DIFFERENT_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_022"
+    },
+    {
+      "case_id": "hold_neg_003",
+      "mention": "гаджет",
+      "target_uid": null,
+      "candidate_uids": [
+        "s_013"
+      ],
+      "case_type": "HOLD_OUT",
+      "expected_relation": "DIFFERENT_CONCEPT",
+      "context": null,
+      "difficulty": "hard",
+      "notes": "force_reject=s_013"
+    }
+  ],
+  "pytest_modules": [
+    "tests/test_entity_resolution.py",
+    "tests/test_identity_ingest.py",
+    "tests/test_identity_paraphrase.py"
+  ],
+  "paraphrase_suite": {
+    "mini_facts": [
+      {
+        "subject": "Юлия",
+        "relation": "LIVES_IN",
+        "object": "Москва"
+      },
+      {
+        "subject": "Юлия",
+        "relation": "WORKS_FOR",
+        "object": "врач"
+      },
+      {
+        "subject": "Антон",
+        "relation": "PURCHASE",
+        "object": "автомобиль"
+      },
+      {
+        "subject": "Антон",
+        "relation": "PURCHASE",
+        "object": "BMW"
+      },
+      {
+        "subject": "Мария",
+        "relation": "LIVES_IN",
+        "object": "Казань"
+      },
+      {
+        "subject": "Сергей",
+        "relation": "PURCHASE",
+        "object": "ноутбук"
+      },
+      {
+        "subject": "Сергей",
+        "relation": "PURCHASE",
+        "object": "телефон"
+      }
+    ],
+    "paraphrase_queries": [
+      {
+        "query": "Где живёт Юли?",
+        "mention": "Юли",
+        "expected_canonical": "Юлия"
+      },
+      {
+        "query": "Куда переехала Юлию?",
+        "mention": "Юлию",
+        "expected_canonical": "Юлия"
+      },
+      {
+        "query": "С кем говорил Антон про Юлией?",
+        "mention": "Юлией",
+        "expected_canonical": "Юлия"
+      },
+      {
+        "query": "В каком городе живёт Маше?",
+        "mention": "Маше",
+        "expected_canonical": "Мария"
+      },
+      {
+        "query": "Что купила Маша?",
+        "mention": "Маша",
+        "expected_canonical": "Мария"
+      },
+      {
+        "query": "Какой город у Марии?",
+        "mention": "Марии",
+        "expected_canonical": "Мария"
+      },
+      {
+        "query": "Где работает врач Юлия — в Москве?",
+        "mention": "Москве",
+        "expected_canonical": "Москва"
+      },
+      {
+        "query": "Антон был в Москву?",
+        "mention": "Москву",
+        "expected_canonical": "Москва"
+      },
+      {
+        "query": "Кто купил машину?",
+        "mention": "машину",
+        "expected_canonical": "автомобиль"
+      },
+      {
+        "query": "На какой машине ездит Антон?",
+        "mention": "машине",
+        "expected_canonical": "автомобиль"
+      },
+      {
+        "query": "Какое авто приобрёл Антон?",
+        "mention": "авто",
+        "expected_canonical": "автомобиль"
+      },
+      {
+        "query": "Какой ноут у Сергея?",
+        "mention": "ноут",
+        "expected_canonical": "ноутбук"
+      },
+      {
+        "query": "Какой смартфон купил Сергей?",
+        "mention": "смартфон",
+        "expected_canonical": "телефон"
+      },
+      {
+        "query": "Кто живёт в Питере?",
+        "mention": "Питере",
+        "expected_canonical": "Санкт-Петербург"
+      },
+      {
+        "query": "Есть ли связь с Петербургом?",
+        "mention": "Петербургом",
+        "expected_canonical": "Санкт-Петербург"
+      },
+      {
+        "query": "Сергей говорил с Сергеем?",
+        "mention": "Сергеем",
+        "expected_canonical": "Сергей"
+      },
+      {
+        "query": "Передай Антону сообщение",
+        "mention": "Антону",
+        "expected_canonical": "Антон"
+      },
+      {
+        "query": "Казань или Казани — одно место",
+        "mention": "Казани",
+        "expected_canonical": "Казань"
+      }
+    ],
+    "negative_paraphrases": [
+      {
+        "mention": "мотоцикл",
+        "must_not_merge_with": "автомобиль"
+      },
+      {
+        "mention": "пациент",
+        "must_not_merge_with": "врач"
+      },
+      {
+        "mention": "Audi",
+        "must_not_merge_with": "BMW"
+      },
+      {
+        "mention": "Санкт-Петербург",
+        "must_not_merge_with": "Москва"
+      },
+      {
+        "mention": "велосипед",
+        "must_not_merge_with": "автомобиль"
+      },
+      {
+        "mention": "ноутбук",
+        "must_not_merge_with": "телефон"
+      }
+    ]
+  }
+}

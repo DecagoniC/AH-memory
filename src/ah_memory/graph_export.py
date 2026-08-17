@@ -1,17 +1,10 @@
-"""Serialize AH as hypergraph: vertices + hyperedges N + binary L."""
+"""Serialize AH as hypergraph: vertices S/M + semantic factors + binary L."""
 from __future__ import annotations
 
 from typing import Any, Mapping
 
-from ah_memory.perception import PREDICATES
 from ah_memory.store import AHStore
-from ah_memory.types import (
-    ElementList,
-    FunctionalSymbol,
-    Hyperlink,
-    SecondOrderSymbol,
-    Template,
-)
+from ah_memory.types import SecondOrderSymbol
 
 _LAYER_X = {
     "S": 0,
@@ -66,7 +59,7 @@ def dump_graph(
 
     # --- vertices: S + m/g/k (not N, not T unless mode=all) ---
     for uid, s in store.ah.S.items():
-        if uid in PREDICATES and mode != "all":
+        if store.get_relation(uid) is not None and mode != "all":
             continue
         px, py = _place("S")
         nodes.append(
@@ -82,190 +75,33 @@ def dump_graph(
             }
         )
 
+    # --- vertices: S + M ---
     for section_name, bucket in (("C", store.ah.C), ("P", store.ah.P), ("H", store.ah.H)):
         for uid, e in bucket.items():
-            if isinstance(e, Hyperlink):
+            if not isinstance(e, SecondOrderSymbol):
                 continue
-            if isinstance(e, Template) and mode != "all":
-                continue
-
-            act = _act(uid, float(getattr(e, "x", 0.0)))
-            if isinstance(e, SecondOrderSymbol):
-                label = uid
-                for p in e.Pr:
-                    if p.name == "label":
-                        label = p.value
-                px, py = _place("vertex")
-                nodes.append(
-                    {
-                        "id": uid,
-                        "label": label,
-                        "group": f"{section_name}_m",
-                        "kind": "vertex",
-                        "activation": round(act, 4),
-                        "x": px,
-                        "y": py,
-                        "title": f"{section_name} m {uid}\nact={act:.3f}",
-                    }
-                )
-            elif isinstance(e, FunctionalSymbol):
-                px, py = _place("vertex")
-                nodes.append(
-                    {
-                        "id": uid,
-                        "label": f"⟨{e.id}⟩",
-                        "group": f"{section_name}_g",
-                        "kind": "vertex",
-                        "activation": round(act, 4),
-                        "x": px,
-                        "y": py,
-                        "title": f"functional {e.id} {uid}",
-                    }
-                )
-            elif isinstance(e, ElementList):
-                label = uid
-                for p in e.Pr:
-                    if p.name == "label":
-                        label = p.value
-                px, py = _place("episode" if section_name == "H" else "vertex")
-                nodes.append(
-                    {
-                        "id": uid,
-                        "label": label,
-                        "group": f"{section_name}_k",
-                        "kind": "vertex",
-                        "activation": round(act, 4),
-                        "x": px,
-                        "y": py,
-                        "title": f"list {uid}",
-                    }
-                )
-            elif isinstance(e, Template):
-                px, py = _place("template")
-                pred = e.predicate.target_uid
-                nodes.append(
-                    {
-                        "id": uid,
-                        "label": f"T:{pred}",
-                        "group": f"{section_name}_T",
-                        "kind": "template",
-                        "activation": round(act, 4),
-                        "x": px,
-                        "y": py,
-                        "title": f"template {uid} → {pred}",
-                    }
-                )
-
-    # --- hyperedges N ---
-    for n in store.find_hypernodes():
-        pred = "?"
-        try:
-            tpl = store.get_template(n.template.target_uid)
-            pred = tpl.predicate.target_uid
-        except Exception:
-            pred = n.template.target_uid
-
-        roles = {r.value: f.target_uid for r, f in n.fillers.items()}
-        members = list(dict.fromkeys(roles.values()))
-        role_lines = "\n".join(f"{r} → {_short(v)}" for r, v in roles.items())
-        label = f"⟦{pred}⟧\n{role_lines}" if roles else f"⟦{pred}⟧"
-
-        px, py = _place("hyperedge")
-        n_activation = _act(
-            n.uid,
-            (
-                sum(_act(uid) for uid in members) / len(members)
-                if activation is not None and members
-                else n.x
-            ),
-        )
-        nodes.append(
-            {
-                "id": n.uid,
-                "label": label,
-                "group": "hyperedge",
-                "kind": "hyperedge",
-                "predicate": pred,
-                "activation": round(n_activation, 4),
-                "x": px,
-                "y": py,
-                "title": (
-                    f"HYPEREDGE {n.uid}\npredicate={pred}\nw={n.w:.3f}\n"
-                    + "\n".join(f"{r}: {v}" for r, v in roles.items())
-                ),
-            }
-        )
-
-        hyperedges.append(
-            {
-                "id": n.uid,
-                "predicate": pred,
-                "w": n.w,
-                "roles": roles,
-                "members": members,
-                "hub": n.uid,
-            }
-        )
-
-        # incidence spokes: hub —role→ each actant
-        for role, target in roles.items():
-            edges.append(
+            act = _act(uid, float(e.x))
+            label = uid
+            for p in e.Pr:
+                if p.name == "label":
+                    label = p.value
+            px, py = _place("vertex")
+            nodes.append(
                 {
-                    "id": f"{n.uid}__{role}",
-                    "from": n.uid,
-                    "to": target,
-                    "label": role,
-                    "kind": "hyper_incidence",
-                    "role": role,
-                    "w": round(float(n.w), 4),
-                    "arrows": "",
-                    "dashes": False,
-                    "width": 2.5,
-                    "color": {"color": _ROLE_COLOR.get(role, "#e9c46a"), "highlight": "#fff"},
-                    "title": f"hyperedge {pred}: {role} = {target} · w={n.w:.3f}",
+                    "id": uid,
+                    "label": label,
+                    "group": f"{section_name}_m",
+                    "kind": "vertex",
+                    "activation": round(act, 4),
+                    "x": px,
+                    "y": py,
+                    "title": f"{section_name} m {uid}\nact={act:.3f}",
                 }
             )
 
-        # n-ary associative mesh: every pair of actants (shared micro-theme of N)
-        for i, a in enumerate(members):
-            for b in members[i + 1 :]:
-                edges.append(
-                    {
-                        "id": f"{n.uid}__mesh__{a}__{b}",
-                        "from": a,
-                        "to": b,
-                        "label": "",
-                        "kind": "hyper_mesh",
-                        "hyperedge": n.uid,
-                        "predicate": pred,
-                        "w": round(float(n.w), 4),
-                        "arrows": "",
-                        "dashes": True,
-                        "width": 2,
-                        "color": {"color": "#ffe566", "opacity": 0.75, "highlight": "#fff"},
-                        "title": f"mesh ⟦{pred}⟧: {a} ↔ {b} (n={len(members)}) · w={n.w:.3f}",
-                    }
-                )
-
-        if mode == "all":
-            edges.append(
-                {
-                    "id": f"{n.uid}__tpl",
-                    "from": n.uid,
-                    "to": n.template.target_uid,
-                    "label": "T",
-                    "kind": "template_ref",
-                    "arrows": "to",
-                    "dashes": True,
-                    "width": 1,
-                    "color": {"color": "#667788"},
-                }
-            )
-
-    # --- open semantic factors (legacy-backed factors are shown by N above) ---
+    # --- semantic factors (open relations) ---
+    co_member_pairs: set[tuple[str, str]] = set()
     for factor in store.list_semantic_factors():
-        if factor.metadata.get("legacy_source_uid"):
-            continue
         roles = dict(factor.roles)
         members = list(dict.fromkeys(factor.variables))
         relation = factor.relation
@@ -323,6 +159,9 @@ def dump_graph(
                 ),
             }
         )
+        for i, a in enumerate(members):
+            for b in members[i + 1 :]:
+                co_member_pairs.add(tuple(sorted((a, b))))
         directional = bool(
             relation is not None
             and relation.properties.directional
@@ -362,6 +201,9 @@ def dump_graph(
 
     # --- binary associative links L ---
     for link in store.ah.L.values():
+        pair = tuple(sorted((link.e1.target_uid, link.e2.target_uid)))
+        if link.id == "ASSOC" and pair in co_member_pairs:
+            continue
         # ASSOC симметрична; IS-A / FOLLOW направлены e1→e2
         directed = link.id in {"IS-A", "FOLLOW"}
         edges.append(
@@ -414,7 +256,7 @@ def dump_graph(
             "P": len(store.ah.P),
             "H": len(store.ah.H),
             "L": len(store.ah.L),
-            "hyperedges": len(store.find_hypernodes()),
+            "hyperedges": len(store.semantic_factors),
             "semantic_factors": len(store.semantic_factors),
             "relations": len(store.list_relations()),
             "events": len(store.events),
@@ -429,7 +271,12 @@ def dump_ah_json(store: AHStore) -> dict[str, Any]:
     return {
         "tau": store.ah.tau,
         "S": {
-            uid: {"R": {m: sorted(forms) for m, forms in s.R.items()}, "activation": s.x}
+            uid: {
+                "R": {m: sorted(forms) for m, forms in s.R.items()},
+                "activation": s.x,
+                "created_tau": s.created_tau,
+                "added_at": getattr(s, "added_at", "") or "",
+            }
             for uid, s in store.ah.S.items()
         },
         "stats": g["stats"],

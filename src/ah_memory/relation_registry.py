@@ -7,8 +7,6 @@ from typing import Any
 
 from ah_memory.relations import (
     Relation,
-    RelationProperties,
-    Vector,
     canonicalize_label,
 )
 
@@ -84,63 +82,6 @@ class RelationRegistry:
         }
 
 
-def _relation(
-    label: str,
-    *,
-    directional: bool = True,
-    symmetric: bool = False,
-    transitive: bool = False,
-    temporal: bool = False,
-    causal: bool = False,
-    state_changing: bool = False,
-) -> Relation:
-    canonical = canonicalize_label(label)
-    return Relation(
-        uid=f"REL_{canonical}",
-        raw_label=label,
-        canonical_label=canonical,
-        properties=RelationProperties(
-            directional=directional,
-            symmetric=symmetric,
-            transitive=transitive,
-            temporal=temporal,
-            causal=causal,
-            state_changing=state_changing,
-        ),
-    )
-
-
 def default_relation_registry() -> RelationRegistry:
-    return RelationRegistry(
-        [
-            _relation("PURCHASE", state_changing=True),
-            _relation("SELL", state_changing=True),
-            _relation("BORROW", state_changing=True),
-            _relation("RECEIVE", state_changing=True),
-            _relation("FOLLOW", temporal=True),
-            _relation("BEFORE", temporal=True, transitive=True),
-            _relation("AFTER", temporal=True, transitive=True),
-            _relation("DURING", temporal=True),
-            _relation("IS_A", transitive=True),
-            _relation("CAUSE", causal=True),
-            _relation("LOCATED_IN"),
-            _relation("PART_OF", transitive=True),
-            _relation("WORKS_FOR"),
-            _relation("OWNS", state_changing=True),
-            _relation("RELATED_TO", directional=False, symmetric=True),
-            _relation("ASSOC", directional=False, symmetric=True),
-            _relation("BIND", directional=False, symmetric=True),
-            _relation("CREATE", state_changing=True),
-            _relation("MOVE", state_changing=True),
-            _relation("START", state_changing=True),
-            _relation("STOP", state_changing=True),
-            _relation("DELETE", state_changing=True),
-            _relation("IS", directional=False, symmetric=True),
-            _relation("LIVE_IN"),
-            _relation("BE_BORN", temporal=True),
-            _relation("HAVE", state_changing=True),
-            _relation("RUN"),
-            _relation("BE_COLORED"),
-            _relation("USE"),
-        ]
-    )
+    """Return an empty open registry; applications register their own relations."""
+    return RelationRegistry()

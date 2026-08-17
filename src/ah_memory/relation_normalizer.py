@@ -48,51 +48,11 @@ class NormalizationStrategy(Protocol):
     ) -> NormalizedRelation | None: ...
 
 
-DEFAULT_EXACT_ALIASES: dict[str, str] = {
-    "купил": "PURCHASE",
-    "купила": "PURCHASE",
-    "покупал": "PURCHASE",
-    "приобрел": "PURCHASE",
-    "приобрёл": "PURCHASE",
-    "приобрела": "PURCHASE",
-    "purchase": "PURCHASE",
-    "bought": "PURCHASE",
-    "продал": "SELL",
-    "продала": "SELL",
-    "продавал": "SELL",
-    "реализовал": "SELL",
-    "sell": "SELL",
-    "sold": "SELL",
-    "получил": "RECEIVE",
-    "взял в долг": "BORROW",
-    "следует за": "FOLLOW",
-    "потом": "AFTER",
-    "после": "AFTER",
-    "до": "BEFORE",
-    "перед": "BEFORE",
-    "во время": "DURING",
-    "является": "IS",
-    "это": "IS",
-    "является частью": "PART_OF",
-    "часть": "PART_OF",
-    "находится в": "LOCATED_IN",
-    "живет в": "LIVE_IN",
-    "живёт в": "LIVE_IN",
-    "работает в": "WORKS_FOR",
-    "работает на": "WORKS_FOR",
-    "имеет": "HAVE",
-    "владеет": "OWNS",
-    "создал": "CREATE",
-    "переместил": "MOVE",
-    "причина": "CAUSE",
-}
-
-
 class ExactNormalizer:
     name = "exact"
 
     def __init__(self, aliases: Mapping[str, str] | None = None) -> None:
-        source = aliases or DEFAULT_EXACT_ALIASES
+        source = aliases or {}
         self.aliases = {
             self._key(raw): canonicalize_label(canonical)
             for raw, canonical in source.items()

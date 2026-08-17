@@ -1,7 +1,6 @@
-"""Offline gold set for M4 (rabbit + encyclopedia micro-bench)."""
+"""Offline gold set for M4 (rabbit fixture)."""
 from __future__ import annotations
 
-from ah_memory.corpus import build_encyclopedia
 from ah_memory.eval.m4 import GoldItem
 from ah_memory.examples.rabbit import RABBIT_TEXT, build_rabbit_memory
 
@@ -80,8 +79,7 @@ def build_m4_fixture(*, use_llm: bool = False) -> tuple:
     from ah_memory.config import load_config
 
     store = build_rabbit_memory()
-    _, enc_text = build_encyclopedia()
-    corpus = RABBIT_TEXT + "\n\n" + enc_text[:8000]
+    corpus = RABBIT_TEXT
     agent = Agent(store=store)
     ds = None
     if use_llm:

@@ -16,32 +16,45 @@ def _fact(relation: str, object_uid: str) -> FactCandidate:
         predicate=relation,
         raw_relation=relation.lower(),
         canonical_relation=relation,
-        roles={"SUBJECT": "FATHER", "OBJECT": object_uid},
+        roles={"SUBJECT": "ACTOR", "OBJECT": object_uid},
     )
 
 
-def test_bmw_audi_opel_state_regression() -> None:
+def test_configured_state_rules_apply_without_domain_defaults() -> None:
     store = AHStore()
-    transform = Transform(store)
+    engine = StateEngine(
+        (
+            TransitionRule(
+                "ADD",
+                (
+                    StateOperation("set", "ACTIVE:{SUBJECT}:{OBJECT}", True),
+                    StateOperation("set", "LAST:{SUBJECT}", "{OBJECT}"),
+                    StateOperation("append", "HISTORY:{SUBJECT}", "{OBJECT}"),
+                ),
+            ),
+            TransitionRule(
+                "REMOVE",
+                (StateOperation("set", "ACTIVE:{SUBJECT}:{OBJECT}", False),),
+            ),
+        )
+    )
+    transform = Transform(store, state_engine=engine)
     transform.apply(
         PerceptionResult(
             kind="fact",
             candidates=[
-                _fact("PURCHASE", "BMW"),
-                _fact("SELL", "BMW"),
-                _fact("PURCHASE", "AUDI"),
-                _fact("SELL", "AUDI"),
-                _fact("PURCHASE", "OPEL"),
+                _fact("ADD", "ALPHA"),
+                _fact("REMOVE", "ALPHA"),
+                _fact("ADD", "BETA"),
             ],
         )
     )
 
-    assert store.state.owns("FATHER", "BMW") is False
-    assert store.state.owns("FATHER", "AUDI") is False
-    assert store.state.owns("FATHER", "OPEL") is True
-    assert store.state.last_purchase("FATHER") == "OPEL"
-    assert store.state.purchase_history("FATHER") == ["BMW", "AUDI", "OPEL"]
-    assert len(store.state_transitions) == 11
+    assert store.state.get("ACTIVE:ACTOR:ALPHA") is False
+    assert store.state.get("ACTIVE:ACTOR:BETA") is True
+    assert store.state.get("LAST:ACTOR") == "BETA"
+    assert list(store.state.history["HISTORY:ACTOR"]) == ["ALPHA", "BETA"]
+    assert len(store.state_transitions) == 7
 
 
 def test_state_transition_rules_are_runtime_configurable() -> None:

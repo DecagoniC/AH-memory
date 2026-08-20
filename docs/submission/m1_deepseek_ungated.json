@@ -1,0 +1,383 @@
+{
+  "model": "deepseek-chat+ungated",
+  "score": {
+    "weighted_f1": 3.5238095238095233,
+    "normalized_weighted_f1": 0.7047619047619047,
+    "by_role": {
+      "LOCATION": {
+        "correct": 12,
+        "predicted": 12,
+        "expected": 16,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571428571428571
+      },
+      "OBJECT": {
+        "correct": 12,
+        "predicted": 20,
+        "expected": 16,
+        "precision": 0.6,
+        "recall": 0.75,
+        "f1": 0.6666666666666665
+      },
+      "SUBJECT": {
+        "correct": 12,
+        "predicted": 20,
+        "expected": 16,
+        "precision": 0.6,
+        "recall": 0.75,
+        "f1": 0.6666666666666665
+      }
+    }
+  },
+  "items": [
+    {
+      "item_id": "M1_001",
+      "text": "Mara delivered the sealed crate to the north depot.",
+      "noise": "clean",
+      "expected_roles": [
+        {
+          "LOCATION": "north depot",
+          "OBJECT": "sealed crate",
+          "SUBJECT": "Mara"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "MARA",
+          "OBJECT": "SEALED_CRATE",
+          "LOCATION": "NORTH_DEPOT"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_002",
+      "text": "Ivo delivered the blue parcel to the river warehouse.",
+      "noise": "clean",
+      "expected_roles": [
+        {
+          "LOCATION": "river warehouse",
+          "OBJECT": "blue parcel",
+          "SUBJECT": "Ivo"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "IVO",
+          "OBJECT": "BLUE_PARCEL",
+          "LOCATION": "RIVER_WAREHOUSE"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_003",
+      "text": "Nia delivered the tool case to the central hub.",
+      "noise": "clean",
+      "expected_roles": [
+        {
+          "LOCATION": "central hub",
+          "OBJECT": "tool case",
+          "SUBJECT": "Nia"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "NIA",
+          "OBJECT": "TOOL_CASE",
+          "LOCATION": "CENTRAL_HUB"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_004",
+      "text": "Oren delivered the sample box to the east terminal.",
+      "noise": "clean",
+      "expected_roles": [
+        {
+          "LOCATION": "east terminal",
+          "OBJECT": "sample box",
+          "SUBJECT": "Oren"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "OREN",
+          "OBJECT": "SAMPLE_BOX",
+          "LOCATION": "EAST_TERMINAL"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_005",
+      "text": "Pia delivered the spare battery to the hill station.",
+      "noise": "clean",
+      "expected_roles": [
+        {
+          "LOCATION": "hill station",
+          "OBJECT": "spare battery",
+          "SUBJECT": "Pia"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "PIA",
+          "OBJECT": "SPARE_BATTERY",
+          "LOCATION": "HILL_STATION"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_006",
+      "text": "Dr. Vale delivered the sterile kit to the ward seven.",
+      "noise": "clean",
+      "expected_roles": [
+        {
+          "LOCATION": "ward seven",
+          "OBJECT": "sterile kit",
+          "SUBJECT": "Dr. Vale"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "DR_VALE",
+          "OBJECT": "STERILE_KIT",
+          "LOCATION": "WARD_SEVEN"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_007",
+      "text": "Nurse Kian delivered the scan record to the imaging room.",
+      "noise": "clean",
+      "expected_roles": [
+        {
+          "LOCATION": "imaging room",
+          "OBJECT": "scan record",
+          "SUBJECT": "Nurse Kian"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "NURSE_KIAN",
+          "OBJECT": "SCAN_RECORD",
+          "LOCATION": "IMAGING_ROOM"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_008",
+      "text": "Medic Rhea delivered the oxygen pack to the triage bay.",
+      "noise": "clean",
+      "expected_roles": [
+        {
+          "LOCATION": "triage bay",
+          "OBJECT": "oxygen pack",
+          "SUBJECT": "Medic Rhea"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "MEDIC_RHEA",
+          "OBJECT": "OXYGEN_PACK",
+          "LOCATION": "TRIAGE_BAY"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_026",
+      "text": "Mara delviered the sealed crate to the north depot.",
+      "noise": "typo",
+      "expected_roles": [
+        {
+          "LOCATION": "north depot",
+          "OBJECT": "sealed crate",
+          "SUBJECT": "Mara"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "MARA",
+          "OBJECT": "SEALED_CRATE",
+          "LOCATION": "NORTH_DEPOT"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_027",
+      "text": "Ivo delviered the blue parcel to the river warehouse.",
+      "noise": "typo",
+      "expected_roles": [
+        {
+          "LOCATION": "river warehouse",
+          "OBJECT": "blue parcel",
+          "SUBJECT": "Ivo"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "IVO",
+          "OBJECT": "BLUE_PARCEL",
+          "LOCATION": "RIVER_WAREHOUSE"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_028",
+      "text": "Nia delviered the tool case to the central hub.",
+      "noise": "typo",
+      "expected_roles": [
+        {
+          "LOCATION": "central hub",
+          "OBJECT": "tool case",
+          "SUBJECT": "Nia"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "NIA",
+          "OBJECT": "TOOL_CASE",
+          "LOCATION": "CENTRAL_HUB"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_029",
+      "text": "Oren delviered the sample box to the east terminal.",
+      "noise": "typo",
+      "expected_roles": [
+        {
+          "LOCATION": "east terminal",
+          "OBJECT": "sample box",
+          "SUBJECT": "Oren"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "OREN",
+          "OBJECT": "SAMPLE_BOX",
+          "LOCATION": "EAST_TERMINAL"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_051",
+      "text": "To the north depot, the sealed crate was delivered by Mara.",
+      "noise": "inversion",
+      "expected_roles": [
+        {
+          "LOCATION": "north depot",
+          "OBJECT": "sealed crate",
+          "SUBJECT": "Mara"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "SEALED_CRATE",
+          "OBJECT": "NORTH_DEPOT"
+        },
+        {
+          "SUBJECT": "SEALED_CRATE",
+          "OBJECT": "MARA"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_052",
+      "text": "To the river warehouse, the blue parcel was delivered by Ivo.",
+      "noise": "inversion",
+      "expected_roles": [
+        {
+          "LOCATION": "river warehouse",
+          "OBJECT": "blue parcel",
+          "SUBJECT": "Ivo"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "BLUE_PARCEL",
+          "OBJECT": "RIVER_WAREHOUSE"
+        },
+        {
+          "SUBJECT": "BLUE_PARCEL",
+          "OBJECT": "IVO"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_053",
+      "text": "To the central hub, the tool case was delivered by Nia.",
+      "noise": "inversion",
+      "expected_roles": [
+        {
+          "LOCATION": "central hub",
+          "OBJECT": "tool case",
+          "SUBJECT": "Nia"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "TOOL_CASE",
+          "OBJECT": "CENTRAL_HUB"
+        },
+        {
+          "SUBJECT": "TOOL_CASE",
+          "OBJECT": "NIA"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    },
+    {
+      "item_id": "M1_054",
+      "text": "To the east terminal, the sample box was delivered by Oren.",
+      "noise": "inversion",
+      "expected_roles": [
+        {
+          "LOCATION": "east terminal",
+          "OBJECT": "sample box",
+          "SUBJECT": "Oren"
+        }
+      ],
+      "predicted_roles": [
+        {
+          "SUBJECT": "SAMPLE_BOX",
+          "OBJECT": "EAST_TERMINAL"
+        },
+        {
+          "SUBJECT": "SAMPLE_BOX",
+          "OBJECT": "OREN"
+        }
+      ],
+      "validation_errors": [],
+      "error": ""
+    }
+  ]
+}

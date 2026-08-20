@@ -1,0 +1,20 @@
+{"answer": "river trail 01", "query_id": "QA_001", "support_ids": ["QA_001_F01"]}
+{"answer": "bird 02", "query_id": "QA_002", "support_ids": ["QA_002_F01", "QA_002_F02"]}
+{"answer": "controller stop 03", "query_id": "QA_003", "support_ids": ["QA_003_F01", "QA_003_F02", "QA_003_F03"]}
+{"answer": "beacon delta 04", "query_id": "QA_004", "support_ids": ["QA_004_F01", "QA_004_F02", "QA_004_F03", "QA_004_F04"]}
+{"answer": "", "query_id": "QA_005", "support_ids": []}
+{"answer": "", "query_id": "QA_006", "support_ids": []}
+{"answer": "north marker 07", "query_id": "QA_007", "support_ids": ["QA_007_F01"]}
+{"answer": "watercraft 08", "query_id": "QA_008", "support_ids": ["QA_008_F01", "QA_008_F02"]}
+{"answer": "flow reduction 09", "query_id": "QA_009", "support_ids": ["QA_009_F01", "QA_009_F02", "QA_009_F03"]}
+{"answer": "forest trail 10", "query_id": "QA_010", "support_ids": ["QA_010_F01", "QA_010_F02", "QA_010_F03", "QA_010_F04"]}
+{"answer": "", "query_id": "QA_011", "support_ids": []}
+{"answer": "", "query_id": "QA_012", "support_ids": []}
+{"answer": "beacon alpha 13", "query_id": "QA_013", "support_ids": ["QA_013_F01"]}
+{"answer": "geologic material 14", "query_id": "QA_014", "support_ids": ["QA_014_F01", "QA_014_F02"]}
+{"answer": "road blockage 15", "query_id": "QA_015", "support_ids": ["QA_015_F01", "QA_015_F02", "QA_015_F03"]}
+{"answer": "west marker 16", "query_id": "QA_016", "support_ids": ["QA_016_F01", "QA_016_F02", "QA_016_F03", "QA_016_F04"]}
+{"answer": "", "query_id": "QA_017", "support_ids": []}
+{"answer": "", "query_id": "QA_018", "support_ids": []}
+{"answer": "river trail 19", "query_id": "QA_019", "support_ids": ["QA_019_F01"]}
+{"answer": "", "query_id": "QA_020", "support_ids": []}

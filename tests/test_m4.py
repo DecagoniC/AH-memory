@@ -19,4 +19,4 @@ def test_vanilla_rag_has_no_uid_trace() -> None:
     agent, rag, gold, _ = build_m4_fixture()
     r = rag.ask(gold[0].question)
     assert r.trace_uids == []
-    assert r.source in {"vanilla_rag", "extractive_rag", "llm_rag"}
+    assert r.source in {"vanilla_rag", "extractive_rag", "llm_rag", "scripted_rag", "empty_retrieve"}

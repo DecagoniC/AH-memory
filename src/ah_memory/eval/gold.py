@@ -72,6 +72,98 @@ def encyclopedia_gold() -> list[GoldItem]:
     ]
 
 
+MINI_CORPUS = "Сущность — это вид. Сущность обитает в месте."
+
+
+def mini_in_corpus_gold() -> list[GoldItem]:
+    """In-graph questions for the generic open-relation fixture (no rabbit)."""
+    return [
+        GoldItem(
+            question="Кто такой сущность?",
+            answer_keywords=["вид", "kind"],
+            gold_trace=["M_ENTITY"],
+            d=1,
+            evidence_spans=["сущность", "вид"],
+        ),
+        GoldItem(
+            question="Где обитает сущность?",
+            answer_keywords=["место", "place", "location"],
+            gold_trace=["M_ENTITY", "M_PLACE"],
+            d=1,
+            evidence_spans=["обитает", "месте"],
+        ),
+    ]
+
+
+def mini_trap_gold() -> list[GoldItem]:
+    """Out-of-graph / wrong-slot probes. Abstain is the only non-hallucinated answer."""
+    return [
+        GoldItem(
+            question="Где обитает барсук?",
+            answer_keywords=["неизвестно", "нет данных", "не знаю"],
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Какой секретный код у сущности?",
+            answer_keywords=["неизвестно", "нет данных", "не знаю"],
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+    ]
+
+
+def rabbit_trap_gold() -> list[GoldItem]:
+    """Adversarial probes on the rabbit corpus: unknown entity, unknown slot, OOD."""
+    abstain = ["неизвестно", "нет данных", "не знаю"]
+    return [
+        GoldItem(
+            question="Где обитает барсук?",
+            answer_keywords=abstain,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Какой секретный код у зайца?",
+            answer_keywords=abstain,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Какой пароль у сервера alpha?",
+            answer_keywords=abstain,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Какого цвета глаза зайца?",
+            answer_keywords=abstain,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Кто такой барсук?",
+            answer_keywords=abstain,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Сколько килограммов весит король зайцев на Луне?",
+            answer_keywords=abstain,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+    ]
+
+
 def build_m4_fixture(*, use_llm: bool = False) -> tuple:
     """AH agent on rabbit graph + VanillaRAG on same NL corpus."""
     from ah_memory.agent import Agent

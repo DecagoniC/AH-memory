@@ -7,10 +7,13 @@ from __future__ import annotations
 import math
 import re
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from ah_memory.config import DeepSeekConfig
 from ah_memory.deepseek import DeepSeekClient
+
+RagGenerator = Callable[[str, list[str]], str]
 
 _TOKEN = re.compile(r"[a-zA-Zа-яА-ЯёЁ0-9_]+", re.UNICODE)
 
@@ -46,6 +49,7 @@ class VanillaRAG:
         top_k: int = 8,
         deepseek: DeepSeekConfig | None = None,
         strict: bool = False,
+        generator: RagGenerator | None = None,
     ) -> None:
         self.corpus = corpus
         self.chunks = _chunk_text(corpus, chunk_size=chunk_size, overlap=chunk_overlap)
@@ -53,8 +57,18 @@ class VanillaRAG:
         self._df = _doc_freq(self.chunks)
         self._n = max(1, len(self.chunks))
         self._vecs = [_tfidf(ch, self._df, self._n) for ch in self.chunks]
-        self.client = DeepSeekClient(deepseek) if deepseek and deepseek.configured else None
-        self.backend = "llm+tfidf" if self.client else "extractive+tfidf"
+        self.generator = generator
+        self.client = (
+            None
+            if generator is not None
+            else (DeepSeekClient(deepseek) if deepseek and deepseek.configured else None)
+        )
+        if generator is not None:
+            self.backend = "scripted+tfidf"
+        elif self.client is not None:
+            self.backend = "llm+tfidf"
+        else:
+            self.backend = "extractive+tfidf"
         self.system_prompt = RAG_SYSTEM_STRICT if strict else RAG_SYSTEM
 
     def ask(self, question: str) -> VanillaRAGReply:
@@ -89,7 +103,10 @@ class VanillaRAG:
         picked.sort(key=lambda x: x[1], reverse=True)
         texts = [c for c, _ in picked[: max(k, 8)]]
         scores = [s for _, s in picked[: max(k, 8)]]
-        if self.client is not None:
+        if self.generator is not None:
+            answer = self.generator(question, texts).strip()
+            source = "scripted_rag"
+        elif self.client is not None:
             ctx = "\n\n".join(f"[{i+1}] {t}" for i, t in enumerate(texts))
             answer = self.client.chat(
                 [

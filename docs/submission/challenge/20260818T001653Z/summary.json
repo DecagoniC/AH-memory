@@ -1,0 +1,25 @@
+{
+  "elapsed_sec": 0.079,
+  "m2": {
+    "correct": 13,
+    "d_max": 6,
+    "explain_score": 0.2583333333333333,
+    "items": 20,
+    "trace_complete": 13
+  },
+  "m3": {
+    "false_live_deletes": [],
+    "gc_efficiency": 1.0,
+    "orphans_after": 0,
+    "orphans_before": 200
+  },
+  "m4": {
+    "ah_explainability": 0.2583333333333333,
+    "ah_hallucination": 0.35,
+    "delta_explainability": 0.2583333333333333,
+    "delta_hallucination": -0.35,
+    "rag_explainability": 0.0,
+    "rag_hallucination": 0.0
+  },
+  "mode": "offline"
+}

@@ -1,0 +1,650 @@
+{
+  "rabbit_extractive_isolated": {
+    "protocol": "isolated",
+    "rag_backend": "extractive+tfidf",
+    "overall": "supported",
+    "h1_explainability": {
+      "name": "explainability",
+      "verdict": "supported",
+      "delta": 0.9,
+      "ah_score": 0.9,
+      "rag_score": 0.0,
+      "n": 5
+    },
+    "h2_hallucination": {
+      "name": "hallucination_resistance",
+      "verdict": "supported",
+      "delta": 0.16666666666666669,
+      "ah_score": 0.3333333333333333,
+      "rag_score": 0.5,
+      "n": 6
+    },
+    "in_corpus": {
+      "ExplainScore_AH": 0.9,
+      "ExplainScore_VanillaRAG": 0.0,
+      "Hallucination_AH": 0.0,
+      "Hallucination_VanillaRAG": 0.0,
+      "delta_explainability": 0.9,
+      "delta_hallucination": 0.0,
+      "n": 5,
+      "explain_hypothesis_ok": true,
+      "hall_hypothesis_ok": false,
+      "hypothesis_ok": false
+    },
+    "traps": {
+      "ExplainScore_AH": 0.0,
+      "ExplainScore_VanillaRAG": 0.0,
+      "Hallucination_AH": 0.3333,
+      "Hallucination_VanillaRAG": 0.5,
+      "delta_explainability": 0.0,
+      "delta_hallucination": 0.1667,
+      "n": 6,
+      "explain_hypothesis_ok": false,
+      "hall_hypothesis_ok": true,
+      "hypothesis_ok": false
+    },
+    "in_corpus_items": [
+      {
+        "question": "Кто такой заяц?",
+        "ah_answer": "зверёк маленький животное",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "EP_LESSON_1",
+          "HARE",
+          "M_BEAST",
+          "M_HARE"
+        ]
+      },
+      {
+        "question": "Где обитает заяц?",
+        "ah_answer": "location:M_MEADOW",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 0.5,
+        "ah_trace": [
+          "EP_LESSON_1",
+          "HARE",
+          "M_BEAST",
+          "M_HARE",
+          "SF::E_00006",
+          "M_MEADOW"
+        ]
+      },
+      {
+        "question": "Какого цвета шерсть зайца зимой?",
+        "ah_answer": "color:M_WHITE",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "FUR",
+          "M_FUR",
+          "SF::E_00023",
+          "M_WHITE",
+          "M_WINTER"
+        ]
+      },
+      {
+        "question": "Почему заяц бегает быстро?",
+        "ah_answer": "cause:M_HIND_LEG",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "EP_LESSON_1",
+          "HARE",
+          "M_BEAST",
+          "M_HARE",
+          "M_VERY_FAST",
+          "VERY_FAST",
+          "SF::E_00010",
+          "M_HIND_LEG"
+        ]
+      },
+      {
+        "question": "Что такое заяц по иерархии IS-A?",
+        "ah_answer": "зверёк маленький животное",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "EP_LESSON_1",
+          "HARE",
+          "M_BEAST",
+          "M_HARE"
+        ]
+      }
+    ],
+    "trap_items": [
+      {
+        "question": "Где обитает барсук?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      },
+      {
+        "question": "Какой секретный код у зайца?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      },
+      {
+        "question": "Какой пароль у сервера alpha?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "неизвестно",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      },
+      {
+        "question": "Какого цвета глаза зайца?",
+        "ah_answer": "color:M_BROWN",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+        "ah_correct": false,
+        "rag_correct": false,
+        "ah_trace_complete": true,
+        "ah_hallucinated": true,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": [
+          "SF::E_00018",
+          "M_BROWN",
+          "M_SUMMER"
+        ]
+      },
+      {
+        "question": "Кто такой барсук?",
+        "ah_answer": "Урок: кто такой заяц",
+        "rag_answer": "неизвестно",
+        "ah_correct": false,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": true,
+        "rag_hallucinated": false,
+        "ah_explain": 0.0,
+        "ah_trace": [
+          "EP_LESSON_1"
+        ]
+      },
+      {
+        "question": "Сколько килограммов весит король зайцев на Луне?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "неизвестно",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      }
+    ]
+  },
+  "rabbit_inventing_isolated": {
+    "protocol": "isolated",
+    "rag_backend": "scripted+tfidf",
+    "overall": "supported",
+    "h1_explainability": {
+      "name": "explainability",
+      "verdict": "supported",
+      "delta": 0.9,
+      "ah_score": 0.9,
+      "rag_score": 0.0,
+      "n": 5
+    },
+    "h2_hallucination": {
+      "name": "hallucination_resistance",
+      "verdict": "supported",
+      "delta": 0.5,
+      "ah_score": 0.3333333333333333,
+      "rag_score": 0.8333333333333334,
+      "n": 6
+    },
+    "in_corpus": {
+      "ExplainScore_AH": 0.9,
+      "ExplainScore_VanillaRAG": 0.0,
+      "Hallucination_AH": 0.0,
+      "Hallucination_VanillaRAG": 0.0,
+      "delta_explainability": 0.9,
+      "delta_hallucination": 0.0,
+      "n": 5,
+      "explain_hypothesis_ok": true,
+      "hall_hypothesis_ok": false,
+      "hypothesis_ok": false
+    },
+    "traps": {
+      "ExplainScore_AH": 0.0,
+      "ExplainScore_VanillaRAG": 0.0,
+      "Hallucination_AH": 0.3333,
+      "Hallucination_VanillaRAG": 0.8333,
+      "delta_explainability": 0.0,
+      "delta_hallucination": 0.5,
+      "n": 6,
+      "explain_hypothesis_ok": false,
+      "hall_hypothesis_ok": true,
+      "hypothesis_ok": false
+    },
+    "in_corpus_items": [
+      {
+        "question": "Кто такой заяц?",
+        "ah_answer": "зверёк маленький животное",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "EP_LESSON_1",
+          "HARE",
+          "M_BEAST",
+          "M_HARE"
+        ]
+      },
+      {
+        "question": "Где обитает заяц?",
+        "ah_answer": "location:M_MEADOW",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 0.5,
+        "ah_trace": [
+          "EP_LESSON_1",
+          "HARE",
+          "M_BEAST",
+          "M_HARE",
+          "SF::E_00006",
+          "M_MEADOW"
+        ]
+      },
+      {
+        "question": "Какого цвета шерсть зайца зимой?",
+        "ah_answer": "color:M_WHITE",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "FUR",
+          "M_FUR",
+          "SF::E_00023",
+          "M_WHITE",
+          "M_WINTER"
+        ]
+      },
+      {
+        "question": "Почему заяц бегает быстро?",
+        "ah_answer": "cause:M_HIND_LEG",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "EP_LESSON_1",
+          "HARE",
+          "M_BEAST",
+          "M_HARE",
+          "M_VERY_FAST",
+          "VERY_FAST",
+          "SF::E_00010",
+          "M_HIND_LEG"
+        ]
+      },
+      {
+        "question": "Что такое заяц по иерархии IS-A?",
+        "ah_answer": "зверёк маленький животное",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "EP_LESSON_1",
+          "HARE",
+          "M_BEAST",
+          "M_HARE"
+        ]
+      }
+    ],
+    "trap_items": [
+      {
+        "question": "Где обитает барсук?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      },
+      {
+        "question": "Какой секретный код у зайца?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      },
+      {
+        "question": "Какой пароль у сервера alpha?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      },
+      {
+        "question": "Какого цвета глаза зайца?",
+        "ah_answer": "color:M_BROWN",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": false,
+        "rag_correct": false,
+        "ah_trace_complete": true,
+        "ah_hallucinated": true,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": [
+          "SF::E_00018",
+          "M_BROWN",
+          "M_SUMMER"
+        ]
+      },
+      {
+        "question": "Кто такой барсук?",
+        "ah_answer": "Урок: кто такой заяц",
+        "rag_answer": "неизвестно",
+        "ah_correct": false,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": true,
+        "rag_hallucinated": false,
+        "ah_explain": 0.0,
+        "ah_trace": [
+          "EP_LESSON_1"
+        ]
+      },
+      {
+        "question": "Сколько килограммов весит король зайцев на Луне?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      }
+    ]
+  },
+  "mini_extractive_isolated": {
+    "protocol": "isolated",
+    "rag_backend": "extractive+tfidf",
+    "overall": "supported",
+    "h1_explainability": {
+      "name": "explainability",
+      "verdict": "supported",
+      "delta": 1.0,
+      "ah_score": 1.0,
+      "rag_score": 0.0,
+      "n": 2
+    },
+    "h2_hallucination": {
+      "name": "hallucination_resistance",
+      "verdict": "supported",
+      "delta": 0.5,
+      "ah_score": 0.0,
+      "rag_score": 0.5,
+      "n": 2
+    },
+    "in_corpus": {
+      "ExplainScore_AH": 1.0,
+      "ExplainScore_VanillaRAG": 0.0,
+      "Hallucination_AH": 0.0,
+      "Hallucination_VanillaRAG": 0.0,
+      "delta_explainability": 1.0,
+      "delta_hallucination": 0.0,
+      "n": 2,
+      "explain_hypothesis_ok": true,
+      "hall_hypothesis_ok": false,
+      "hypothesis_ok": false
+    },
+    "traps": {
+      "ExplainScore_AH": 0.0,
+      "ExplainScore_VanillaRAG": 0.0,
+      "Hallucination_AH": 0.0,
+      "Hallucination_VanillaRAG": 0.5,
+      "delta_explainability": 0.0,
+      "delta_hallucination": 0.5,
+      "n": 2,
+      "explain_hypothesis_ok": false,
+      "hall_hypothesis_ok": true,
+      "hypothesis_ok": false
+    },
+    "in_corpus_items": [
+      {
+        "question": "Кто такой сущность?",
+        "ah_answer": "вид",
+        "rag_answer": "Сущность — это вид.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "ENTITY",
+          "M_ENTITY"
+        ]
+      },
+      {
+        "question": "Где обитает сущность?",
+        "ah_answer": "location:M_PLACE",
+        "rag_answer": "Сущность — это вид.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "ENTITY",
+          "M_ENTITY",
+          "SF::E_00004",
+          "M_PLACE"
+        ]
+      }
+    ],
+    "trap_items": [
+      {
+        "question": "Где обитает барсук?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "Сущность — это вид.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      },
+      {
+        "question": "Какой секретный код у сущности?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "неизвестно",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      }
+    ]
+  },
+  "mini_inventing_isolated": {
+    "protocol": "isolated",
+    "rag_backend": "scripted+tfidf",
+    "overall": "supported",
+    "h1_explainability": {
+      "name": "explainability",
+      "verdict": "supported",
+      "delta": 1.0,
+      "ah_score": 1.0,
+      "rag_score": 0.0,
+      "n": 2
+    },
+    "h2_hallucination": {
+      "name": "hallucination_resistance",
+      "verdict": "supported",
+      "delta": 0.5,
+      "ah_score": 0.0,
+      "rag_score": 0.5,
+      "n": 2
+    },
+    "in_corpus": {
+      "ExplainScore_AH": 1.0,
+      "ExplainScore_VanillaRAG": 0.0,
+      "Hallucination_AH": 0.0,
+      "Hallucination_VanillaRAG": 1.0,
+      "delta_explainability": 1.0,
+      "delta_hallucination": 1.0,
+      "n": 2,
+      "explain_hypothesis_ok": true,
+      "hall_hypothesis_ok": true,
+      "hypothesis_ok": true
+    },
+    "traps": {
+      "ExplainScore_AH": 0.0,
+      "ExplainScore_VanillaRAG": 0.0,
+      "Hallucination_AH": 0.0,
+      "Hallucination_VanillaRAG": 0.5,
+      "delta_explainability": 0.0,
+      "delta_hallucination": 0.5,
+      "n": 2,
+      "explain_hypothesis_ok": false,
+      "hall_hypothesis_ok": true,
+      "hypothesis_ok": false
+    },
+    "in_corpus_items": [
+      {
+        "question": "Кто такой сущность?",
+        "ah_answer": "вид",
+        "rag_answer": "Сущность — это вид. Сущность обитает в месте. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "ENTITY",
+          "M_ENTITY"
+        ]
+      },
+      {
+        "question": "Где обитает сущность?",
+        "ah_answer": "location:M_PLACE",
+        "rag_answer": "Сущность — это вид. Сущность обитает в месте. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": true,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 1.0,
+        "ah_trace": [
+          "ENTITY",
+          "M_ENTITY",
+          "SF::E_00004",
+          "M_PLACE"
+        ]
+      }
+    ],
+    "trap_items": [
+      {
+        "question": "Где обитает барсук?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "Сущность — это вид. Сущность обитает в месте. Также из общих знаний: секретный код равен NEPTUNE-9, глаза зелёные, масса 12 кг.",
+        "ah_correct": true,
+        "rag_correct": false,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": true,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      },
+      {
+        "question": "Какой секретный код у сущности?",
+        "ah_answer": "неизвестно",
+        "rag_answer": "неизвестно",
+        "ah_correct": true,
+        "rag_correct": true,
+        "ah_trace_complete": false,
+        "ah_hallucinated": false,
+        "rag_hallucinated": false,
+        "ah_explain": 0.0,
+        "ah_trace": []
+      }
+    ]
+  }
+}

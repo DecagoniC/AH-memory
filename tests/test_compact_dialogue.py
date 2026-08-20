@@ -255,7 +255,7 @@ def test_compact_architecture_dialogue_builds_inspectable_graph() -> None:
     exported_factor_ids = {
         node["id"]
         for node in exported["nodes"]
-        if node.get("kind") == "semantic_factor"
+        if node.get("kind") in {"semantic_factor", "hyperedge"}
     }
     assert {factor.uid for factor in factors}.issubset(exported_factor_ids)
     snapshot = {

@@ -1,0 +1,33 @@
+{
+  "score": {
+    "weighted_f1": 0.0,
+    "normalized_weighted_f1": 0.0,
+    "by_role": {
+      "LOCATION": {
+        "correct": 0,
+        "predicted": 0,
+        "expected": 100,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "OBJECT": {
+        "correct": 0,
+        "predicted": 0,
+        "expected": 100,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "SUBJECT": {
+        "correct": 0,
+        "predicted": 0,
+        "expected": 100,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    }
+  },
+  "n": 100
+}

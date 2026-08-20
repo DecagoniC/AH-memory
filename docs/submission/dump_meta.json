@@ -1,0 +1,42 @@
+{
+  "who_is_hare": "зверёк маленький животное",
+  "fact_hit": 8,
+  "fact_total": 8,
+  "extracted_keys": [
+    "BE_COLORED:FUR:BROWN",
+    "BE_COLORED:FUR:WHITE",
+    "HAVE:HARE:EAR",
+    "HAVE:HARE:HIND_LEG",
+    "HAVE:HARE:TAIL",
+    "IS:HARE:BEAST",
+    "IS:HARE:SMALL",
+    "LIVE_IN:HARE",
+    "RUN:HARE"
+  ],
+  "expected_keys": [
+    "IS:HARE:BEAST",
+    "LIVE_IN:HARE",
+    "HAVE:HARE:HIND_LEG",
+    "RUN:HARE",
+    "HAVE:HARE:EAR",
+    "HAVE:HARE:TAIL",
+    "BE_COLORED:FUR:BROWN",
+    "BE_COLORED:FUR:WHITE"
+  ],
+  "stats": {
+    "S": 15,
+    "C": 15,
+    "P": 0,
+    "H": 2,
+    "L": 19,
+    "hyperedges": 10,
+    "semantic_factors": 10,
+    "relations": 5,
+    "events": 10,
+    "graph_size": 46,
+    "tau": 0
+  },
+  "graph_nodes": 42,
+  "graph_edges": 75,
+  "hyperedges": 10
+}

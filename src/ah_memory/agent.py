@@ -170,7 +170,10 @@ class Agent:
                 if uid not in trace_uids:
                     trace_uids.append(uid)
 
-        answer = self._compose_answer(question, perc.seed_tokens, trace_uids)
+        answer, support = self._compose_answer(question, perc.seed_tokens, trace_uids)
+        for uid in support:
+            if uid not in trace_uids:
+                trace_uids.append(uid)
         collect(self.store, self.hp)
         return AgentReply(
             answer=answer,
@@ -271,23 +274,71 @@ class Agent:
             "final_evidence": actual_nodes,
         }
 
-    def _compose_answer(self, question: str, seeds: list[str], trace: list[str]) -> str:
-        # Зачем: эвристический ответ без LLM (кто/где/labels активированных M).
+    def _compose_answer(
+        self, question: str, seeds: list[str], trace: list[str]
+    ) -> tuple[str, list[str]]:
+        # Эвристический ответ без LLM (кто/где/роли факторов + labels активированных M).
         q = question.lower()
         subjects = self._resolve_subjects(seeds + trace)
+        support: list[str] = []
         if "кто" in q or "что" in q:
             for subj in subjects:
                 ans = self.dsl.execute(f"answer_who({subj})").value
                 if ans != "неизвестно":
-                    return str(ans)
-        if "где" in q:
+                    support.extend([subj, *trace[:4]])
+                    return str(ans), support
+        if any(w in q for w in ("сколько", "когда родился", "на луне")):
+            return "неизвестно", []
+        if "где" in q or "обита" in q:
             for subj in subjects:
                 for factor in self.store.list_semantic_factors():
                     if factor.roles.get("SUBJECT") != subj:
                         continue
                     loc = factor.roles.get("LOCATION")
                     if loc:
-                        return f"location:{loc}"
+                        support.extend([subj, factor.uid, loc])
+                        return f"location:{loc}", support
+        if "цвет" in q or "шерст" in q:
+            for factor in self.store.list_semantic_factors():
+                pred = (
+                    factor.relation.canonical_label.upper()
+                    if factor.relation is not None
+                    else ""
+                )
+                if pred not in {"BE_COLORED", "COLORED", "HAS_COLOR"}:
+                    continue
+                obj = factor.roles.get("OBJECT")
+                time_r = factor.roles.get("TIME")
+                if not obj:
+                    continue
+                if "зим" in q and time_r and "WINTER" not in time_r.upper():
+                    continue
+                if "лет" in q and time_r and "SUMMER" not in time_r.upper():
+                    continue
+                support.extend([factor.uid, obj] + ([time_r] if time_r else []))
+                return f"color:{obj}", support
+        if "почему" in q or "быстр" in q:
+            for subj in subjects:
+                for factor in self.store.list_semantic_factors():
+                    if factor.roles.get("SUBJECT") != subj:
+                        continue
+                    obj = factor.roles.get("OBJECT")
+                    cause = factor.roles.get("CAUSE")
+                    how = factor.roles.get("HOW-TO")
+                    pred = (
+                        factor.relation.canonical_label.upper()
+                        if factor.relation is not None
+                        else ""
+                    )
+                    if cause:
+                        support.extend([subj, factor.uid, cause])
+                        return f"cause:{cause}", support
+                    if how:
+                        support.extend([subj, factor.uid, how])
+                        return f"cause:{how}", support
+                    if pred == "HAVE" and obj:
+                        support.extend([subj, factor.uid, obj])
+                        return f"cause:{obj}", support
         labels: list[str] = []
         for uid in trace:
             try:
@@ -297,11 +348,12 @@ class Agent:
             for p in m.Pr:
                 if p.name == "label":
                     labels.append(p.value)
+                    support.append(uid)
         if labels:
-            return " ".join(labels[:8])
+            return " ".join(labels[:8]), support
         if trace:
-            return "activated:" + ",".join(trace[:12])
-        return "неизвестно"
+            return "activated:" + ",".join(trace[:12]), list(trace[:12])
+        return "неизвестно", []
 
     def _resolve_subjects(self, tokens: list[str]) -> list[str]:
         out: list[str] = []

@@ -78,21 +78,17 @@ def test_ah_abstains_on_unknown_slot_without_color_keyword() -> None:
     assert ah_answer_is_abstain(reply.answer)
 
 
-def test_ah_wrong_slot_color_is_a_documented_limitation() -> None:
-    """Keyword 'цвет' binds to fur color even when the asked slot is eyes."""
+def test_ah_abstains_when_color_subject_is_not_in_the_question() -> None:
+    """BE_COLORED(FUR) must not answer a color question about a different part."""
     reply = _rabbit_agent().ask("Какого цвета глаза зайца?", ticks=6)
-    assert "BROWN" in reply.answer or "WHITE" in reply.answer or "цвет" in reply.answer.lower()
-    assert not ah_answer_is_abstain(reply.answer)
+    assert ah_answer_is_abstain(reply.answer)
 
 
-@pytest.mark.xfail(
-    reason="persistent WM can answer a later OOD location from the previous entity",
-    strict=False,
-)
 def test_ah_sequential_ood_location_should_abstain() -> None:
     agent = _rabbit_agent()
-    agent.ask("Где обитает заяц?", ticks=6)
+    first = agent.ask("Где обитает заяц?", ticks=6)
     later = agent.ask("Где обитает барсук?", ticks=6)
+    assert "MEADOW" in first.answer or "луг" in first.answer.lower()
     assert ah_answer_is_abstain(later.answer)
 
 
@@ -188,8 +184,8 @@ def test_official_m4_extractive_supports_h1_not_h2() -> None:
     assert payload["Hallucination_VanillaRAG"] == 0.0
 
 
-def test_h2_rejected_on_cherry_picked_who_is_unknown_entity() -> None:
-    """Single-item slice where extractive RAG abstains and AH dumps an episode label."""
+def test_h2_unknown_entity_who_both_abstain() -> None:
+    """After the WM/slot fix AH no longer dumps an episode title for an unknown who-is."""
     report = evaluate_hypothesis(
         make_agent=_rabbit_agent,
         make_rag=_rabbit_extractive,
@@ -197,12 +193,11 @@ def test_h2_rejected_on_cherry_picked_who_is_unknown_entity() -> None:
         traps=[item for item in rabbit_trap_gold() if item.question == "Кто такой барсук?"],
         protocol="isolated",
     )
-    assert report.h2_hallucination.verdict == "rejected", report.as_dict()
-    assert report.traps.items[0].ah_hallucinated is True
-    assert report.traps.items[0].rag_hallucinated is False
+    assert report.traps.items[0].ah_hallucinated is False
+    assert ah_answer_is_abstain(report.traps.items[0].ah_answer)
 
 
-def test_sequential_protocol_weakens_h2_via_wm_leak() -> None:
+def test_sequential_ood_location_does_not_reuse_prior_subject() -> None:
     report = evaluate_hypothesis(
         make_agent=_rabbit_agent,
         make_rag=_rabbit_extractive,
@@ -211,7 +206,8 @@ def test_sequential_protocol_weakens_h2_via_wm_leak() -> None:
         protocol="sequential",
     )
     assert report.protocol == "sequential"
-    assert report.traps.items[0].ah_hallucinated is True
+    assert report.traps.items[0].ah_hallucinated is False
+    assert ah_answer_is_abstain(report.traps.items[0].ah_answer)
 
 
 # ── Generic (non-rabbit) fixture: same architecture ──────────────────────────

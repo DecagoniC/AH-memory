@@ -5,6 +5,7 @@
 """
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass, field
 
 from ah_memory.dsl import DSLInterpreter
@@ -131,6 +132,8 @@ class Agent:
         perception: PerceptionResult | None = None,
     ) -> AgentReply:
         # Зачем: не писать вопрос как факт, а найти UID по seeds → ignition → compose.
+        # Каждый вопрос — новый фокус: иначе WM прошлого субъекта отвечает за чужую сущность.
+        self.ignition.reset_query()
         if perception is None:
             perc = self.perception.parse(question, list(self.ignition.wm.contents()))
         else:
@@ -170,7 +173,11 @@ class Agent:
                 if uid not in trace_uids:
                     trace_uids.append(uid)
 
-        answer, support = self._compose_answer(question, perc.seed_tokens, trace_uids)
+        answer, support = self._compose_answer(
+            question,
+            perc.seed_tokens + [s.uid for s in seeds],
+            trace_uids,
+        )
         for uid in support:
             if uid not in trace_uids:
                 trace_uids.append(uid)
@@ -277,9 +284,9 @@ class Agent:
     def _compose_answer(
         self, question: str, seeds: list[str], trace: list[str]
     ) -> tuple[str, list[str]]:
-        # Эвристический ответ без LLM (кто/где/роли факторов + labels активированных M).
+        # Только сущности из текущего вопроса — не чужой фокус WM и не чужой слот.
         q = question.lower()
-        subjects = self._resolve_subjects(seeds + trace)
+        subjects = self._resolve_subjects(seeds)
         support: list[str] = []
         if "кто" in q or "что" in q:
             for subj in subjects:
@@ -287,7 +294,6 @@ class Agent:
                 if ans != "неизвестно":
                     support.extend([subj, *trace[:4]])
                     return str(ans), support
-        if any(w in q for w in ("сколько", "когда родился", "на луне")):
             return "неизвестно", []
         if "где" in q or "обита" in q:
             for subj in subjects:
@@ -298,25 +304,12 @@ class Agent:
                     if loc:
                         support.extend([subj, factor.uid, loc])
                         return f"location:{loc}", support
+            return "неизвестно", []
         if "цвет" in q or "шерст" in q:
-            for factor in self.store.list_semantic_factors():
-                pred = (
-                    factor.relation.canonical_label.upper()
-                    if factor.relation is not None
-                    else ""
-                )
-                if pred not in {"BE_COLORED", "COLORED", "HAS_COLOR"}:
-                    continue
-                obj = factor.roles.get("OBJECT")
-                time_r = factor.roles.get("TIME")
-                if not obj:
-                    continue
-                if "зим" in q and time_r and "WINTER" not in time_r.upper():
-                    continue
-                if "лет" in q and time_r and "SUMMER" not in time_r.upper():
-                    continue
-                support.extend([factor.uid, obj] + ([time_r] if time_r else []))
-                return f"color:{obj}", support
+            colored = self._color_answer(subjects, q)
+            if colored is not None:
+                return colored
+            return "неизвестно", []
         if "почему" in q or "быстр" in q:
             for subj in subjects:
                 for factor in self.store.list_semantic_factors():
@@ -339,21 +332,72 @@ class Agent:
                     if pred == "HAVE" and obj:
                         support.extend([subj, factor.uid, obj])
                         return f"cause:{obj}", support
-        labels: list[str] = []
-        for uid in trace:
-            try:
-                m = self.store.get_symbol(uid)
-            except Exception:
-                continue
-            for p in m.Pr:
-                if p.name == "label":
-                    labels.append(p.value)
-                    support.append(uid)
-        if labels:
-            return " ".join(labels[:8]), support
-        if trace:
-            return "activated:" + ",".join(trace[:12]), list(trace[:12])
+            return "неизвестно", []
         return "неизвестно", []
+
+    def _color_answer(
+        self, subjects: list[str], question: str
+    ) -> tuple[str, list[str]] | None:
+        grounded = set(subjects)
+        color_factors = []
+        for factor in self.store.list_semantic_factors():
+            pred = (
+                factor.relation.canonical_label.upper()
+                if factor.relation is not None
+                else ""
+            )
+            if pred not in {"BE_COLORED", "COLORED", "HAS_COLOR"}:
+                continue
+            subj = factor.roles.get("SUBJECT")
+            obj = factor.roles.get("OBJECT")
+            if not obj or subj not in grounded:
+                continue
+            color_factors.append(factor)
+        if not color_factors:
+            return None
+        mentioned_times = {
+            factor.roles["TIME"]
+            for factor in color_factors
+            if factor.roles.get("TIME")
+            and self._surface_in_question(factor.roles["TIME"], question)
+        }
+        for factor in color_factors:
+            time_r = factor.roles.get("TIME")
+            if mentioned_times and time_r not in mentioned_times:
+                continue
+            obj = factor.roles.get("OBJECT")
+            support = [factor.uid, obj] + ([time_r] if time_r else [])
+            return f"color:{obj}", support
+        return None
+
+    def _surface_in_question(self, uid: str, question: str) -> bool:
+        q = question.lower().replace("ё", "е")
+        names: set[str] = {uid.lower(), uid.lower().removeprefix("m_")}
+        try:
+            symbol = self.store.get_symbol(uid if uid.startswith("M_") else f"M_{uid}")
+            names.update(
+                p.value.lower().replace("ё", "е")
+                for p in symbol.Pr
+                if p.name == "label"
+            )
+        except Exception:
+            pass
+        bare = uid[2:] if uid.startswith("M_") else uid
+        if bare in self.store.ah.S:
+            names.update(
+                str(form).lower().replace("ё", "е")
+                for form in (self.store.ah.S[bare].R.get("TEXT") or set())
+            )
+        tokens = {part for part in re.findall(r"[a-zA-Zа-яА-ЯёЁ0-9]+", q) if len(part) >= 3}
+        for name in names:
+            if not name or len(name) < 3:
+                continue
+            if name in q:
+                return True
+            stem = name[: max(3, len(name) - 1)]
+            if any(token.startswith(stem) or stem.startswith(token[:3]) for token in tokens):
+                return True
+        return False
 
     def _resolve_subjects(self, tokens: list[str]) -> list[str]:
         out: list[str] = []

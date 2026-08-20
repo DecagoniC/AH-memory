@@ -187,6 +187,14 @@ class IgnitionEngine:
     def seed(self, seeds: list[ActivationSeed]) -> None:
         self._pending_seeds.extend(seeds)
 
+    def reset_query(self) -> None:
+        """Drop prior focus so the next question cannot inherit leftover WM."""
+        self._pending_seeds = []
+        self._evidence = {}
+        self.wm = WorkingMemory()
+        self._ensure_graph()
+        self.state = self.bp.initialize(self.graph)
+
     def tick(
         self,
         state: BPState | None = None,

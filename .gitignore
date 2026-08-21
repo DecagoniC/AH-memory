@@ -1,4 +1,5 @@
 .env
+.cursor/
 config.local.yaml
 __pycache__/
 *.pyc

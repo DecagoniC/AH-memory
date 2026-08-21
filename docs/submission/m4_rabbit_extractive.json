@@ -1,0 +1,129 @@
+{
+  "summary": {
+    "ExplainScore_AH": 0.6667,
+    "ExplainScore_VanillaRAG": 0.0,
+    "Hallucination_AH": 0.0,
+    "Hallucination_VanillaRAG": 0.0,
+    "delta_explainability": 0.6667,
+    "delta_hallucination": 0.0,
+    "n": 6,
+    "explain_hypothesis_ok": true,
+    "hall_hypothesis_ok": false,
+    "hypothesis_ok": false
+  },
+  "items": [
+    {
+      "q": "Кто такой заяц?",
+      "ah": "зверёк маленький животное",
+      "rag": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+      "ah_correct": true,
+      "rag_correct": true,
+      "ah_trace_complete": true,
+      "ah_hall": false,
+      "rag_hall": false,
+      "ah_explain": 1.0,
+      "trace": [
+        "EP_LESSON_1",
+        "HARE",
+        "M_BEAST",
+        "M_HARE"
+      ]
+    },
+    {
+      "q": "Где обитает заяц?",
+      "ah": "location:M_MEADOW",
+      "rag": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+      "ah_correct": true,
+      "rag_correct": true,
+      "ah_trace_complete": true,
+      "ah_hall": false,
+      "rag_hall": false,
+      "ah_explain": 0.5,
+      "trace": [
+        "EP_LESSON_1",
+        "HARE",
+        "M_HARE",
+        "SF::E_00006",
+        "M_MEADOW"
+      ]
+    },
+    {
+      "q": "Какого цвета шерсть зайца зимой?",
+      "ah": "color:M_WHITE",
+      "rag": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+      "ah_correct": true,
+      "rag_correct": false,
+      "ah_trace_complete": true,
+      "ah_hall": false,
+      "rag_hall": false,
+      "ah_explain": 1.0,
+      "trace": [
+        "EP_LESSON_1",
+        "FUR",
+        "HARE",
+        "M_FUR",
+        "M_HARE",
+        "SF::E_00023",
+        "M_WHITE",
+        "M_WINTER"
+      ]
+    },
+    {
+      "q": "Почему заяц бегает быстро?",
+      "ah": "cause:M_HIND_LEG",
+      "rag": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+      "ah_correct": true,
+      "rag_correct": false,
+      "ah_trace_complete": true,
+      "ah_hall": false,
+      "rag_hall": false,
+      "ah_explain": 1.0,
+      "trace": [
+        "EP_LESSON_1",
+        "FUR",
+        "HARE",
+        "M_FUR",
+        "M_HARE",
+        "M_VERY_FAST",
+        "VERY_FAST",
+        "SF::E_00010",
+        "M_HIND_LEG"
+      ]
+    },
+    {
+      "q": "Что такое заяц по иерархии IS-A?",
+      "ah": "зверёк маленький животное",
+      "rag": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу.",
+      "ah_correct": true,
+      "rag_correct": true,
+      "ah_trace_complete": false,
+      "ah_hall": false,
+      "rag_hall": false,
+      "ah_explain": 0.0,
+      "trace": [
+        "EP_LESSON_1",
+        "HARE",
+        "M_HARE",
+        "M_VERY_FAST",
+        "VERY_FAST"
+      ]
+    },
+    {
+      "q": "Сколько килограммов весит король зайцев на Луне?",
+      "ah": "неизвестно",
+      "rag": "неизвестно",
+      "ah_correct": true,
+      "rag_correct": true,
+      "ah_trace_complete": true,
+      "ah_hall": false,
+      "rag_hall": false,
+      "ah_explain": 0.5,
+      "trace": [
+        "EP_LESSON_1",
+        "HARE",
+        "M_HARE"
+      ]
+    }
+  ],
+  "rag_backend": "extractive+tfidf"
+}

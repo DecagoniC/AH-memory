@@ -1,0 +1,20 @@
+{"answer": "river trail 19", "query_id": "QA_001", "support_ids": ["QA_016_D03", "QA_005_D04", "QA_016_D04", "QA_001_D01", "QA_016_D01", "QA_019_D01"]}
+{"answer": "ice formation 09", "query_id": "QA_002", "support_ids": ["QA_005_D02", "QA_014_D02", "QA_008_D01", "QA_006_D02", "QA_003_D02", "QA_009_D01"]}
+{"answer": "slope movement 15", "query_id": "QA_003", "support_ids": ["QA_003_D03", "QA_003_D01", "QA_005_D04", "QA_003_D02", "QA_015_D03", "QA_015_D02"]}
+{"answer": "north marker 07", "query_id": "QA_004", "support_ids": ["QA_004_D01", "QA_016_D01", "QA_004_D03", "QA_004_D02", "QA_004_D04", "QA_007_D01"]}
+{"answer": "valve restriction 18", "query_id": "QA_005", "support_ids": ["QA_005_D01", "QA_003_D02", "QA_005_D02", "QA_003_D03", "QA_018_D01", "QA_018_D02"]}
+{"answer": "north marker 16", "query_id": "QA_006", "support_ids": ["QA_006_D01", "QA_016_D03", "QA_015_D01", "QA_003_D03", "QA_016_D04", "QA_016_D01"]}
+{"answer": "beacon gamma 04", "query_id": "QA_007", "support_ids": ["QA_007_D01", "QA_016_D01", "QA_005_D04", "QA_004_D01", "QA_005_D03", "QA_004_D03"]}
+{"answer": "inspection 18", "query_id": "QA_008", "support_ids": ["QA_008_D01", "QA_014_D02", "QA_017_D01", "QA_018_D01", "QA_005_D02", "QA_018_D06"]}
+{"answer": "beacon alpha 13", "query_id": "QA_009", "support_ids": ["QA_009_D01", "QA_018_D01", "QA_003_D03", "QA_009_D02", "QA_015_D03", "QA_013_D01"]}
+{"answer": "geologic material 05", "query_id": "QA_010", "support_ids": ["QA_016_D01", "QA_016_D03", "QA_019_D01", "QA_007_D01", "QA_014_D02", "QA_005_D02"]}
+{"answer": "controller stop 03", "query_id": "QA_011", "support_ids": ["QA_009_D01", "QA_003_D02", "QA_018_D01", "QA_012_D02", "QA_006_D02", "QA_003_D03"]}
+{"answer": "physical substance 05", "query_id": "QA_012", "support_ids": ["QA_003_D03", "QA_012_D01", "QA_006_D02", "QA_015_D02", "QA_003_D02", "QA_005_D04"]}
+{"answer": "south marker 16", "query_id": "QA_013", "support_ids": ["QA_013_D01", "QA_004_D01", "QA_016_D01", "QA_005_D04", "QA_016_D04", "QA_016_D03"]}
+{"answer": "soil saturation 06", "query_id": "QA_014", "support_ids": ["QA_008_D01", "QA_006_D02", "QA_014_D02", "QA_003_D02", "QA_018_D01", "QA_006_D01"]}
+{"answer": "ice formation 09", "query_id": "QA_015", "support_ids": ["QA_015_D01", "QA_003_D03", "QA_015_D03", "QA_003_D02", "QA_018_D01", "QA_009_D01"]}
+{"answer": "beacon gamma 04", "query_id": "QA_016", "support_ids": ["QA_016_D01", "QA_007_D01", "QA_004_D01", "QA_016_D03", "QA_016_D02", "QA_004_D03"]}
+{"answer": "slope movement 06", "query_id": "QA_017", "support_ids": ["QA_017_D01", "QA_018_D01", "QA_008_D01", "QA_009_D01", "QA_003_D02", "QA_006_D02"]}
+{"answer": "physical substance 05", "query_id": "QA_018", "support_ids": ["QA_009_D01", "QA_018_D01", "QA_003_D03", "QA_009_D02", "QA_015_D01", "QA_005_D04"]}
+{"answer": "natural material 05", "query_id": "QA_019", "support_ids": ["QA_016_D03", "QA_019_D01", "QA_016_D04", "QA_016_D01", "QA_005_D04", "QA_005_D03"]}
+{"answer": "slope movement 06", "query_id": "QA_020", "support_ids": ["QA_009_D01", "QA_018_D06", "QA_018_D01", "QA_006_D01", "QA_003_D02", "QA_006_D02"]}

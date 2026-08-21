@@ -1,0 +1,1958 @@
+{
+  "nodes": [
+    {
+      "id": "HARE",
+      "label": "заяц",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -580.0,
+      "title": "S HARE\nR={TEXT:hare|заяц}\nact=0.000"
+    },
+    {
+      "id": "BEAST",
+      "label": "beast",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -516.0,
+      "title": "S BEAST\nR={TEXT:beast|зверёк}\nact=0.000"
+    },
+    {
+      "id": "SMALL",
+      "label": "small",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -452.0,
+      "title": "S SMALL\nR={TEXT:small|маленький}\nact=0.000"
+    },
+    {
+      "id": "MEADOW",
+      "label": "луг",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -388.0,
+      "title": "S MEADOW\nR={TEXT:meadow|луг}\nact=0.000"
+    },
+    {
+      "id": "FOREST",
+      "label": "лес",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -324.0,
+      "title": "S FOREST\nR={TEXT:forest|лес}\nact=0.000"
+    },
+    {
+      "id": "HIND_LEG",
+      "label": "hind_leg",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -260.0,
+      "title": "S HIND_LEG\nR={TEXT:hind_leg|задние лапы}\nact=0.000"
+    },
+    {
+      "id": "VERY_FAST",
+      "label": "very_fast",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -196.0,
+      "title": "S VERY_FAST\nR={TEXT:very_fast|очень быстро}\nact=0.000"
+    },
+    {
+      "id": "EAR",
+      "label": "ear",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -132.0,
+      "title": "S EAR\nR={TEXT:ear|уши}\nact=0.000"
+    },
+    {
+      "id": "TAIL",
+      "label": "tail",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -68.0,
+      "title": "S TAIL\nR={TEXT:tail|хвост}\nact=0.000"
+    },
+    {
+      "id": "FUR",
+      "label": "fur",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": -4.0,
+      "title": "S FUR\nR={TEXT:fur|шерсть}\nact=0.000"
+    },
+    {
+      "id": "BROWN",
+      "label": "brown",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": 60.0,
+      "title": "S BROWN\nR={TEXT:brown|коричневый}\nact=0.000"
+    },
+    {
+      "id": "WHITE",
+      "label": "white",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": 124.0,
+      "title": "S WHITE\nR={TEXT:white|белый}\nact=0.000"
+    },
+    {
+      "id": "SUMMER",
+      "label": "лето",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": 188.0,
+      "title": "S SUMMER\nR={TEXT:summer|лето}\nact=0.000"
+    },
+    {
+      "id": "WINTER",
+      "label": "winter",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": 252.0,
+      "title": "S WINTER\nR={TEXT:winter|зима}\nact=0.000"
+    },
+    {
+      "id": "ANIMAL",
+      "label": "животное",
+      "group": "S",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 0.0,
+      "y": 316.0,
+      "title": "S ANIMAL\nR={TEXT:animal|животное}\nact=0.000"
+    },
+    {
+      "id": "M_HARE",
+      "label": "Заяц",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -580.0,
+      "title": "C m M_HARE\nact=0.000"
+    },
+    {
+      "id": "M_BEAST",
+      "label": "зверёк",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -516.0,
+      "title": "C m M_BEAST\nact=0.000"
+    },
+    {
+      "id": "M_SMALL",
+      "label": "маленький",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -452.0,
+      "title": "C m M_SMALL\nact=0.000"
+    },
+    {
+      "id": "M_MEADOW",
+      "label": "луг",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -388.0,
+      "title": "C m M_MEADOW\nact=0.000"
+    },
+    {
+      "id": "M_FOREST",
+      "label": "лес",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -324.0,
+      "title": "C m M_FOREST\nact=0.000"
+    },
+    {
+      "id": "M_HIND_LEG",
+      "label": "задние лапы",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -260.0,
+      "title": "C m M_HIND_LEG\nact=0.000"
+    },
+    {
+      "id": "M_VERY_FAST",
+      "label": "очень быстро",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -196.0,
+      "title": "C m M_VERY_FAST\nact=0.000"
+    },
+    {
+      "id": "M_EAR",
+      "label": "уши",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -132.0,
+      "title": "C m M_EAR\nact=0.000"
+    },
+    {
+      "id": "M_TAIL",
+      "label": "хвост",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -68.0,
+      "title": "C m M_TAIL\nact=0.000"
+    },
+    {
+      "id": "M_FUR",
+      "label": "шерсть",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": -4.0,
+      "title": "C m M_FUR\nact=0.000"
+    },
+    {
+      "id": "M_BROWN",
+      "label": "коричневый",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": 60.0,
+      "title": "C m M_BROWN\nact=0.000"
+    },
+    {
+      "id": "M_WHITE",
+      "label": "белый",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": 124.0,
+      "title": "C m M_WHITE\nact=0.000"
+    },
+    {
+      "id": "M_SUMMER",
+      "label": "лето",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": 188.0,
+      "title": "C m M_SUMMER\nact=0.000"
+    },
+    {
+      "id": "M_WINTER",
+      "label": "зима",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": 252.0,
+      "title": "C m M_WINTER\nact=0.000"
+    },
+    {
+      "id": "M_ANIMAL",
+      "label": "Животное",
+      "group": "C_m",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 560.0,
+      "y": 316.0,
+      "title": "C m M_ANIMAL\nact=0.000"
+    },
+    {
+      "id": "EP_LESSON_1",
+      "label": "Урок: кто такой заяц",
+      "group": "H_k",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 1220.0,
+      "y": -580.0,
+      "title": "H m EP_LESSON_1\nact=0.000"
+    },
+    {
+      "id": "EP_LESSON_2",
+      "label": "Урок: линька",
+      "group": "H_k",
+      "kind": "vertex",
+      "activation": 0.0,
+      "x": 1220.0,
+      "y": -516.0,
+      "title": "H m EP_LESSON_2\nact=0.000"
+    },
+    {
+      "id": "SF::E_00001",
+      "label": "⟦IS⟧\nSUBJECT → HARE\nOBJECT → BEAST",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "IS",
+      "raw_relation": "IS",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -580.0,
+      "title": "HYPEREDGE SF::E_00001\npredicate=IS\nw=0.500\nSUBJECT: M_HARE\nOBJECT: M_BEAST"
+    },
+    {
+      "id": "SF::E_00004",
+      "label": "⟦IS⟧\nSUBJECT → HARE\nOBJECT → SMALL",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "IS",
+      "raw_relation": "IS",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -516.0,
+      "title": "HYPEREDGE SF::E_00004\npredicate=IS\nw=0.500\nSUBJECT: M_HARE\nOBJECT: M_SMALL"
+    },
+    {
+      "id": "SF::E_00006",
+      "label": "⟦LIVE_IN⟧\nSUBJECT → HARE\nLOCATION → MEADOW",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "LIVE_IN",
+      "raw_relation": "LIVE_IN",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -452.0,
+      "title": "HYPEREDGE SF::E_00006\npredicate=LIVE_IN\nw=0.500\nSUBJECT: M_HARE\nLOCATION: M_MEADOW"
+    },
+    {
+      "id": "SF::E_00008",
+      "label": "⟦LIVE_IN⟧\nSUBJECT → HARE\nLOCATION → FOREST",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "LIVE_IN",
+      "raw_relation": "LIVE_IN",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -388.0,
+      "title": "HYPEREDGE SF::E_00008\npredicate=LIVE_IN\nw=0.500\nSUBJECT: M_HARE\nLOCATION: M_FOREST"
+    },
+    {
+      "id": "SF::E_00010",
+      "label": "⟦HAVE⟧\nSUBJECT → HARE\nOBJECT → HIND_LEG",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "HAVE",
+      "raw_relation": "HAVE",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -324.0,
+      "title": "HYPEREDGE SF::E_00010\npredicate=HAVE\nw=0.500\nSUBJECT: M_HARE\nOBJECT: M_HIND_LEG"
+    },
+    {
+      "id": "SF::E_00012",
+      "label": "⟦RUN⟧\nSUBJECT → HARE\nHOW-TO → VERY_FAST",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "RUN",
+      "raw_relation": "RUN",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -260.0,
+      "title": "HYPEREDGE SF::E_00012\npredicate=RUN\nw=0.500\nSUBJECT: M_HARE\nHOW-TO: M_VERY_FAST"
+    },
+    {
+      "id": "SF::E_00014",
+      "label": "⟦HAVE⟧\nSUBJECT → HARE\nOBJECT → EAR",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "HAVE",
+      "raw_relation": "HAVE",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -196.0,
+      "title": "HYPEREDGE SF::E_00014\npredicate=HAVE\nw=0.500\nSUBJECT: M_HARE\nOBJECT: M_EAR"
+    },
+    {
+      "id": "SF::E_00016",
+      "label": "⟦HAVE⟧\nSUBJECT → HARE\nOBJECT → TAIL",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "HAVE",
+      "raw_relation": "HAVE",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -132.0,
+      "title": "HYPEREDGE SF::E_00016\npredicate=HAVE\nw=0.500\nSUBJECT: M_HARE\nOBJECT: M_TAIL"
+    },
+    {
+      "id": "SF::E_00018",
+      "label": "⟦BE_COLORED⟧\nSUBJECT → FUR\nOBJECT → BROWN\nTIME → SUMMER",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "BE_COLORED",
+      "raw_relation": "BE_COLORED",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -68.0,
+      "title": "HYPEREDGE SF::E_00018\npredicate=BE_COLORED\nw=0.500\nSUBJECT: M_FUR\nOBJECT: M_BROWN\nTIME: M_SUMMER"
+    },
+    {
+      "id": "SF::E_00023",
+      "label": "⟦BE_COLORED⟧\nSUBJECT → FUR\nOBJECT → WHITE\nTIME → WINTER",
+      "group": "hyperedge",
+      "kind": "hyperedge",
+      "predicate": "BE_COLORED",
+      "raw_relation": "BE_COLORED",
+      "activation": 0.0,
+      "x": 920.0,
+      "y": -4.0,
+      "title": "HYPEREDGE SF::E_00023\npredicate=BE_COLORED\nw=0.500\nSUBJECT: M_FUR\nOBJECT: M_WHITE\nTIME: M_WINTER"
+    }
+  ],
+  "edges": [
+    {
+      "id": "SF::E_00001__SUBJECT",
+      "from": "SF::E_00001",
+      "to": "M_HARE",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge IS: SUBJECT = M_HARE · w=0.500"
+    },
+    {
+      "id": "SF::E_00001__OBJECT",
+      "from": "SF::E_00001",
+      "to": "M_BEAST",
+      "label": "OBJECT",
+      "kind": "hyper_incidence",
+      "role": "OBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#2a9d8f",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge IS: OBJECT = M_BEAST · w=0.500"
+    },
+    {
+      "id": "SF::E_00001__mesh__M_HARE__M_BEAST",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00001",
+      "predicate": "IS",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦IS⟧: M_HARE ↔ M_BEAST (n=2) · w=0.500"
+    },
+    {
+      "id": "SF::E_00004__SUBJECT",
+      "from": "SF::E_00004",
+      "to": "M_HARE",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge IS: SUBJECT = M_HARE · w=0.500"
+    },
+    {
+      "id": "SF::E_00004__OBJECT",
+      "from": "SF::E_00004",
+      "to": "M_SMALL",
+      "label": "OBJECT",
+      "kind": "hyper_incidence",
+      "role": "OBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#2a9d8f",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge IS: OBJECT = M_SMALL · w=0.500"
+    },
+    {
+      "id": "SF::E_00004__mesh__M_HARE__M_SMALL",
+      "from": "M_HARE",
+      "to": "M_SMALL",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00004",
+      "predicate": "IS",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦IS⟧: M_HARE ↔ M_SMALL (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00004__mesh__M_HARE__M_BEAST",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00004",
+      "predicate": "IS",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦IS⟧: M_HARE ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00004__mesh__M_SMALL__M_BEAST",
+      "from": "M_SMALL",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00004",
+      "predicate": "IS",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦IS⟧: M_SMALL ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00006__SUBJECT",
+      "from": "SF::E_00006",
+      "to": "M_HARE",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge LIVE_IN: SUBJECT = M_HARE · w=0.500"
+    },
+    {
+      "id": "SF::E_00006__LOCATION",
+      "from": "SF::E_00006",
+      "to": "M_MEADOW",
+      "label": "LOCATION",
+      "kind": "hyper_incidence",
+      "role": "LOCATION",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#457b9d",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge LIVE_IN: LOCATION = M_MEADOW · w=0.500"
+    },
+    {
+      "id": "SF::E_00006__mesh__M_HARE__M_MEADOW",
+      "from": "M_HARE",
+      "to": "M_MEADOW",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00006",
+      "predicate": "LIVE_IN",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦LIVE_IN⟧: M_HARE ↔ M_MEADOW (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00006__mesh__M_HARE__M_BEAST",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00006",
+      "predicate": "LIVE_IN",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦LIVE_IN⟧: M_HARE ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00006__mesh__M_MEADOW__M_BEAST",
+      "from": "M_MEADOW",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00006",
+      "predicate": "LIVE_IN",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦LIVE_IN⟧: M_MEADOW ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00008__SUBJECT",
+      "from": "SF::E_00008",
+      "to": "M_HARE",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge LIVE_IN: SUBJECT = M_HARE · w=0.500"
+    },
+    {
+      "id": "SF::E_00008__LOCATION",
+      "from": "SF::E_00008",
+      "to": "M_FOREST",
+      "label": "LOCATION",
+      "kind": "hyper_incidence",
+      "role": "LOCATION",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#457b9d",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge LIVE_IN: LOCATION = M_FOREST · w=0.500"
+    },
+    {
+      "id": "SF::E_00008__mesh__M_HARE__M_FOREST",
+      "from": "M_HARE",
+      "to": "M_FOREST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00008",
+      "predicate": "LIVE_IN",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦LIVE_IN⟧: M_HARE ↔ M_FOREST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00008__mesh__M_HARE__M_BEAST",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00008",
+      "predicate": "LIVE_IN",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦LIVE_IN⟧: M_HARE ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00008__mesh__M_FOREST__M_BEAST",
+      "from": "M_FOREST",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00008",
+      "predicate": "LIVE_IN",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦LIVE_IN⟧: M_FOREST ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00010__SUBJECT",
+      "from": "SF::E_00010",
+      "to": "M_HARE",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge HAVE: SUBJECT = M_HARE · w=0.500"
+    },
+    {
+      "id": "SF::E_00010__OBJECT",
+      "from": "SF::E_00010",
+      "to": "M_HIND_LEG",
+      "label": "OBJECT",
+      "kind": "hyper_incidence",
+      "role": "OBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#2a9d8f",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge HAVE: OBJECT = M_HIND_LEG · w=0.500"
+    },
+    {
+      "id": "SF::E_00010__mesh__M_HARE__M_HIND_LEG",
+      "from": "M_HARE",
+      "to": "M_HIND_LEG",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00010",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦HAVE⟧: M_HARE ↔ M_HIND_LEG (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00010__mesh__M_HARE__M_BEAST",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00010",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦HAVE⟧: M_HARE ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00010__mesh__M_HIND_LEG__M_BEAST",
+      "from": "M_HIND_LEG",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00010",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦HAVE⟧: M_HIND_LEG ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00012__SUBJECT",
+      "from": "SF::E_00012",
+      "to": "M_HARE",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge RUN: SUBJECT = M_HARE · w=0.500"
+    },
+    {
+      "id": "SF::E_00012__HOW-TO",
+      "from": "SF::E_00012",
+      "to": "M_VERY_FAST",
+      "label": "HOW-TO",
+      "kind": "hyper_incidence",
+      "role": "HOW-TO",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#ef476f",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge RUN: HOW-TO = M_VERY_FAST · w=0.500"
+    },
+    {
+      "id": "SF::E_00012__mesh__M_HARE__M_VERY_FAST",
+      "from": "M_HARE",
+      "to": "M_VERY_FAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00012",
+      "predicate": "RUN",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦RUN⟧: M_HARE ↔ M_VERY_FAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00012__mesh__M_HARE__M_BEAST",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00012",
+      "predicate": "RUN",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦RUN⟧: M_HARE ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00012__mesh__M_VERY_FAST__M_BEAST",
+      "from": "M_VERY_FAST",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00012",
+      "predicate": "RUN",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦RUN⟧: M_VERY_FAST ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00014__SUBJECT",
+      "from": "SF::E_00014",
+      "to": "M_HARE",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge HAVE: SUBJECT = M_HARE · w=0.500"
+    },
+    {
+      "id": "SF::E_00014__OBJECT",
+      "from": "SF::E_00014",
+      "to": "M_EAR",
+      "label": "OBJECT",
+      "kind": "hyper_incidence",
+      "role": "OBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#2a9d8f",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge HAVE: OBJECT = M_EAR · w=0.500"
+    },
+    {
+      "id": "SF::E_00014__mesh__M_HARE__M_EAR",
+      "from": "M_HARE",
+      "to": "M_EAR",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00014",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦HAVE⟧: M_HARE ↔ M_EAR (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00014__mesh__M_HARE__M_BEAST",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00014",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦HAVE⟧: M_HARE ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00014__mesh__M_EAR__M_BEAST",
+      "from": "M_EAR",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00014",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦HAVE⟧: M_EAR ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00016__SUBJECT",
+      "from": "SF::E_00016",
+      "to": "M_HARE",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge HAVE: SUBJECT = M_HARE · w=0.500"
+    },
+    {
+      "id": "SF::E_00016__OBJECT",
+      "from": "SF::E_00016",
+      "to": "M_TAIL",
+      "label": "OBJECT",
+      "kind": "hyper_incidence",
+      "role": "OBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#2a9d8f",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge HAVE: OBJECT = M_TAIL · w=0.500"
+    },
+    {
+      "id": "SF::E_00016__mesh__M_HARE__M_TAIL",
+      "from": "M_HARE",
+      "to": "M_TAIL",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00016",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦HAVE⟧: M_HARE ↔ M_TAIL (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00016__mesh__M_HARE__M_BEAST",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00016",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦HAVE⟧: M_HARE ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00016__mesh__M_TAIL__M_BEAST",
+      "from": "M_TAIL",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00016",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦HAVE⟧: M_TAIL ↔ M_BEAST (n=3) · w=0.500"
+    },
+    {
+      "id": "SF::E_00018__SUBJECT",
+      "from": "SF::E_00018",
+      "to": "M_FUR",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge BE_COLORED: SUBJECT = M_FUR · w=0.500"
+    },
+    {
+      "id": "SF::E_00018__OBJECT",
+      "from": "SF::E_00018",
+      "to": "M_BROWN",
+      "label": "OBJECT",
+      "kind": "hyper_incidence",
+      "role": "OBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#2a9d8f",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge BE_COLORED: OBJECT = M_BROWN · w=0.500"
+    },
+    {
+      "id": "SF::E_00018__TIME",
+      "from": "SF::E_00018",
+      "to": "M_SUMMER",
+      "label": "TIME",
+      "kind": "hyper_incidence",
+      "role": "TIME",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#9b5de5",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge BE_COLORED: TIME = M_SUMMER · w=0.500"
+    },
+    {
+      "id": "SF::E_00018__mesh__M_FUR__M_BROWN",
+      "from": "M_FUR",
+      "to": "M_BROWN",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00018",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_FUR ↔ M_BROWN (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00018__mesh__M_FUR__M_SUMMER",
+      "from": "M_FUR",
+      "to": "M_SUMMER",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00018",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_FUR ↔ M_SUMMER (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00018__mesh__M_FUR__M_BEAST",
+      "from": "M_FUR",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00018",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_FUR ↔ M_BEAST (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00018__mesh__M_BROWN__M_SUMMER",
+      "from": "M_BROWN",
+      "to": "M_SUMMER",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00018",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_BROWN ↔ M_SUMMER (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00018__mesh__M_BROWN__M_BEAST",
+      "from": "M_BROWN",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00018",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_BROWN ↔ M_BEAST (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00018__mesh__M_SUMMER__M_BEAST",
+      "from": "M_SUMMER",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00018",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_SUMMER ↔ M_BEAST (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00023__SUBJECT",
+      "from": "SF::E_00023",
+      "to": "M_FUR",
+      "label": "SUBJECT",
+      "kind": "hyper_incidence",
+      "role": "SUBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#e76f51",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge BE_COLORED: SUBJECT = M_FUR · w=0.500"
+    },
+    {
+      "id": "SF::E_00023__OBJECT",
+      "from": "SF::E_00023",
+      "to": "M_WHITE",
+      "label": "OBJECT",
+      "kind": "hyper_incidence",
+      "role": "OBJECT",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#2a9d8f",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge BE_COLORED: OBJECT = M_WHITE · w=0.500"
+    },
+    {
+      "id": "SF::E_00023__TIME",
+      "from": "SF::E_00023",
+      "to": "M_WINTER",
+      "label": "TIME",
+      "kind": "hyper_incidence",
+      "role": "TIME",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": false,
+      "width": 2.5,
+      "color": {
+        "color": "#9b5de5",
+        "highlight": "#fff"
+      },
+      "title": "hyperedge BE_COLORED: TIME = M_WINTER · w=0.500"
+    },
+    {
+      "id": "SF::E_00023__mesh__M_FUR__M_WHITE",
+      "from": "M_FUR",
+      "to": "M_WHITE",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00023",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_FUR ↔ M_WHITE (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00023__mesh__M_FUR__M_WINTER",
+      "from": "M_FUR",
+      "to": "M_WINTER",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00023",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_FUR ↔ M_WINTER (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00023__mesh__M_FUR__M_BEAST",
+      "from": "M_FUR",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00023",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_FUR ↔ M_BEAST (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00023__mesh__M_WHITE__M_WINTER",
+      "from": "M_WHITE",
+      "to": "M_WINTER",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00023",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_WHITE ↔ M_WINTER (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00023__mesh__M_WHITE__M_BEAST",
+      "from": "M_WHITE",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00023",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_WHITE ↔ M_BEAST (n=4) · w=0.500"
+    },
+    {
+      "id": "SF::E_00023__mesh__M_WINTER__M_BEAST",
+      "from": "M_WINTER",
+      "to": "M_BEAST",
+      "label": "",
+      "kind": "hyper_mesh",
+      "hyperedge": "SF::E_00023",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 2,
+      "color": {
+        "color": "#ffe566",
+        "opacity": 0.75,
+        "highlight": "#fff"
+      },
+      "title": "mesh ⟦BE_COLORED⟧: M_WINTER ↔ M_BEAST (n=4) · w=0.500"
+    },
+    {
+      "uid": "L_MESH_00002",
+      "id": "L_MESH_00002",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_BIND_00003",
+      "id": "L_BIND_00003",
+      "from": "M_HARE",
+      "to": "HARE",
+      "label": "BIND",
+      "kind": "binary",
+      "w": 1.0,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary BIND w=1.000 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00005",
+      "id": "L_MESH_00005",
+      "from": "M_HARE",
+      "to": "M_SMALL",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00007",
+      "id": "L_MESH_00007",
+      "from": "M_HARE",
+      "to": "M_MEADOW",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00009",
+      "id": "L_MESH_00009",
+      "from": "M_HARE",
+      "to": "M_FOREST",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00011",
+      "id": "L_MESH_00011",
+      "from": "M_HARE",
+      "to": "M_HIND_LEG",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00013",
+      "id": "L_MESH_00013",
+      "from": "M_HARE",
+      "to": "M_VERY_FAST",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00015",
+      "id": "L_MESH_00015",
+      "from": "M_HARE",
+      "to": "M_EAR",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00017",
+      "id": "L_MESH_00017",
+      "from": "M_HARE",
+      "to": "M_TAIL",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00019",
+      "id": "L_MESH_00019",
+      "from": "M_FUR",
+      "to": "M_BROWN",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00020",
+      "id": "L_MESH_00020",
+      "from": "M_FUR",
+      "to": "M_SUMMER",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00021",
+      "id": "L_MESH_00021",
+      "from": "M_BROWN",
+      "to": "M_SUMMER",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_BIND_00022",
+      "id": "L_BIND_00022",
+      "from": "M_FUR",
+      "to": "FUR",
+      "label": "BIND",
+      "kind": "binary",
+      "w": 1.0,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary BIND w=1.000 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00024",
+      "id": "L_MESH_00024",
+      "from": "M_FUR",
+      "to": "M_WHITE",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00025",
+      "id": "L_MESH_00025",
+      "from": "M_FUR",
+      "to": "M_WINTER",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_MESH_00026",
+      "id": "L_MESH_00026",
+      "from": "M_WHITE",
+      "to": "M_WINTER",
+      "label": "ASSOC",
+      "kind": "binary",
+      "w": 0.5,
+      "arrows": "",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary ASSOC w=0.500 (undirected)"
+    },
+    {
+      "uid": "L_ISA_00027",
+      "id": "L_ISA_00027",
+      "from": "M_HARE",
+      "to": "M_BEAST",
+      "label": "IS-A",
+      "kind": "binary",
+      "w": 0.9,
+      "arrows": "to",
+      "dashes": false,
+      "width": 2,
+      "color": {
+        "color": "#98c1d9",
+        "opacity": 0.45
+      },
+      "title": "binary IS-A w=0.900"
+    },
+    {
+      "uid": "L_ISA_00028",
+      "id": "L_ISA_00028",
+      "from": "M_BEAST",
+      "to": "M_ANIMAL",
+      "label": "IS-A",
+      "kind": "binary",
+      "w": 0.9,
+      "arrows": "to",
+      "dashes": false,
+      "width": 2,
+      "color": {
+        "color": "#98c1d9",
+        "opacity": 0.45
+      },
+      "title": "binary IS-A w=0.900"
+    },
+    {
+      "uid": "L_FOLLOW_00029",
+      "id": "L_FOLLOW_00029",
+      "from": "EP_LESSON_1",
+      "to": "EP_LESSON_2",
+      "label": "FOLLOW",
+      "kind": "binary",
+      "w": 0.8,
+      "arrows": "to",
+      "dashes": true,
+      "width": 1,
+      "color": {
+        "color": "#4a5568",
+        "opacity": 0.45
+      },
+      "title": "binary FOLLOW w=0.800"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "SF::E_00001",
+      "predicate": "IS",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_HARE",
+        "OBJECT": "M_BEAST"
+      },
+      "members": [
+        "M_HARE",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00001"
+    },
+    {
+      "id": "SF::E_00004",
+      "predicate": "IS",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_HARE",
+        "OBJECT": "M_SMALL"
+      },
+      "members": [
+        "M_HARE",
+        "M_SMALL",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00004"
+    },
+    {
+      "id": "SF::E_00006",
+      "predicate": "LIVE_IN",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_HARE",
+        "LOCATION": "M_MEADOW"
+      },
+      "members": [
+        "M_HARE",
+        "M_MEADOW",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00006"
+    },
+    {
+      "id": "SF::E_00008",
+      "predicate": "LIVE_IN",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_HARE",
+        "LOCATION": "M_FOREST"
+      },
+      "members": [
+        "M_HARE",
+        "M_FOREST",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00008"
+    },
+    {
+      "id": "SF::E_00010",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_HARE",
+        "OBJECT": "M_HIND_LEG"
+      },
+      "members": [
+        "M_HARE",
+        "M_HIND_LEG",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00010"
+    },
+    {
+      "id": "SF::E_00012",
+      "predicate": "RUN",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_HARE",
+        "HOW-TO": "M_VERY_FAST"
+      },
+      "members": [
+        "M_HARE",
+        "M_VERY_FAST",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00012"
+    },
+    {
+      "id": "SF::E_00014",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_HARE",
+        "OBJECT": "M_EAR"
+      },
+      "members": [
+        "M_HARE",
+        "M_EAR",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00014"
+    },
+    {
+      "id": "SF::E_00016",
+      "predicate": "HAVE",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_HARE",
+        "OBJECT": "M_TAIL"
+      },
+      "members": [
+        "M_HARE",
+        "M_TAIL",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00016"
+    },
+    {
+      "id": "SF::E_00018",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_FUR",
+        "OBJECT": "M_BROWN",
+        "TIME": "M_SUMMER"
+      },
+      "members": [
+        "M_FUR",
+        "M_BROWN",
+        "M_SUMMER",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00018"
+    },
+    {
+      "id": "SF::E_00023",
+      "predicate": "BE_COLORED",
+      "w": 0.5,
+      "roles": {
+        "SUBJECT": "M_FUR",
+        "OBJECT": "M_WHITE",
+        "TIME": "M_WINTER"
+      },
+      "members": [
+        "M_FUR",
+        "M_WHITE",
+        "M_WINTER",
+        "M_BEAST"
+      ],
+      "hub": "SF::E_00023"
+    }
+  ],
+  "mode": "hyper",
+  "stats": {
+    "S": 15,
+    "C": 15,
+    "P": 0,
+    "H": 2,
+    "L": 19,
+    "hyperedges": 10,
+    "semantic_factors": 10,
+    "relations": 5,
+    "events": 10,
+    "graph_size": 46,
+    "tau": 0
+  }
+}

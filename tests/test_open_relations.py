@@ -166,13 +166,13 @@ def test_open_semantic_factor_is_visible_in_exported_graph() -> None:
     spokes = [
         edge
         for edge in graph["edges"]
-        if edge["kind"] == "semantic_incidence"
+        if edge["kind"] == "hyper_incidence"
     ]
-    assert exported["kind"] == "semantic_factor"
+    assert exported["kind"] == "hyperedge"
     assert graph["hyperedges"][0]["predicate"] == "PURCHASE"
     assert len(spokes) == 2
     assert any(
-        edge["from"] == "M_FATHER" and edge["to"] == factor.uid
+        edge["from"] == factor.uid and edge["to"] == "M_FATHER"
         for edge in spokes
     )
     assert any(

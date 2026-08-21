@@ -30,9 +30,12 @@ ah-challenge = "ah_memory.benchmarks.challenge.runner:main"
 [tool.setuptools]
 packages = [
   "ah_memory",
+  "ah_memory.baselines",
   "ah_memory.benchmarks",
   "ah_memory.benchmarks.challenge",
   "ah_memory.benchmarks.entity_resolution",
+  "ah_memory.eval",
+  "ah_memory.examples",
   "ah_memory.synthetic",
   "benchmark",
   "benchmark.entity_resolution",

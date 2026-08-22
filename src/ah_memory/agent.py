@@ -6,9 +6,12 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+import re
+from typing import Callable, Sequence
 
 from ah_memory.dsl import DSLInterpreter
 from ah_memory.gc import collect
+from ah_memory.graph_query import GraphQueryPlanner, QueryPlan
 from ah_memory.hyperparams import HyperParams
 from ah_memory.ignition import ActivationSeed, IgnitionEngine, TickTrace
 from ah_memory.perception import PerceptionBackend, PerceptionResult, SeedPerception, FactCandidate
@@ -82,6 +85,7 @@ class Agent:
         parameter_generator=None,
         state_engine=None,
         identity=None,
+        query_embed: Callable[[str], Sequence[float]] | None = None,
     ) -> None:
         self.store = store or AHStore()
         self.hp = hp or HyperParams()
@@ -96,6 +100,22 @@ class Agent:
         )
         self.ignition = IgnitionEngine(self.store, self.hp)
         self.dsl = DSLInterpreter(self.store)
+        self.query_planner = GraphQueryPlanner(
+            self.store,
+            embed=query_embed,
+        )
+
+    def adopt_store(self, store: AHStore) -> None:
+        """Swap graph contents in place and rebuild ignition over the new structure."""
+        if store is not self.store:
+            self.store.replace_from(store)
+        self.transform.store = self.store
+        self.transform.relation_normalizer.registry = self.store.relations
+        if self.transform.identity is not None:
+            self.transform.identity.store = self.store
+        self.ignition = IgnitionEngine(self.store, self.hp)
+        self.dsl = DSLInterpreter(self.store)
+        self.query_planner.bind_store(self.store)
 
     def ingest(
         self,
@@ -112,6 +132,21 @@ class Agent:
             perc = perception
         if source == "assistant":
             perc = _filter_assistant_perception(perc)
+        elif perc.kind == "question":
+            # Keep explicit factual clauses in mixed utterances, never the query itself.
+            from ah_memory.morph import seeds_from_roles
+
+            factual = [
+                candidate
+                for candidate in perc.candidates
+                if candidate.statement_type not in {"topic", "open_question"}
+            ]
+            perc = PerceptionResult(
+                kind="message",
+                candidates=factual,
+                seed_tokens=seeds_from_roles(factual),
+                meta={**perc.meta, "not_persisted": "question"},
+            )
         report = self.transform.apply(perc, section=section)
         # Зачем: новые символы сразу «подогреть», чтобы следующий ask их видел в WM.
         seeds = [
@@ -135,33 +170,22 @@ class Agent:
             perc = self.perception.parse(question, list(self.ignition.wm.contents()))
         else:
             perc = perception
-        seeds: list[ActivationSeed] = []
-        seen: set[str] = set()
-        for u in perc.seed_tokens:
-            bare = u[2:] if u.startswith("M_") else u
-            if bare.count("_") > 3:
-                continue
-            q = bare.lower().replace("_", " ")
-            candidates = []
-            if bare in self.store.ah.S:
-                candidates.append(bare)
-            m_uid = f"M_{bare}"
-            if m_uid in self.store.ah.all_hyper():
-                candidates.append(m_uid)
-            for s in self.store.find_symbols(q):
-                candidates.append(s.uid)
-            for form_uid, abs_s in self.store.ah.S.items():
-                forms = " ".join(abs_s.R.get("TEXT", set())).lower()
-                if q and (q in forms or q in form_uid.lower()):
-                    candidates.append(form_uid)
-                    candidates.append(f"M_{form_uid}")
-            for uid in candidates:
-                if uid in seen:
-                    continue
-                seen.add(uid)
-                seeds.append(ActivationSeed(uid=uid, delta_x=self.hp.seed_delta))
-            if len(seeds) >= 16:
-                break
+        entry_uids = self._resolve_entry_uids(
+            perc.seed_tokens,
+            text=question,
+        )
+        seeds = [
+            ActivationSeed(uid=uid, delta_x=self.hp.seed_delta)
+            for uid in entry_uids
+        ]
+        plan = self.query_planner.plan(question, perc, entry_uids)
+        if plan.factor_scores:
+            self.ignition.set_factor_gates(
+                plan.factor_scores,
+                reset_state=True,
+            )
+        else:
+            self.ignition.set_factor_gates(None)
         self.ignition.seed(seeds)
         traces = self.ignition.run(ticks)
         trace_uids: list[str] = []
@@ -170,11 +194,27 @@ class Agent:
                 if uid not in trace_uids:
                     trace_uids.append(uid)
 
-        answer, support = self._compose_answer(question, perc.seed_tokens, trace_uids)
+        answer, support = self._answer_from_plan(plan)
+        if answer == "неизвестно":
+            answer, support = self._compose_answer(
+                question,
+                perc.seed_tokens,
+                trace_uids,
+            )
+        self.ignition.set_factor_gates(None)
         for uid in support:
             if uid not in trace_uids:
                 trace_uids.append(uid)
         collect(self.store, self.hp)
+        full_trace = self._full_trace(traces, trace_uids, answer=answer)
+        full_trace["query_plan"] = {
+            "anchors": list(plan.anchors),
+            "relation_text": plan.relation_text,
+            "target_role": plan.target_role,
+            "cardinality": plan.cardinality,
+            "relation_scores": dict(plan.relation_scores),
+            "factor_gates": dict(plan.factor_scores),
+        }
         return AgentReply(
             answer=answer,
             trace_uids=trace_uids,
@@ -182,14 +222,114 @@ class Agent:
             source="graph",
             seed_uids=[s.uid for s in seeds],
             perception=perc.to_graph_json(),
-            full_trace=self._full_trace(traces, trace_uids, answer=answer),
+            full_trace=full_trace,
         )
+
+    def _answer_from_plan(self, plan: QueryPlan) -> tuple[str, list[str]]:
+        if not plan.factor_scores:
+            return "неизвестно", []
+        return self.query_planner.decode(plan)
+
+    def _resolve_entry_uids(
+        self,
+        tokens: list[str],
+        *,
+        text: str = "",
+    ) -> list[str]:
+        mentions = self._resolve_text_mentions(text)
+        if mentions:
+            return mentions
+        out: list[str] = []
+        seen: set[str] = set()
+        for token in tokens:
+            bare = token[2:] if token.startswith("M_") else token
+            if bare.count("_") > 3:
+                continue
+            query = bare.lower().replace("_", " ")
+            candidates: list[str] = []
+            if bare in self.store.ah.S:
+                candidates.append(bare)
+            m_uid = f"M_{bare}"
+            if m_uid in self.store.ah.all_hyper():
+                candidates.append(m_uid)
+            candidates.extend(symbol.uid for symbol in self.store.find_symbols(query))
+            for form_uid, abstract in self.store.ah.S.items():
+                forms = " ".join(abstract.R.get("TEXT", set())).lower()
+                if query and (query in forms or query in form_uid.lower()):
+                    candidates.extend([form_uid, f"M_{form_uid}"])
+            for uid in candidates:
+                if uid in seen:
+                    continue
+                if uid not in self.store.ah.S and uid not in self.store.ah.all_hyper():
+                    continue
+                seen.add(uid)
+                out.append(uid)
+            if len(out) >= 16:
+                break
+        return out[:16]
+
+    def _resolve_text_mentions(self, text: str) -> list[str]:
+        """Resolve longest entity phrases before broad token lookup."""
+        from ah_memory.morph import lemma
+
+        text_lemmas = [
+            normalized
+            for token in re.findall(r"[a-zа-яё0-9]+", text.lower())
+            if (normalized := lemma(token))
+        ]
+        if not text_lemmas:
+            return []
+        matches: list[tuple[int, int, str]] = []
+        for bare, abstract in self.store.ah.S.items():
+            surfaces = set(abstract.R.get("TEXT") or set())
+            m_uid = f"M_{bare}"
+            if m_uid in self.store.ah.all_hyper():
+                try:
+                    symbol = self.store.get_symbol(m_uid)
+                    surfaces.update(
+                        prop.value
+                        for prop in symbol.Pr
+                        if prop.name == "label" and prop.value
+                    )
+                except Exception:
+                    pass
+            for surface in surfaces:
+                phrase = [
+                    normalized
+                    for token in re.findall(
+                        r"[a-zа-яё0-9]+",
+                        surface.lower(),
+                    )
+                    if (normalized := lemma(token))
+                ]
+                if len(phrase) < 2 or len(phrase) > len(text_lemmas):
+                    continue
+                width = len(phrase)
+                for start in range(len(text_lemmas) - width + 1):
+                    if text_lemmas[start : start + width] == phrase:
+                        matches.append((start, start + width, bare))
+        matches.sort(key=lambda item: (-(item[1] - item[0]), item[0], item[2]))
+        occupied: set[int] = set()
+        selected: list[str] = []
+        for start, end, bare in matches:
+            span = set(range(start, end))
+            if occupied.intersection(span):
+                continue
+            occupied.update(span)
+            m_uid = f"M_{bare}"
+            if m_uid in self.store.ah.all_hyper():
+                selected.append(m_uid)
+            if bare in self.store.ah.S:
+                selected.append(bare)
+            if len(selected) >= 8:
+                break
+        return list(dict.fromkeys(selected))
 
     def step_message(self, text: str, ticks: int = 3) -> AgentReply:
         """Один шаг цикла: вопрос → ask, иначе → ingest."""
         perc = self.perception.parse(text, list(self.ignition.wm.contents()))
-        if perc.kind == "question" and not perc.candidates:
-            return self.ask(text, ticks=ticks)
+        if perc.kind == "question":
+            return self.ask(text, ticks=ticks, perception=perc)
         report = self.ingest(text)
         wm = list(self.ignition.wm.contents())
         return AgentReply(

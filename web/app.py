@@ -25,6 +25,7 @@ from ah_memory.factor_parameters import (
 )
 from ah_memory.gigachat_llm import GigaChatClient, HybridPerception
 from ah_memory.graph_export import dump_ah_json, dump_graph
+from ah_memory.graph_library import GraphLibrary
 from ah_memory.perception import SeedPerception
 from ah_memory.relation_normalizer import (
     EmbeddingNormalizer,
@@ -201,6 +202,7 @@ class ChatIn(BaseModel):
 class CompareIn(BaseModel):
     question: str = Field(min_length=1)
     ticks: int | None = None
+    mode: Literal["raw", "generated"] = "generated"
 
 
 class ChatOut(BaseModel):
@@ -218,8 +220,42 @@ class ChatOut(BaseModel):
     full_trace: dict[str, Any] = Field(default_factory=dict)
 
 
+class SaveGraphIn(BaseModel):
+    name: str = ""
+
+
 class ProviderIn(BaseModel):
     provider: Literal["gigachat", "deepseek"]
+
+
+def _graph_library() -> GraphLibrary:
+    return GraphLibrary()
+
+
+def _apply_loaded_store(store: AHStore, *, source_text: str = "") -> dict[str, Any]:
+    agent.adopt_store(store)
+    dialogue.reset_history()
+    comparer.clear()
+    if source_text.strip():
+        comparer.set_source_docs([source_text])
+    return dump_graph(
+        agent.store,
+        activation=agent.ignition.state.activation,
+    )["stats"]
+
+
+def _seed_fixture_graphs() -> None:
+    try:
+        from ah_memory.examples.closed_world import build_closed_world_memory
+        from ah_memory.examples.rabbit import build_rabbit_memory
+
+        build_closed_world_memory()
+        build_rabbit_memory()
+    except OSError:
+        pass
+
+
+_seed_fixture_graphs()
 
 
 class SyntheticGenerateIn(BaseModel):
@@ -313,6 +349,43 @@ def full_dump() -> dict[str, Any]:
     return dump_ah_json(agent.store)
 
 
+@app.get("/api/graphs")
+def list_graphs() -> dict[str, Any]:
+    return {"ok": True, "graphs": _graph_library().list()}
+
+
+@app.post("/api/graphs")
+def save_graph(body: SaveGraphIn) -> dict[str, Any]:
+    name = (body.name or "").strip() or f"graph-{agent.store.ah.tau}"
+    corpus = (comparer.rag.corpus or "").strip()
+    source_text = "" if corpus in {"", "Корпус пуст."} else corpus
+    record = _graph_library().save(
+        agent.store,
+        name=name,
+        kind="user",
+        source_text=source_text,
+    )
+    return {"ok": True, **record}
+
+
+@app.post("/api/graphs/{graph_id}/load")
+def load_graph(graph_id: str) -> dict[str, Any]:
+    try:
+        store, meta = _graph_library().load(graph_id)
+    except FileNotFoundError:
+        raise HTTPException(404, f"graph not found: {graph_id}") from None
+    source_text = str(meta.pop("source_text", "") or "")
+    stats = _apply_loaded_store(store, source_text=source_text)
+    return {"ok": True, **meta, "stats": stats, "source_chars": len(source_text)}
+
+
+@app.delete("/api/graphs/{graph_id}")
+def delete_graph(graph_id: str) -> dict[str, Any]:
+    if not _graph_library().delete(graph_id):
+        raise HTTPException(404, f"graph not found: {graph_id}")
+    return {"ok": True, "id": graph_id}
+
+
 @app.get("/api/trace")
 def last_trace() -> dict[str, Any]:
     """Last turn activation trace (evidence / BP ticks / WM)."""
@@ -355,7 +428,6 @@ def chat(body: ChatIn) -> ChatOut:
     ticks = body.ticks or cfg.agent.ticks
     try:
         turn = dialogue.talk(text, ticks=ticks)
-        # держим RAG-корпус в синхроне с диалогом
         comparer.bind_history(dialogue.history)
         comparer.rebuild_rag()
     except Exception as exc:  # noqa: BLE001
@@ -383,16 +455,14 @@ def chat(body: ChatIn) -> ChatOut:
 
 @app.post("/api/compare")
 def compare(body: CompareIn) -> dict[str, Any]:
-    """Произвольный запрос пользователя: живая АГ vs RAG по тому же диалогу/графу."""
+    """Произвольный запрос: AH по графу, RAG по своим документам/диалогу."""
     q = body.question.strip()
     if not q:
         raise HTTPException(400, "empty question")
     ticks = body.ticks or cfg.agent.ticks
     try:
         comparer.bind_history(dialogue.history)
-        turn = comparer.ask(q, ticks=ticks)
-        # факты, записанные compare, уже в agent; обновим history-корпус без дублирования chat
-        comparer.rebuild_rag()
+        turn = comparer.ask(q, ticks=ticks, mode=body.mode)
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(502, f"compare failed: {exc}") from exc
     return turn.as_dict()
@@ -400,15 +470,15 @@ def compare(body: CompareIn) -> dict[str, Any]:
 
 @app.post("/api/compare/m4")
 def compare_m4() -> dict[str, Any]:
-    """Эталонный gold M4 (заяц) — отдельный бенчмарк, не UI-диалог."""
+    """Эталонный gold M4 (закрытый бюллетень) — отдельный бенчмарк, не UI-диалог."""
     try:
         report = comparer.run_m4()
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(502, f"m4 failed: {exc}") from exc
     return {
         "summary": report.as_dict(),
-        "rag_backend": "llm+tfidf (rabbit gold)",
-        "note": "M4 — контрольный корпус «заяц». Кнопка Сравнить использует ваш живой диалог.",
+        "rag_backend": "llm+faiss (closed-world gold)",
+        "note": "M4 — корпус Википедии «Тиманский кряж». Кнопка Сравнить использует ваш живой диалог.",
         "items": [
             {
                 "q": i.question,
@@ -460,7 +530,7 @@ def reset(preload: str = "empty") -> dict[str, Any]:
 
 @app.post("/api/synthetic/generate")
 def synthetic_generate(body: SyntheticGenerateIn) -> dict[str, Any]:
-    global agent, dialogue
+    global agent, dialogue, comparer
     global _synthetic_world, _synthetic_ingest, _synthetic_report, _synthetic_zip
     started = time.perf_counter()
     try:
@@ -492,6 +562,13 @@ def synthetic_generate(body: SyntheticGenerateIn) -> dict[str, Any]:
     dialogue = _build_dialogue(agent)
     dialogue.reset_history()
     ingest = ingest_world(world, agent.store)
+    comparer = _build_compare(agent)
+    docs = "\n\n".join(
+        str(getattr(doc, "text", "") or "").strip()
+        for doc in world.documents
+    )
+    if docs.strip():
+        comparer.set_source_docs([docs])
     zip_path = Path(tempfile.gettempdir()) / f"ah_synthetic_{config.random_seed}.zip"
     export_zip(world, zip_path)
     _synthetic_world = world

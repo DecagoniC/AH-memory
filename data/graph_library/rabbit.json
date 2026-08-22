@@ -1,0 +1,3151 @@
+{
+  "id": "rabbit",
+  "name": "rabbit",
+  "kind": "fixture",
+  "created_at": "2026-08-22T02:23:20+03:00",
+  "updated_at": "2026-08-22T05:18:06+03:00",
+  "stats": {
+    "S": 15,
+    "C": 15,
+    "P": 0,
+    "H": 2,
+    "L": 19,
+    "hyperedges": 10,
+    "semantic_factors": 10,
+    "relations": 5,
+    "events": 10,
+    "graph_size": 46,
+    "tau": 0
+  },
+  "source_text": "Заяц — маленький дикий зверёк, который обитает на лугу или в лесу. У него сильные задние лапы, поэтому бегает он очень быстро. Уши зайца длинные, а хвост — круглый и пушистый. Летом шерсть зайца коричневого цвета, а зимой — белого.",
+  "store": {
+    "format": "ah-store-v1",
+    "tau": 0,
+    "revision": 61,
+    "uid_seq": 29,
+    "S": {
+      "HARE": {
+        "R": {
+          "TEXT": [
+            "hare",
+            "заяц"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "BEAST": {
+        "R": {
+          "TEXT": [
+            "beast",
+            "зверёк"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "SMALL": {
+        "R": {
+          "TEXT": [
+            "small",
+            "маленький"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "MEADOW": {
+        "R": {
+          "TEXT": [
+            "meadow",
+            "луг"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "FOREST": {
+        "R": {
+          "TEXT": [
+            "forest",
+            "лес"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "HIND_LEG": {
+        "R": {
+          "TEXT": [
+            "hind_leg",
+            "задние лапы"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "VERY_FAST": {
+        "R": {
+          "TEXT": [
+            "very_fast",
+            "очень быстро"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "EAR": {
+        "R": {
+          "TEXT": [
+            "ear",
+            "уши"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "TAIL": {
+        "R": {
+          "TEXT": [
+            "tail",
+            "хвост"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "FUR": {
+        "R": {
+          "TEXT": [
+            "fur",
+            "шерсть"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "BROWN": {
+        "R": {
+          "TEXT": [
+            "brown",
+            "коричневый"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "WHITE": {
+        "R": {
+          "TEXT": [
+            "white",
+            "белый"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "SUMMER": {
+        "R": {
+          "TEXT": [
+            "summer",
+            "лето"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "WINTER": {
+        "R": {
+          "TEXT": [
+            "winter",
+            "зима"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "ANIMAL": {
+        "R": {
+          "TEXT": [
+            "animal",
+            "животное"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      }
+    },
+    "C": {
+      "M_HARE": {
+        "type": "M",
+        "uid": "M_HARE",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "Заяц",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_BEAST": {
+        "type": "M",
+        "uid": "M_BEAST",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "зверёк",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_SMALL": {
+        "type": "M",
+        "uid": "M_SMALL",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "маленький",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_MEADOW": {
+        "type": "M",
+        "uid": "M_MEADOW",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "луг",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_FOREST": {
+        "type": "M",
+        "uid": "M_FOREST",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "лес",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_HIND_LEG": {
+        "type": "M",
+        "uid": "M_HIND_LEG",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "задние лапы",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_VERY_FAST": {
+        "type": "M",
+        "uid": "M_VERY_FAST",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "очень быстро",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_EAR": {
+        "type": "M",
+        "uid": "M_EAR",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "уши",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_TAIL": {
+        "type": "M",
+        "uid": "M_TAIL",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "хвост",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_FUR": {
+        "type": "M",
+        "uid": "M_FUR",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "шерсть",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_BROWN": {
+        "type": "M",
+        "uid": "M_BROWN",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "коричневый",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_WHITE": {
+        "type": "M",
+        "uid": "M_WHITE",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "белый",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_SUMMER": {
+        "type": "M",
+        "uid": "M_SUMMER",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "лето",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_WINTER": {
+        "type": "M",
+        "uid": "M_WINTER",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "зима",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "M_ANIMAL": {
+        "type": "M",
+        "uid": "M_ANIMAL",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "Животное",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      }
+    },
+    "P": {},
+    "H": {
+      "EP_LESSON_1": {
+        "type": "M",
+        "uid": "EP_LESSON_1",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "Урок: кто такой заяц",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [
+          {
+            "name": "kind",
+            "value": "Episode",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "EP_LESSON_2": {
+        "type": "M",
+        "uid": "EP_LESSON_2",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "Урок: линька",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [
+          {
+            "name": "kind",
+            "value": "Episode",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      }
+    },
+    "L": {
+      "L_MESH_00002": {
+        "uid": "L_MESH_00002",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_BEAST"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_BIND_00003": {
+        "uid": "L_BIND_00003",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "HARE"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00005": {
+        "uid": "L_MESH_00005",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_SMALL"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00007": {
+        "uid": "L_MESH_00007",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_MEADOW"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00009": {
+        "uid": "L_MESH_00009",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_FOREST"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00011": {
+        "uid": "L_MESH_00011",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_HIND_LEG"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00013": {
+        "uid": "L_MESH_00013",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_VERY_FAST"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00015": {
+        "uid": "L_MESH_00015",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_EAR"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00017": {
+        "uid": "L_MESH_00017",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_TAIL"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00019": {
+        "uid": "L_MESH_00019",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_FUR"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_BROWN"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00020": {
+        "uid": "L_MESH_00020",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_FUR"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_SUMMER"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00021": {
+        "uid": "L_MESH_00021",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_BROWN"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_SUMMER"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_BIND_00022": {
+        "uid": "L_BIND_00022",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_FUR"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "FUR"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00024": {
+        "uid": "L_MESH_00024",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_FUR"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_WHITE"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00025": {
+        "uid": "L_MESH_00025",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_FUR"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_WINTER"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_MESH_00026": {
+        "uid": "L_MESH_00026",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_WHITE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_WINTER"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_ISA_00027": {
+        "uid": "L_ISA_00027",
+        "id": "IS-A",
+        "w": 0.9,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HARE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_BEAST"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_ISA_00028": {
+        "uid": "L_ISA_00028",
+        "id": "IS-A",
+        "w": 0.9,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_BEAST"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_ANIMAL"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      },
+      "L_FOLLOW_00029": {
+        "uid": "L_FOLLOW_00029",
+        "id": "FOLLOW",
+        "w": 0.8,
+        "e1": {
+          "kind": "M",
+          "target_uid": "EP_LESSON_1"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "EP_LESSON_2"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T05:18:06+03:00"
+      }
+    },
+    "relations": {
+      "BE_COLORED": {
+        "uid": "REL_BE_COLORED",
+        "raw_label": "BE_COLORED",
+        "canonical_label": "BE_COLORED",
+        "embedding": [
+          -0.39391929857916763,
+          0.0,
+          0.13130643285972254,
+          0.13130643285972254,
+          0.39391929857916763,
+          0.0,
+          -0.13130643285972254,
+          0.0,
+          -0.13130643285972254,
+          0.0,
+          0.13130643285972254,
+          0.2626128657194451,
+          -0.13130643285972254,
+          0.39391929857916763,
+          -0.13130643285972254,
+          -0.2626128657194451,
+          0.13130643285972254,
+          0.0,
+          -0.2626128657194451,
+          0.0,
+          0.0,
+          0.0,
+          -0.2626128657194451,
+          -0.13130643285972254,
+          0.0,
+          0.0,
+          0.13130643285972254,
+          0.0,
+          0.0,
+          0.2626128657194451,
+          0.0,
+          -0.13130643285972254
+        ],
+        "arity": 3,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 0.5,
+          "normalization_strategy": "new_relation",
+          "created_by_normalizer": true
+        }
+      },
+      "HAVE": {
+        "uid": "REL_HAVE",
+        "raw_label": "HAVE",
+        "canonical_label": "HAVE",
+        "embedding": [
+          -0.25,
+          0.0,
+          0.25,
+          0.25,
+          0.0,
+          0.0,
+          -0.25,
+          0.0,
+          0.0,
+          0.0,
+          -0.25,
+          0.25,
+          0.0,
+          0.25,
+          0.25,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.5,
+          0.0,
+          -0.25,
+          0.25,
+          0.0,
+          -0.25,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 0.5,
+          "normalization_strategy": "new_relation",
+          "created_by_normalizer": true
+        }
+      },
+      "IS": {
+        "uid": "REL_IS",
+        "raw_label": "IS",
+        "canonical_label": "IS",
+        "embedding": [
+          -0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          -0.2672612419124244,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          0.0,
+          0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244
+        ],
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 0.5,
+          "normalization_strategy": "new_relation",
+          "created_by_normalizer": true
+        }
+      },
+      "LIVE_IN": {
+        "uid": "REL_LIVE_IN",
+        "raw_label": "LIVE_IN",
+        "canonical_label": "LIVE_IN",
+        "embedding": [
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.4364357804719848,
+          0.2182178902359924,
+          0.4364357804719848,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.2182178902359924,
+          0.0,
+          0.2182178902359924,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.4364357804719848
+        ],
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 0.5,
+          "normalization_strategy": "new_relation",
+          "created_by_normalizer": true
+        }
+      },
+      "RUN": {
+        "uid": "REL_RUN",
+        "raw_label": "RUN",
+        "canonical_label": "RUN",
+        "embedding": [
+          -0.5163977794943222,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.2581988897471611,
+          -0.2581988897471611,
+          0.0,
+          0.2581988897471611,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.5163977794943222,
+          0.2581988897471611,
+          0.0,
+          0.0,
+          0.0,
+          0.2581988897471611,
+          -0.2581988897471611,
+          0.0,
+          0.2581988897471611,
+          0.0
+        ],
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 0.5,
+          "normalization_strategy": "new_relation",
+          "created_by_normalizer": true
+        }
+      }
+    },
+    "semantic_factors": [
+      {
+        "uid": "SF::E_00001",
+        "fid": "SF::E_00001",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_IS",
+          "raw_label": "IS",
+          "canonical_label": "IS",
+          "embedding": [
+            -0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            -0.2672612419124244,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            0.0,
+            0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_HARE",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_HARE",
+          "OBJECT": "M_BEAST"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00001",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          -0.2672612419124244,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          0.0,
+          0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244
+        ],
+        "metadata": {
+          "event_uid": "E_00001",
+          "raw_relation": "IS",
+          "canonical_relation": "IS",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": null,
+          "source_variable": "M_HARE",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00004",
+        "fid": "SF::E_00004",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_IS",
+          "raw_label": "IS",
+          "canonical_label": "IS",
+          "embedding": [
+            -0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            -0.2672612419124244,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            0.0,
+            0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_HARE",
+          "M_SMALL",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_HARE",
+          "OBJECT": "M_SMALL"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00004",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          -0.2672612419124244,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          0.0,
+          0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244
+        ],
+        "metadata": {
+          "event_uid": "E_00004",
+          "raw_relation": "IS",
+          "canonical_relation": "IS",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_BEAST",
+          "source_variable": "M_HARE",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00006",
+        "fid": "SF::E_00006",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_LIVE_IN",
+          "raw_label": "LIVE_IN",
+          "canonical_label": "LIVE_IN",
+          "embedding": [
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.4364357804719848,
+            0.2182178902359924,
+            0.4364357804719848,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.2182178902359924,
+            0.0,
+            0.2182178902359924,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.4364357804719848
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_HARE",
+          "M_MEADOW",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_HARE",
+          "LOCATION": "M_MEADOW"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00006",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.4364357804719848,
+          0.2182178902359924,
+          0.4364357804719848,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.2182178902359924,
+          0.0,
+          0.2182178902359924,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.4364357804719848
+        ],
+        "metadata": {
+          "event_uid": "E_00006",
+          "raw_relation": "LIVE_IN",
+          "canonical_relation": "LIVE_IN",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_BEAST",
+          "source_variable": "M_HARE",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00008",
+        "fid": "SF::E_00008",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_LIVE_IN",
+          "raw_label": "LIVE_IN",
+          "canonical_label": "LIVE_IN",
+          "embedding": [
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.4364357804719848,
+            0.2182178902359924,
+            0.4364357804719848,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.2182178902359924,
+            0.0,
+            0.2182178902359924,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.4364357804719848
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_HARE",
+          "M_FOREST",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_HARE",
+          "LOCATION": "M_FOREST"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00008",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.4364357804719848,
+          0.2182178902359924,
+          0.4364357804719848,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.2182178902359924,
+          0.0,
+          0.2182178902359924,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.4364357804719848
+        ],
+        "metadata": {
+          "event_uid": "E_00008",
+          "raw_relation": "LIVE_IN",
+          "canonical_relation": "LIVE_IN",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_BEAST",
+          "source_variable": "M_HARE",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00010",
+        "fid": "SF::E_00010",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_HAVE",
+          "raw_label": "HAVE",
+          "canonical_label": "HAVE",
+          "embedding": [
+            -0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            0.25,
+            0.0,
+            0.5,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_HARE",
+          "M_HIND_LEG",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_HARE",
+          "OBJECT": "M_HIND_LEG"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00010",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.25,
+          0.0,
+          0.25,
+          0.25,
+          0.0,
+          0.0,
+          -0.25,
+          0.0,
+          0.0,
+          0.0,
+          -0.25,
+          0.25,
+          0.0,
+          0.25,
+          0.25,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.5,
+          0.0,
+          -0.25,
+          0.25,
+          0.0,
+          -0.25,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "metadata": {
+          "event_uid": "E_00010",
+          "raw_relation": "HAVE",
+          "canonical_relation": "HAVE",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_BEAST",
+          "source_variable": "M_HARE",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00012",
+        "fid": "SF::E_00012",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_RUN",
+          "raw_label": "RUN",
+          "canonical_label": "RUN",
+          "embedding": [
+            -0.5163977794943222,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.2581988897471611,
+            -0.2581988897471611,
+            0.0,
+            0.2581988897471611,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.5163977794943222,
+            0.2581988897471611,
+            0.0,
+            0.0,
+            0.0,
+            0.2581988897471611,
+            -0.2581988897471611,
+            0.0,
+            0.2581988897471611,
+            0.0
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_HARE",
+          "M_VERY_FAST",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_HARE",
+          "HOW-TO": "M_VERY_FAST"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00012",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.5163977794943222,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.2581988897471611,
+          -0.2581988897471611,
+          0.0,
+          0.2581988897471611,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.5163977794943222,
+          0.2581988897471611,
+          0.0,
+          0.0,
+          0.0,
+          0.2581988897471611,
+          -0.2581988897471611,
+          0.0,
+          0.2581988897471611,
+          0.0
+        ],
+        "metadata": {
+          "event_uid": "E_00012",
+          "raw_relation": "RUN",
+          "canonical_relation": "RUN",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_BEAST",
+          "source_variable": "M_HARE",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00014",
+        "fid": "SF::E_00014",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_HAVE",
+          "raw_label": "HAVE",
+          "canonical_label": "HAVE",
+          "embedding": [
+            -0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            0.25,
+            0.0,
+            0.5,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_HARE",
+          "M_EAR",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_HARE",
+          "OBJECT": "M_EAR"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00014",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.25,
+          0.0,
+          0.25,
+          0.25,
+          0.0,
+          0.0,
+          -0.25,
+          0.0,
+          0.0,
+          0.0,
+          -0.25,
+          0.25,
+          0.0,
+          0.25,
+          0.25,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.5,
+          0.0,
+          -0.25,
+          0.25,
+          0.0,
+          -0.25,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "metadata": {
+          "event_uid": "E_00014",
+          "raw_relation": "HAVE",
+          "canonical_relation": "HAVE",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_BEAST",
+          "source_variable": "M_HARE",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00016",
+        "fid": "SF::E_00016",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_HAVE",
+          "raw_label": "HAVE",
+          "canonical_label": "HAVE",
+          "embedding": [
+            -0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            0.25,
+            0.0,
+            0.5,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_HARE",
+          "M_TAIL",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_HARE",
+          "OBJECT": "M_TAIL"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00016",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.25,
+          0.0,
+          0.25,
+          0.25,
+          0.0,
+          0.0,
+          -0.25,
+          0.0,
+          0.0,
+          0.0,
+          -0.25,
+          0.25,
+          0.0,
+          0.25,
+          0.25,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.5,
+          0.0,
+          -0.25,
+          0.25,
+          0.0,
+          -0.25,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "metadata": {
+          "event_uid": "E_00016",
+          "raw_relation": "HAVE",
+          "canonical_relation": "HAVE",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_BEAST",
+          "source_variable": "M_HARE",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00018",
+        "fid": "SF::E_00018",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_BE_COLORED",
+          "raw_label": "BE_COLORED",
+          "canonical_label": "BE_COLORED",
+          "embedding": [
+            -0.39391929857916763,
+            0.0,
+            0.13130643285972254,
+            0.13130643285972254,
+            0.39391929857916763,
+            0.0,
+            -0.13130643285972254,
+            0.0,
+            -0.13130643285972254,
+            0.0,
+            0.13130643285972254,
+            0.2626128657194451,
+            -0.13130643285972254,
+            0.39391929857916763,
+            -0.13130643285972254,
+            -0.2626128657194451,
+            0.13130643285972254,
+            0.0,
+            -0.2626128657194451,
+            0.0,
+            0.0,
+            0.0,
+            -0.2626128657194451,
+            -0.13130643285972254,
+            0.0,
+            0.0,
+            0.13130643285972254,
+            0.0,
+            0.0,
+            0.2626128657194451,
+            0.0,
+            -0.13130643285972254
+          ],
+          "arity": 3,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_FUR",
+          "M_BROWN",
+          "M_SUMMER",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_FUR",
+          "OBJECT": "M_BROWN",
+          "TIME": "M_SUMMER"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00018",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.39391929857916763,
+          0.0,
+          0.13130643285972254,
+          0.13130643285972254,
+          0.39391929857916763,
+          0.0,
+          -0.13130643285972254,
+          0.0,
+          -0.13130643285972254,
+          0.0,
+          0.13130643285972254,
+          0.2626128657194451,
+          -0.13130643285972254,
+          0.39391929857916763,
+          -0.13130643285972254,
+          -0.2626128657194451,
+          0.13130643285972254,
+          0.0,
+          -0.2626128657194451,
+          0.0,
+          0.0,
+          0.0,
+          -0.2626128657194451,
+          -0.13130643285972254,
+          0.0,
+          0.0,
+          0.13130643285972254,
+          0.0,
+          0.0,
+          0.2626128657194451,
+          0.0,
+          -0.13130643285972254
+        ],
+        "metadata": {
+          "event_uid": "E_00018",
+          "raw_relation": "BE_COLORED",
+          "canonical_relation": "BE_COLORED",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_BEAST",
+          "source_variable": "M_FUR",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00023",
+        "fid": "SF::E_00023",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_BE_COLORED",
+          "raw_label": "BE_COLORED",
+          "canonical_label": "BE_COLORED",
+          "embedding": [
+            -0.39391929857916763,
+            0.0,
+            0.13130643285972254,
+            0.13130643285972254,
+            0.39391929857916763,
+            0.0,
+            -0.13130643285972254,
+            0.0,
+            -0.13130643285972254,
+            0.0,
+            0.13130643285972254,
+            0.2626128657194451,
+            -0.13130643285972254,
+            0.39391929857916763,
+            -0.13130643285972254,
+            -0.2626128657194451,
+            0.13130643285972254,
+            0.0,
+            -0.2626128657194451,
+            0.0,
+            0.0,
+            0.0,
+            -0.2626128657194451,
+            -0.13130643285972254,
+            0.0,
+            0.0,
+            0.13130643285972254,
+            0.0,
+            0.0,
+            0.2626128657194451,
+            0.0,
+            -0.13130643285972254
+          ],
+          "arity": 3,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_FUR",
+          "M_WHITE",
+          "M_WINTER",
+          "M_BEAST"
+        ],
+        "roles": {
+          "SUBJECT": "M_FUR",
+          "OBJECT": "M_WHITE",
+          "TIME": "M_WINTER"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00023",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.39391929857916763,
+          0.0,
+          0.13130643285972254,
+          0.13130643285972254,
+          0.39391929857916763,
+          0.0,
+          -0.13130643285972254,
+          0.0,
+          -0.13130643285972254,
+          0.0,
+          0.13130643285972254,
+          0.2626128657194451,
+          -0.13130643285972254,
+          0.39391929857916763,
+          -0.13130643285972254,
+          -0.2626128657194451,
+          0.13130643285972254,
+          0.0,
+          -0.2626128657194451,
+          0.0,
+          0.0,
+          0.0,
+          -0.2626128657194451,
+          -0.13130643285972254,
+          0.0,
+          0.0,
+          0.13130643285972254,
+          0.0,
+          0.0,
+          0.2626128657194451,
+          0.0,
+          -0.13130643285972254
+        ],
+        "metadata": {
+          "event_uid": "E_00023",
+          "raw_relation": "BE_COLORED",
+          "canonical_relation": "BE_COLORED",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_BEAST",
+          "source_variable": "M_FUR",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      }
+    ],
+    "events": [
+      {
+        "uid": "E_00001",
+        "predicate": {
+          "uid": "REL_IS",
+          "raw_label": "IS",
+          "canonical_label": "IS",
+          "embedding": [
+            -0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            -0.2672612419124244,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            0.0,
+            0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_HARE",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_BEAST",
+            "role": "OBJECT"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "IS",
+          "normalization": "new_relation",
+          "normalization_confidence": 0.5,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00004",
+        "predicate": {
+          "uid": "REL_IS",
+          "raw_label": "IS",
+          "canonical_label": "IS",
+          "embedding": [
+            -0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            -0.2672612419124244,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            0.0,
+            0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_HARE",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_SMALL",
+            "role": "OBJECT"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "IS",
+          "normalization": "parser_hint",
+          "normalization_confidence": 1.0,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00006",
+        "predicate": {
+          "uid": "REL_LIVE_IN",
+          "raw_label": "LIVE_IN",
+          "canonical_label": "LIVE_IN",
+          "embedding": [
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.4364357804719848,
+            0.2182178902359924,
+            0.4364357804719848,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.2182178902359924,
+            0.0,
+            0.2182178902359924,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.4364357804719848
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_HARE",
+            "role": "SUBJECT"
+          },
+          "LOCATION": {
+            "uid": "M_MEADOW",
+            "role": "LOCATION"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "LIVE_IN",
+          "normalization": "new_relation",
+          "normalization_confidence": 0.5,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00008",
+        "predicate": {
+          "uid": "REL_LIVE_IN",
+          "raw_label": "LIVE_IN",
+          "canonical_label": "LIVE_IN",
+          "embedding": [
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.4364357804719848,
+            0.2182178902359924,
+            0.4364357804719848,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.2182178902359924,
+            0.0,
+            0.2182178902359924,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.4364357804719848
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_HARE",
+            "role": "SUBJECT"
+          },
+          "LOCATION": {
+            "uid": "M_FOREST",
+            "role": "LOCATION"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "LIVE_IN",
+          "normalization": "parser_hint",
+          "normalization_confidence": 1.0,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00010",
+        "predicate": {
+          "uid": "REL_HAVE",
+          "raw_label": "HAVE",
+          "canonical_label": "HAVE",
+          "embedding": [
+            -0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            0.25,
+            0.0,
+            0.5,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_HARE",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_HIND_LEG",
+            "role": "OBJECT"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "HAVE",
+          "normalization": "new_relation",
+          "normalization_confidence": 0.5,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00012",
+        "predicate": {
+          "uid": "REL_RUN",
+          "raw_label": "RUN",
+          "canonical_label": "RUN",
+          "embedding": [
+            -0.5163977794943222,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.2581988897471611,
+            -0.2581988897471611,
+            0.0,
+            0.2581988897471611,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.5163977794943222,
+            0.2581988897471611,
+            0.0,
+            0.0,
+            0.0,
+            0.2581988897471611,
+            -0.2581988897471611,
+            0.0,
+            0.2581988897471611,
+            0.0
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_HARE",
+            "role": "SUBJECT"
+          },
+          "HOW-TO": {
+            "uid": "M_VERY_FAST",
+            "role": "HOW-TO"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "RUN",
+          "normalization": "new_relation",
+          "normalization_confidence": 0.5,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00014",
+        "predicate": {
+          "uid": "REL_HAVE",
+          "raw_label": "HAVE",
+          "canonical_label": "HAVE",
+          "embedding": [
+            -0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            0.25,
+            0.0,
+            0.5,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_HARE",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_EAR",
+            "role": "OBJECT"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "HAVE",
+          "normalization": "parser_hint",
+          "normalization_confidence": 1.0,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00016",
+        "predicate": {
+          "uid": "REL_HAVE",
+          "raw_label": "HAVE",
+          "canonical_label": "HAVE",
+          "embedding": [
+            -0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            0.25,
+            0.25,
+            0.0,
+            0.0,
+            0.25,
+            0.0,
+            0.5,
+            0.0,
+            -0.25,
+            0.25,
+            0.0,
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_HARE",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_TAIL",
+            "role": "OBJECT"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "HAVE",
+          "normalization": "parser_hint",
+          "normalization_confidence": 1.0,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00018",
+        "predicate": {
+          "uid": "REL_BE_COLORED",
+          "raw_label": "BE_COLORED",
+          "canonical_label": "BE_COLORED",
+          "embedding": [
+            -0.39391929857916763,
+            0.0,
+            0.13130643285972254,
+            0.13130643285972254,
+            0.39391929857916763,
+            0.0,
+            -0.13130643285972254,
+            0.0,
+            -0.13130643285972254,
+            0.0,
+            0.13130643285972254,
+            0.2626128657194451,
+            -0.13130643285972254,
+            0.39391929857916763,
+            -0.13130643285972254,
+            -0.2626128657194451,
+            0.13130643285972254,
+            0.0,
+            -0.2626128657194451,
+            0.0,
+            0.0,
+            0.0,
+            -0.2626128657194451,
+            -0.13130643285972254,
+            0.0,
+            0.0,
+            0.13130643285972254,
+            0.0,
+            0.0,
+            0.2626128657194451,
+            0.0,
+            -0.13130643285972254
+          ],
+          "arity": 3,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_FUR",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_BROWN",
+            "role": "OBJECT"
+          },
+          "TIME": {
+            "uid": "M_SUMMER",
+            "role": "TIME"
+          }
+        },
+        "timestamp": "M_SUMMER",
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "BE_COLORED",
+          "normalization": "new_relation",
+          "normalization_confidence": 0.5,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00023",
+        "predicate": {
+          "uid": "REL_BE_COLORED",
+          "raw_label": "BE_COLORED",
+          "canonical_label": "BE_COLORED",
+          "embedding": [
+            -0.39391929857916763,
+            0.0,
+            0.13130643285972254,
+            0.13130643285972254,
+            0.39391929857916763,
+            0.0,
+            -0.13130643285972254,
+            0.0,
+            -0.13130643285972254,
+            0.0,
+            0.13130643285972254,
+            0.2626128657194451,
+            -0.13130643285972254,
+            0.39391929857916763,
+            -0.13130643285972254,
+            -0.2626128657194451,
+            0.13130643285972254,
+            0.0,
+            -0.2626128657194451,
+            0.0,
+            0.0,
+            0.0,
+            -0.2626128657194451,
+            -0.13130643285972254,
+            0.0,
+            0.0,
+            0.13130643285972254,
+            0.0,
+            0.0,
+            0.2626128657194451,
+            0.0,
+            -0.13130643285972254
+          ],
+          "arity": 3,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_FUR",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_WHITE",
+            "role": "OBJECT"
+          },
+          "TIME": {
+            "uid": "M_WINTER",
+            "role": "TIME"
+          }
+        },
+        "timestamp": "M_WINTER",
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "BE_COLORED",
+          "normalization": "parser_hint",
+          "normalization_confidence": 1.0,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T05:18:06+03:00",
+          "created_tau": 0
+        }
+      }
+    ],
+    "state": {
+      "values": {},
+      "history": {},
+      "applied_events": [
+        "E_00001",
+        "E_00004",
+        "E_00006",
+        "E_00008",
+        "E_00010",
+        "E_00012",
+        "E_00014",
+        "E_00016",
+        "E_00018",
+        "E_00023"
+      ]
+    },
+    "state_transitions": []
+  }
+}

@@ -201,7 +201,11 @@ def test_compact_architecture_dialogue_builds_inspectable_graph() -> None:
 
     print("COMPACT_DIALOGUE_RELATIONS=" + json.dumps(relations))
     expected_candidates = sum(
-        len(payload["candidates"]) for payload in USER_PARSE.values()
+        sum(
+            candidate["statement_type"] not in {"topic", "open_question"}
+            for candidate in payload["candidates"]
+        )
+        for payload in USER_PARSE.values()
     )
     assert len(factors) == expected_candidates, relations
     anchor_uid = factors[0].roles["OBJECT"]

@@ -11,14 +11,18 @@ from ah_memory.morph import seeds_from_roles, slug_uid
 from ah_memory.perception import (
     PerceptionResult,
     SeedPerception,
-    _is_question,
-    _norm,
     candidates_from_llm_json,
+    classify_utterance,
     content_entity_uids,
     gate_candidates,
     llm_payload_errors,
 )
-from ah_memory.perception_prompt import SYSTEM_PROMPT, build_user_payload
+from ah_memory.perception_prompt import (
+    REPAIR_SYSTEM_PROMPT,
+    SYSTEM_PROMPT,
+    build_repair_payload,
+    build_user_payload,
+)
 
 
 class DeepSeekClient:
@@ -82,14 +86,53 @@ class DeepSeekPerception:
             f"candidate rejected: {item.get('reason', 'validation')}"
             for item in gate_report.get("dropped", [])
         )
-        kind = data.get("kind", "fact")
-        if kind not in {"fact", "question", "message"}:
-            kind = "fact"
-        low = _norm(text.strip())
-        if _is_question(text.strip(), low):
-            kind = "question"
-        elif gated:
-            kind = "fact"
+        repair_used = False
+        if validation_errors:
+            repaired_raw = self.client.chat(
+                [
+                    {"role": "system", "content": REPAIR_SYSTEM_PROMPT},
+                    {
+                        "role": "user",
+                        "content": build_repair_payload(
+                            text,
+                            data,
+                            validation_errors,
+                        ),
+                    },
+                ]
+            )
+            repaired_data = _parse_json(repaired_raw)
+            repaired_candidates = candidates_from_llm_json(repaired_data)
+            repaired_gated, repaired_report = gate_candidates(
+                text,
+                repaired_candidates,
+                require_grounding=self.require_grounding,
+                allow_open_relations=True,
+                report=True,
+            )
+            repaired_errors = llm_payload_errors(repaired_data)
+            repaired_errors.extend(
+                f"candidate rejected: {item.get('reason', 'validation')}"
+                for item in repaired_report.get("dropped", [])
+            )
+            if (
+                len(repaired_gated) > len(gated)
+                or (
+                    len(repaired_gated) == len(gated)
+                    and len(repaired_errors) < len(validation_errors)
+                )
+            ):
+                data = repaired_data
+                gated = repaired_gated
+                gate_report = repaired_report
+                validation_errors = repaired_errors
+                repair_used = True
+        kind = classify_utterance(
+            text,
+            declared_kind=str(data.get("kind") or ""),
+            candidates=gated,
+            query=data.get("query"),
+        )
         seeds = seeds_from_roles(
             gated,
             extra=[slug_uid(str(s)) for s in data.get("seed_tokens", [])][:12],
@@ -107,6 +150,7 @@ class DeepSeekPerception:
                 "llm_raw": data,
                 "gate_report": gate_report,
                 "validation_errors": validation_errors,
+                "repair_used": repair_used,
                 "system_prompt": SYSTEM_PROMPT,
             },
         )
@@ -149,5 +193,9 @@ class DeepSeekHybridPerception:
                 "llm_raw": llm.meta.get("llm_raw"),
                 "system_prompt": llm.meta.get("system_prompt", SYSTEM_PROMPT),
                 "llm_candidates": len(llm.candidates),
+                "repair_used": bool(llm.meta.get("repair_used")),
+                "validation_errors": list(
+                    llm.meta.get("validation_errors") or []
+                ),
             },
         )

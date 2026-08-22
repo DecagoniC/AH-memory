@@ -52,5 +52,12 @@ def build_mini_open_store() -> AHStore:
             e1=store.m_ref("EP_1"),
             e2=store.m_ref("EP_2"),
         )
+        )
+    from ah_memory.graph_library import remember_fixture
+
+    remember_fixture(
+        "mini-open",
+        store,
+        source_text="Сущность — это вид. Сущность обитает в месте.",
     )
     return store

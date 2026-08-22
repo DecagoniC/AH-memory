@@ -121,6 +121,14 @@ def ingest_world(
             # fallback: last inserted
             factor_map[factor.uid] = next(reversed(store.semantic_factors))
 
+    from ah_memory.graph_library import remember_fixture
+
+    preset = getattr(getattr(world, "config", None), "preset", None) or "synthetic"
+    docs = "\n\n".join(
+        str(getattr(doc, "text", "") or "").strip()
+        for doc in getattr(world, "documents", ()) or ()
+    )
+    remember_fixture(f"synthetic-{preset}", store, source_text=docs)
     return IngestResult(
         store=store,
         uid_map=uid_map,

@@ -215,15 +215,17 @@
       word-break: break-word;
     }
     .composer {
-      display: flex;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
       padding: 12px;
       border-top: 1px solid var(--line);
     }
     .composer textarea {
-      flex: 1;
+      box-sizing: border-box;
+      width: 100%;
       resize: none;
-      min-height: 52px;
+      min-height: 64px;
       max-height: 140px;
       border-radius: 10px;
       border: 1px solid var(--line);
@@ -231,6 +233,28 @@
       color: var(--text);
       padding: 10px 12px;
       font: inherit;
+    }
+    .composer-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .composer-actions #send { margin-right: auto; }
+    .compare-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,.025);
+    }
+    .compare-label {
+      padding: 0 5px;
+      color: var(--muted);
+      font-size: .75rem;
+      white-space: nowrap;
     }
     button {
       border: 0;
@@ -243,7 +267,23 @@
       min-height: 44px;
     }
     button.secondary { background: #334155; color: var(--text); }
-    button.compare-btn { background: var(--accent2); color: #1a1408; min-width: 110px; }
+    button.compare-btn {
+      background: var(--accent2);
+      color: #1a1408;
+      min-width: 82px;
+      min-height: 38px;
+      padding: 0 12px;
+    }
+    @media (max-width: 720px) {
+      .composer-actions #send {
+        width: 100%;
+        margin-right: 0;
+      }
+      .compare-group {
+        flex: 1;
+        justify-content: flex-end;
+      }
+    }
     button:disabled { opacity: .5; cursor: wait; }
     #network, #networkTrace {
       flex: 1;
@@ -253,6 +293,17 @@
         #151c26;
     }
     #networkTrace { display: none; }
+    #graphSelect, #graphName {
+      background: #12181f;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      min-height: 36px;
+      padding: 0 10px;
+      font: inherit;
+    }
+    #graphSelect { min-width: 180px; max-width: 260px; }
+    #graphName { width: 150px; }
     .graph-tabs {
       display: flex;
       gap: 0;
@@ -348,11 +399,15 @@
         <div id="log"></div>
         <div class="composer">
           <textarea id="input" placeholder="Факт или вопрос…"></textarea>
-          <button id="send">Отправить</button>
-          <button type="button" class="compare-btn" id="compare" title="АГ vs БЯМ+RAG">Сравнить</button>
-        </div>
-        <div class="toolbar" style="border-top:1px solid var(--line); border-bottom:none;">
-          <button class="secondary" id="runM4">M4 бенчмарк</button>
+          <div class="composer-actions">
+            <button id="send">Отправить</button>
+            <button class="secondary" id="runM4">M4</button>
+            <div class="compare-group" aria-label="Режим сравнения">
+              <span class="compare-label">Сравнить</span>
+              <button type="button" class="compare-btn" id="compareRaw" title="Декодер АГ vs extractive FAISS-RAG">Без LLM</button>
+              <button type="button" class="compare-btn" id="compareGenerated" title="Один LLM-генератор для контекста АГ и RAG">С LLM</button>
+            </div>
+          </div>
         </div>
       </section>
       <section class="trace-wrap">
@@ -372,6 +427,12 @@
           <button class="secondary" id="modeAll">Все связи</button>
           <button class="secondary" id="dump">JSON</button>
           <button class="secondary" id="reset">Сброс</button>
+          <select id="graphSelect" title="Сохранённые графы">
+            <option value="">библиотека графов…</option>
+          </select>
+          <input id="graphName" type="text" placeholder="имя графа" />
+          <button class="secondary" id="graphSave">Сохранить</button>
+          <button class="secondary" id="graphLoad">Загрузить</button>
         </div>
         <div class="legend" id="legend">
           <div class="legend-grid">
@@ -408,7 +469,8 @@
     const log = document.getElementById("log");
     const input = document.getElementById("input");
     const sendBtn = document.getElementById("send");
-    const compareBtn = document.getElementById("compare");
+    const compareRawBtn = document.getElementById("compareRaw");
+    const compareGeneratedBtn = document.getElementById("compareGenerated");
     const m4Btn = document.getElementById("runM4");
     const traceView = document.getElementById("traceView");
     let network = null;
@@ -424,7 +486,8 @@
 
     function setBusy(busy) {
       if (sendBtn) sendBtn.disabled = busy;
-      if (compareBtn) compareBtn.disabled = busy;
+      if (compareRawBtn) compareRawBtn.disabled = busy;
+      if (compareGeneratedBtn) compareGeneratedBtn.disabled = busy;
       if (m4Btn) m4Btn.disabled = busy;
     }
 
@@ -1226,22 +1289,22 @@
     }
 
     sendBtn.addEventListener("click", send);
-    compareBtn.addEventListener("click", async () => {
+    async function compare(mode) {
       const question = resolveQuestion();
       if (!question) {
-        addMsg("bot", "Введи факт или вопрос, затем Сравнить.", "hint");
+        addMsg("bot", "Введи факт или вопрос, затем выбери режим сравнения.", "hint");
         input.focus();
         return;
       }
       lastQuestion = question;
-      addMsg("user", question, "compare");
+      addMsg("user", question, `compare · ${mode}`);
       input.value = "";
       setBusy(true);
       try {
         const r = await fetch("/api/compare", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question }),
+          body: JSON.stringify({ question, mode }),
           cache: "no-store",
         });
         let j;
@@ -1252,7 +1315,7 @@
         addMsg(
           "bot",
           `АГ-память:\n${j.ah_answer}\n\nБЯМ+RAG:\n${j.rag_answer}`,
-          `compare · ${j.notes?.mode || "?"} · ah=${j.ah_source} · rag=${j.rag_source} · corpus=${j.notes?.corpus_chars ?? "?"}`,
+          `compare · ${j.notes?.comparison_mode || mode} · ${j.notes?.mode || "?"} · ah=${j.ah_source} · rag=${j.rag_source} · corpus=${j.notes?.corpus_chars ?? "?"}`,
           { systemPrompt: (preview ? `corpus:\n${preview}\n\n` : "") + (ragBits ? `chunks:\n${ragBits}` : "chunks: (пусто)") }
         );
         highlight = new Set(j.ah_trace_uids || []);
@@ -1264,7 +1327,9 @@
         setBusy(false);
         input.focus();
       }
-    });
+    }
+    compareRawBtn.addEventListener("click", () => compare("raw"));
+    compareGeneratedBtn.addEventListener("click", () => compare("generated"));
 
     m4Btn.addEventListener("click", async () => {
       addMsg("bot", "Запуск M4 (АГ vs БЯМ+RAG)…", "m4");
@@ -1307,6 +1372,67 @@
       a.download = "ah_dump.json";
       a.click();
     });
+    async function refreshGraphLibrary(selectedId) {
+      const sel = document.getElementById("graphSelect");
+      const r = await fetch("/api/graphs", { cache: "no-store" });
+      const j = await r.json();
+      const graphs = j.graphs || [];
+      const current = selectedId || sel.value;
+      sel.innerHTML = "";
+      const ph = document.createElement("option");
+      ph.value = "";
+      ph.textContent = graphs.length ? "выбери граф…" : "библиотека пуста";
+      sel.appendChild(ph);
+      for (const g of graphs) {
+        const opt = document.createElement("option");
+        opt.value = g.id;
+        const n = g.stats && g.stats.graph_size != null ? g.stats.graph_size : "?";
+        opt.textContent = `${g.kind === "fixture" ? "● " : ""}${g.name}  (|G|=${n})`;
+        sel.appendChild(opt);
+      }
+      if (current && [...sel.options].some((o) => o.value === current)) sel.value = current;
+    }
+    document.getElementById("graphSave").addEventListener("click", async () => {
+      try {
+        const name = document.getElementById("graphName").value.trim();
+        const r = await fetch("/api/graphs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name }),
+        });
+        const j = await r.json();
+        if (!r.ok || !j.ok) throw new Error(j.detail || "save failed");
+        document.getElementById("graphName").value = "";
+        await refreshGraphLibrary(j.id);
+        addMsg("bot", `Граф сохранён: ${j.name}`, "system");
+      } catch (e) {
+        addMsg("bot", String(e), "error");
+      }
+    });
+    document.getElementById("graphLoad").addEventListener("click", async () => {
+      const id = document.getElementById("graphSelect").value;
+      if (!id) { addMsg("bot", "Сначала выбери граф в списке.", "system"); return; }
+      try {
+        wipeNetwork();
+        const r = await fetch(`/api/graphs/${encodeURIComponent(id)}/load`, {
+          method: "POST",
+          cache: "no-store",
+        });
+        const j = await r.json();
+        if (!r.ok || !j.ok) throw new Error(typeof j.detail === "string" ? j.detail : "load failed");
+        highlight = new Set();
+        lastActivation = null;
+        lastGraphData = null;
+        renderActivation(null);
+        lastQuestion = "";
+        addMsg("bot", `Загружен граф «${j.name}» · graph_size=${j.stats?.graph_size ?? "?"}`, "system");
+        await loadHealth();
+        await loadGraph();
+        if (graphPane === "trace") renderTraceGraph();
+      } catch (e) {
+        addMsg("bot", String(e), "error");
+      }
+    });
     document.getElementById("reset").addEventListener("click", async () => {
       try {
         wipeNetwork();
@@ -1346,6 +1472,7 @@
       addMsg("bot", "Готов к диалогу. Каждая твоя реплика и ответ модели пишутся в АГ-память.", "system");
       await loadHealth();
       await loadGraph();
+      await refreshGraphLibrary();
     })();
   </script>
 </body>

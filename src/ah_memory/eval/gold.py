@@ -1,8 +1,124 @@
-"""Offline gold set for M4 (rabbit fixture)."""
+"""Offline gold set for M4 (closed-world bulletin + optional rabbit demo)."""
 from __future__ import annotations
 
 from ah_memory.eval.m4 import GoldItem
+from ah_memory.examples.closed_world import (
+    build_closed_world_memory,
+    closed_world_text,
+)
 from ah_memory.examples.rabbit import RABBIT_TEXT, build_rabbit_memory
+
+_ABSTAIN = ["неизвестно", "нет данных", "не знаю"]
+
+
+def closed_world_gold() -> list[GoldItem]:
+    """In-corpus items plus one distractor whose answer is not in the bulletin."""
+    return [
+        GoldItem(
+            question="Что такое Тиманский кряж?",
+            answer_keywords=["тиманский", "возвышенность", "кряж", "равнин"],
+            gold_trace=["M_ТИМАНСКИЙ_КРЯЖ"],
+            d=2,
+            evidence_spans=["Тиманский кряж", "возвышенность"],
+        ),
+        GoldItem(
+            question="Где расположен Тиманский кряж?",
+            answer_keywords=["тиманский", "равнин", "восток", "баренц", "location"],
+            gold_trace=["M_ТИМАНСКИЙ_КРЯЖ"],
+            d=1,
+            evidence_spans=["расположенная", "Восточно-Европейской"],
+        ),
+        GoldItem(
+            question="Какая высшая точка Тиманского кряжа?",
+            answer_keywords=["четласский", "471", "тиманский", "камень"],
+            gold_trace=["M_ТИМАНСКИЙ_КРЯЖ"],
+            d=2,
+            evidence_spans=["Четласский Камень", "471"],
+        ),
+        GoldItem(
+            question="Где располагается южная часть Тиманского кряжа?",
+            answer_keywords=["тайга", "южн", "тиманский"],
+            gold_trace=["M_ЮЖНЫЙ_ЧАСТЬ_ТИМАНСКИЙ_КРЯЖ", "M_ТИМАНСКИЙ_КРЯЖ"],
+            d=2,
+            evidence_spans=["Южная часть", "тайги"],
+        ),
+        GoldItem(
+            question="Кто назвал кряж Тиманским?",
+            answer_keywords=["кейзерлинг", "тиманский", "кряж"],
+            gold_trace=["M_ТИМАНСКИЙ_КРЯЖ"],
+            d=2,
+            evidence_spans=["Кейзерлинг", "назвал"],
+        ),
+        GoldItem(
+            question="Сколько килограммов весит Тиманский кряж?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+    ]
+
+
+def closed_world_trap_gold() -> list[GoldItem]:
+    """Unknown entity, unknown slot, and facts the bulletin does not state."""
+    return [
+        GoldItem(
+            question="Где обитает барсук?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Какой секретный код у Тиманского кряжа?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Какой пароль у сервера alpha?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Какого цвета глаза Тиманского кряжа?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Кто такой барсук?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Какой код замка у станции Veshnet?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Сколько килограммов весит Тиманский кряж?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Сколько килограммов весит король зайцев на Луне?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+    ]
 
 
 def rabbit_gold() -> list[GoldItem]:
@@ -42,10 +158,9 @@ def rabbit_gold() -> list[GoldItem]:
             d=2,
             evidence_spans=["заяц", "зверёк"],
         ),
-        # Trap: not in corpus — probes hallucination under LLM RAG
         GoldItem(
             question="Сколько килограммов весит король зайцев на Луне?",
-            answer_keywords=["неизвестно", "нет данных", "не знаю"],
+            answer_keywords=_ABSTAIN,
             gold_trace=[],
             d=1,
             evidence_spans=["__none__"],
@@ -100,14 +215,14 @@ def mini_trap_gold() -> list[GoldItem]:
     return [
         GoldItem(
             question="Где обитает барсук?",
-            answer_keywords=["неизвестно", "нет данных", "не знаю"],
+            answer_keywords=_ABSTAIN,
             gold_trace=[],
             d=1,
             evidence_spans=["__none__"],
         ),
         GoldItem(
             question="Какой секретный код у сущности?",
-            answer_keywords=["неизвестно", "нет данных", "не знаю"],
+            answer_keywords=_ABSTAIN,
             gold_trace=[],
             d=1,
             evidence_spans=["__none__"],
@@ -117,46 +232,45 @@ def mini_trap_gold() -> list[GoldItem]:
 
 def rabbit_trap_gold() -> list[GoldItem]:
     """Adversarial probes on the rabbit corpus: unknown entity, unknown slot, OOD."""
-    abstain = ["неизвестно", "нет данных", "не знаю"]
     return [
         GoldItem(
             question="Где обитает барсук?",
-            answer_keywords=abstain,
+            answer_keywords=_ABSTAIN,
             gold_trace=[],
             d=1,
             evidence_spans=["__none__"],
         ),
         GoldItem(
             question="Какой секретный код у зайца?",
-            answer_keywords=abstain,
+            answer_keywords=_ABSTAIN,
             gold_trace=[],
             d=1,
             evidence_spans=["__none__"],
         ),
         GoldItem(
             question="Какой пароль у сервера alpha?",
-            answer_keywords=abstain,
+            answer_keywords=_ABSTAIN,
             gold_trace=[],
             d=1,
             evidence_spans=["__none__"],
         ),
         GoldItem(
             question="Какого цвета глаза зайца?",
-            answer_keywords=abstain,
+            answer_keywords=_ABSTAIN,
             gold_trace=[],
             d=1,
             evidence_spans=["__none__"],
         ),
         GoldItem(
             question="Кто такой барсук?",
-            answer_keywords=abstain,
+            answer_keywords=_ABSTAIN,
             gold_trace=[],
             d=1,
             evidence_spans=["__none__"],
         ),
         GoldItem(
             question="Сколько килограммов весит король зайцев на Луне?",
-            answer_keywords=abstain,
+            answer_keywords=_ABSTAIN,
             gold_trace=[],
             d=1,
             evidence_spans=["__none__"],
@@ -165,17 +279,33 @@ def rabbit_trap_gold() -> list[GoldItem]:
 
 
 def build_m4_fixture(*, use_llm: bool = False) -> tuple:
-    """AH agent on rabbit graph + VanillaRAG on same NL corpus."""
+    """AH agent on the closed-world graph + VanillaRAG on the same bulletin."""
     from ah_memory.agent import Agent
     from ah_memory.baselines.vanilla_rag import VanillaRAG
     from ah_memory.config import load_config
 
-    store = build_rabbit_memory()
-    corpus = RABBIT_TEXT
+    store = build_closed_world_memory()
+    corpus = closed_world_text()
     agent = Agent(store=store)
     ds = None
     if use_llm:
         cfg = load_config()
         ds = cfg.deepseek if cfg.deepseek.configured else None
     rag = VanillaRAG(corpus, top_k=4, deepseek=ds)
+    return agent, rag, closed_world_gold(), None
+
+
+def build_rabbit_m4_fixture(*, use_llm: bool = False) -> tuple:
+    """Legacy encyclopedia fixture (parametric overlap with pretrained LLMs)."""
+    from ah_memory.agent import Agent
+    from ah_memory.baselines.vanilla_rag import VanillaRAG
+    from ah_memory.config import load_config
+
+    store = build_rabbit_memory()
+    agent = Agent(store=store)
+    ds = None
+    if use_llm:
+        cfg = load_config()
+        ds = cfg.deepseek if cfg.deepseek.configured else None
+    rag = VanillaRAG(RABBIT_TEXT, top_k=4, deepseek=ds)
     return agent, rag, rabbit_gold(), None

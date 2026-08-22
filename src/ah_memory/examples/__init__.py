@@ -1,1 +1,1 @@
-"""Benchmark fixtures (rabbit gold for M4). Generic tests use tests/_mini_graph."""
+"""Benchmark fixtures. M4 gold is the Wikipedia closed-world ingest."""

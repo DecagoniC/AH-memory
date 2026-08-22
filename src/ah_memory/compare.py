@@ -1,20 +1,26 @@
 """Side-by-side: АГ-память vs БЯМ+RAG на живом диалоге/графе (не фиксированный «заяц»)."""
 from __future__ import annotations
 
-import re
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from ah_memory.agent import Agent
+from ah_memory.baselines.rag_embedder import RagEmbedder, resolve_rag_embedder
 from ah_memory.baselines.vanilla_rag import VanillaRAG
 from ah_memory.config import DeepSeekConfig, load_config
-from ah_memory.eval.gold import rabbit_gold
+from ah_memory.eval.gold import closed_world_gold
 from ah_memory.eval.m4 import GoldItem, M4Report, evaluate_m4
-from ah_memory.examples.rabbit import RABBIT_TEXT, build_rabbit_memory
-from ah_memory.factor_graph import Factor
-from ah_memory.perception import _is_question, _norm
+from ah_memory.examples.closed_world import (
+    build_closed_world_memory,
+    closed_world_text,
+)
+from ah_memory.perception import PerceptionResult, content_entity_uids
 from ah_memory.store import AHStore
-from ah_memory.types import Section
+
+
+COMPARE_GENERATION_SYSTEM = """Ты формируешь ответ только по переданному контексту.
+Не используй внешние знания. Если контекст не содержит ответа, ответь ровно:
+неизвестно. Перечисления передавай полностью. Отвечай по-русски кратко."""
 
 
 @dataclass
@@ -33,20 +39,6 @@ class CompareTurn:
         return asdict(self)
 
 
-def facts_to_corpus(store: AHStore) -> list[str]:
-    """Человекочитаемые факты из semantic factors / events → чанки для RAG."""
-    lines: list[str] = []
-    for factor in store.list_semantic_factors():
-        line = _fmt_factor(store, factor)
-        if line:
-            lines.append(line)
-    for event in store.list_events():
-        span = (event.raw_span or "").strip()
-        if span and span not in lines:
-            lines.append(span)
-    return lines
-
-
 def history_to_corpus(history: list[dict[str, str]]) -> list[str]:
     out: list[str] = []
     for m in history:
@@ -56,18 +48,19 @@ def history_to_corpus(history: list[dict[str, str]]) -> list[str]:
     return out
 
 
-def build_live_corpus(
-    store: AHStore,
-    history: list[dict[str, str]] | None = None,
+def build_rag_corpus(
     *,
+    source_docs: list[str] | None = None,
+    history: list[dict[str, str]] | None = None,
     extra: list[str] | None = None,
 ) -> str:
+    """Join RAG-only documents. Never reads AHStore / graph factors."""
     parts: list[str] = []
+    if source_docs:
+        parts.extend(t.strip() for t in source_docs if t and t.strip())
     parts.extend(history_to_corpus(history or []))
-    parts.extend(facts_to_corpus(store))
     if extra:
         parts.extend(t.strip() for t in extra if t and t.strip())
-    # dedupe keep order
     seen: set[str] = set()
     uniq: list[str] = []
     for p in parts:
@@ -79,46 +72,8 @@ def build_live_corpus(
     return "\n\n".join(uniq) if uniq else "Корпус пуст."
 
 
-def _label_of(store: AHStore, uid: str) -> str:
-    bare = uid[2:] if uid.startswith("M_") else uid
-    try:
-        m = store.get_symbol(uid if uid.startswith("M_") else f"M_{bare}")
-        for p in m.Pr:
-            if p.name == "label" and p.value:
-                return p.value
-    except Exception:
-        pass
-    if bare in store.ah.S:
-        forms = store.ah.S[bare].R.get("TEXT") or set()
-        if forms:
-            return next(iter(forms))
-    return bare.replace("_", " ").lower()
-
-
-def _fmt_factor(store: AHStore, factor: Factor) -> str | None:
-    pred = (
-        factor.relation.canonical_label.upper()
-        if factor.relation is not None
-        else ""
-    )
-    if not pred:
-        return None
-    roles = {role: _label_of(store, uid) for role, uid in factor.roles.items()}
-    subj = roles.get("SUBJECT", "?")
-    if pred in {"IS", "IS_A"} and "OBJECT" in roles:
-        return f"{subj} — {roles['OBJECT']}"
-    if pred in {"LIVE_IN", "LIVEIN"} and "LOCATION" in roles:
-        return f"{subj} учится/обитает в {roles['LOCATION']}"
-    if pred == "HAVE" and "OBJECT" in roles:
-        return f"у {subj} есть {roles['OBJECT']}"
-    if pred == "CREATE" and "OBJECT" in roles:
-        return f"{roles.get('SUBJECT', '?')} создал(и) {roles['OBJECT']}"
-    extras = ", ".join(f"{k}: {v}" for k, v in roles.items() if k != "SUBJECT")
-    return f"{pred}: {subj}" + (f" — {extras}" if extras else "")
-
-
 class CompareEngine:
-    """Живой агент + RAG по корпусу диалога/фактов (без чужого эталона «заяц»)."""
+    """AH graph vs RAG documents. Two arms, no shared memory."""
 
     def __init__(
         self,
@@ -128,43 +83,66 @@ class CompareEngine:
         ticks: int = 6,
         deepseek: DeepSeekConfig | None = None,
         history: list[dict[str, str]] | None = None,
+        source_docs: list[str] | None = None,
     ) -> None:
         self.agent = agent
         self.ticks = ticks
         self.deepseek = deepseek
         self.history = history if history is not None else []
         self._extra_docs: list[str] = []
-        corpus = build_live_corpus(agent.store, self.history)
+        self.source_docs: list[str] = [
+            t.strip() for t in (source_docs or []) if t and t.strip()
+        ]
         ds = deepseek
-        self.rag = rag or VanillaRAG(
-            corpus,
-            top_k=4,
-            deepseek=ds if ds and ds.configured else None,
-            strict=True,
-        )
+        if rag is not None:
+            self.rag = rag
+            self._embedder: RagEmbedder = getattr(rag, "embedder", None) or resolve_rag_embedder()
+            if not self.source_docs and rag.corpus.strip() and rag.corpus != "Корпус пуст.":
+                self.source_docs = [rag.corpus]
+        else:
+            self._embedder = resolve_rag_embedder()
+            self.rag = VanillaRAG(
+                build_rag_corpus(
+                    source_docs=self.source_docs,
+                    history=self.history,
+                ),
+                top_k=4,
+                deepseek=ds if ds and ds.configured else None,
+                strict=True,
+                embedder=self._embedder,
+            )
 
     @classmethod
-    def from_rabbit(cls, deepseek: DeepSeekConfig | None = None, ticks: int = 6) -> CompareEngine:
-        """Офлайн M4-бенчмарк на эталоне «заяц» (не для UI-сравнения)."""
+    def from_m4_gold(
+        cls, deepseek: DeepSeekConfig | None = None, ticks: int = 6
+    ) -> CompareEngine:
+        """Офлайн M4: один исходный текст → граф AH и отдельно чанки RAG."""
         cfg = load_config()
         ds = deepseek if deepseek is not None else cfg.deepseek
-        store = build_rabbit_memory()
+        source = closed_world_text()
+        store = build_closed_world_memory()
         agent = Agent(store=store)
-        # loose prompt допустим только в gold-бенчмарке
         rag = VanillaRAG(
-            RABBIT_TEXT,
+            source,
             top_k=4,
             deepseek=ds if ds.configured else None,
             strict=False,
         )
-        return cls(agent, rag, ticks=ticks, deepseek=ds)
+        return cls(agent, rag, ticks=ticks, deepseek=ds, source_docs=[source])
+
+    from_rabbit = from_m4_gold
 
     def bind_history(self, history: list[dict[str, str]]) -> None:
         self.history = history
 
+    def set_source_docs(self, texts: list[str]) -> None:
+        self.source_docs = [t.strip() for t in texts if t and t.strip()]
+        self.rebuild_rag()
+
     def clear(self) -> None:
         self.history = []
         self._extra_docs = []
+        self.source_docs = []
         self.rebuild_rag()
 
     def rebuild_rag(self, *, extra: list[str] | None = None) -> None:
@@ -173,74 +151,64 @@ class CompareEngine:
                 e = (e or "").strip()
                 if e and e not in self._extra_docs:
                     self._extra_docs.append(e)
-        corpus = build_live_corpus(
-            self.agent.store,
-            self.history,
+        corpus = build_rag_corpus(
+            source_docs=self.source_docs,
+            history=self.history,
             extra=self._extra_docs,
         )
-        # Живой UI: strict — без параметрических «зайцев»
         self.rag = VanillaRAG(
             corpus,
             top_k=6,
             deepseek=self.deepseek if self.deepseek and self.deepseek.configured else None,
             strict=True,
+            embedder=self._embedder,
         )
 
-    def ask(self, text: str, *, ticks: int | None = None) -> CompareTurn:
+    def ask(
+        self,
+        text: str,
+        *,
+        ticks: int | None = None,
+        mode: str = "generated",
+    ) -> CompareTurn:
         """Сравнить произвольный пользовательский запрос на живых данных."""
+        if mode not in {"raw", "generated"}:
+            raise ValueError(f"unknown comparison mode: {mode}")
         t = ticks if ticks is not None else self.ticks
         text = text.strip()
-        low = _norm(text)
-        is_q = _is_question(text, low)
-
-        if not is_q:
-            # факт/сообщение: пишем в АГ и в корпус RAG, затем оба отвечают на вопрос по содержанию
-            rep = self.agent.ingest(text, section=Section.H)
-            self.rebuild_rag(extra=[text])
-            probe = _probe_question(text)
-            ah = self.agent.ask(probe, ticks=t)
-            fact_bits = _summarize_ingest(self.agent, rep.created_n)
-            ah_answer = fact_bits or ah.answer
-            if fact_bits and ah.answer and ah.answer != "неизвестно":
-                ah_answer = f"{fact_bits}\n=> {ah.answer}"
-            vr = self.rag.ask(probe)
-            return CompareTurn(
-                question=text,
-                ah_answer=ah_answer,
-                rag_answer=vr.answer,
-                ah_trace_uids=list(dict.fromkeys(rep.created_n + ah.trace_uids + rep.seed_uids[:8])),
-                rag_chunks=list(vr.chunks),
-                rag_scores=list(vr.scores),
-                ah_source="graph+ingest",
-                rag_source=vr.source,
-                notes={
-                    "mode": "fact",
-                    "probe": probe,
-                    "ah_has_trace": bool(ah.trace_uids or rep.created_n),
-                    "rag_has_trace": False,
-                    "rag_llm": self.rag.client is not None,
-                    "corpus_chars": len(self.rag.corpus),
-                    "corpus_preview": self.rag.corpus[:280],
-                    "ingested_n": len(rep.created_n),
-                    "live": True,
-                },
-            )
-
-        # вопрос: только живой граф + актуальный корпус диалога
+        query_perception = PerceptionResult(
+            kind="question",
+            candidates=[],
+            seed_tokens=content_entity_uids(text)[:8],
+            meta={"backend": "compare_query", "interaction": "query"},
+        )
         self.rebuild_rag()
-        ah = self.agent.ask(text, ticks=t)
-        vr = self.rag.ask(text)
+        ah = self.agent.ask(
+            text,
+            ticks=t,
+            perception=query_perception,
+        )
+        vr = self.rag.ask(text, generate=False)
+        ah_answer, rag_answer, ah_source, rag_source = self._comparison_output(
+            text,
+            ah.answer,
+            vr.answer,
+            vr.chunks,
+            mode,
+            ah_source=ah.source,
+        )
         return CompareTurn(
             question=text,
-            ah_answer=ah.answer,
-            rag_answer=vr.answer,
+            ah_answer=ah_answer,
+            rag_answer=rag_answer,
             ah_trace_uids=list(ah.trace_uids),
             rag_chunks=list(vr.chunks),
             rag_scores=list(vr.scores),
-            ah_source=ah.source,
-            rag_source=vr.source,
+            ah_source=ah_source,
+            rag_source=rag_source,
             notes={
                 "mode": "question",
+                "comparison_mode": mode,
                 "ah_has_trace": bool(ah.trace_uids),
                 "rag_has_trace": False,
                 "rag_llm": self.rag.client is not None,
@@ -250,53 +218,58 @@ class CompareEngine:
             },
         )
 
-    def run_m4(self, gold: list[GoldItem] | None = None) -> M4Report:
-        """Для бенчмарка — эталон rabbit (отдельный контур)."""
-        bench = CompareEngine.from_rabbit(self.deepseek, ticks=self.ticks)
-        return evaluate_m4(bench.agent, bench.rag, gold or rabbit_gold(), ticks=self.ticks)
-
-
-def _probe_question(fact_text: str) -> str:
-    """Превращает утверждение в вопрос для честного сравнения ответов."""
-    low = fact_text.lower().replace("ё", "е")
-    # Несколько фактов в одной реплике → сводный вопрос (иначе RAG отвечает только на «как зовут»)
-    clauses = [c.strip() for c in re.split(r"[.!?;]+", fact_text) if c.strip()]
-    hits = sum(
-        1
-        for key in ("зовут", "имя", "учусь", "универ", "спбпу", "вуз", "сестр", "брат", "живу", "работа")
-        if key in low
-    )
-    if len(clauses) >= 2 or hits >= 2 or len(fact_text) > 60:
-        return (
-            "Что известно из корпуса о собеседнике? "
-            "Перечисли кратко все факты: имя, учёба/работа, родственники и прочее."
+    def _comparison_output(
+        self,
+        question: str,
+        ah_context: str,
+        rag_fallback: str,
+        rag_chunks: list[str],
+        mode: str,
+        *,
+        ah_source: str,
+    ) -> tuple[str, str, str, str]:
+        if mode == "raw" or self.rag.client is None:
+            return (
+                ah_context,
+                rag_fallback,
+                ah_source,
+                "extractive_rag",
+            )
+        rag_context = "\n\n".join(
+            f"[{index}] {chunk}"
+            for index, chunk in enumerate(rag_chunks, start=1)
         )
-    if "зовут" in low or "имя" in low:
-        return "Как зовут собеседника?"
-    if "учусь" in low or "универ" in low or "спбпу" in low or "вуз" in low:
-        return "Где учится собеседник?"
-    if "сестр" in low or "брат" in low:
-        return "Кто родственники собеседника?"
-    return "Что известно из только что сказанного? Перечисли все факты."
+        return (
+            self._generate_from_context(question, ah_context),
+            self._generate_from_context(question, rag_context),
+            f"{ah_source}+llm",
+            "faiss+llm",
+        )
 
+    def _generate_from_context(self, question: str, context: str) -> str:
+        if not context.strip() or context.strip() == "неизвестно":
+            return "неизвестно"
+        assert self.rag.client is not None
+        return self.rag.client.chat(
+            [
+                {
+                    "role": "system",
+                    "content": COMPARE_GENERATION_SYSTEM,
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Контекст:\n{context}\n\n"
+                        f"Вопрос: {question}"
+                    ),
+                },
+            ],
+            json_mode=False,
+        ).strip()
 
-def _summarize_ingest(agent: Agent, created: list[str]) -> str:
-    if not created:
-        return ""
-    by_uid = {factor.uid: factor for factor in agent.store.list_semantic_factors()}
-    bits: list[str] = []
-    for uid in created[:12]:
-        factor = by_uid.get(uid)
-        if factor is not None:
-            line = _fmt_factor(agent.store, factor)
-            if line:
-                bits.append(line)
-                continue
-        try:
-            m = agent.store.get_symbol(uid if uid.startswith("M_") else f"M_{uid}")
-            for p in m.Pr:
-                if p.name == "label":
-                    bits.append(p.value)
-        except Exception:
-            continue
-    return "записано: " + "; ".join(bits) if bits else f"записано узлов: {len(created)}"
+    def run_m4(self, gold: list[GoldItem] | None = None) -> M4Report:
+        """Для бенчмарка — закрытый корпус M4 (отдельный контур)."""
+        bench = CompareEngine.from_m4_gold(self.deepseek, ticks=self.ticks)
+        return evaluate_m4(
+            bench.agent, bench.rag, gold or closed_world_gold(), ticks=self.ticks
+        )

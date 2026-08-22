@@ -1,7 +1,7 @@
 """Compare AH-memory vs DeepSeek LLM + vector RAG (M4).
 
   python scripts/compare_ah_vs_rag.py
-  python scripts/compare_ah_vs_rag.py -q "Кто такой заяц?"
+  python scripts/compare_ah_vs_rag.py -q "Что такое Тиманский кряж?"
   python scripts/compare_ah_vs_rag.py --m4
 """
 from __future__ import annotations
@@ -31,7 +31,7 @@ def main() -> int:
         print("ERROR: DEEPSEEK_API_KEY не задан (.env)", file=sys.stderr)
         return 2
 
-    engine = CompareEngine.from_rabbit(cfg.deepseek, ticks=args.ticks)
+    engine = CompareEngine.from_m4_gold(cfg.deepseek, ticks=args.ticks)
     print(f"RAG backend: {engine.rag.backend}  model={cfg.deepseek.model}")
 
     payload: dict = {"model": cfg.deepseek.model, "rag_backend": engine.rag.backend}

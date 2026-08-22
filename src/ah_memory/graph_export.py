@@ -259,56 +259,23 @@ def dump_graph(
 
 
 def dump_ah_json(store: AHStore) -> dict[str, Any]:
+    from ah_memory.store_codec import snapshot_store
+
     g = dump_graph(store, mode="hyper")
-    return {
-        "tau": store.ah.tau,
-        "S": {
-            uid: {
-                "R": {m: sorted(forms) for m, forms in s.R.items()},
-                "activation": s.x,
-                "created_tau": s.created_tau,
-                "added_at": getattr(s, "added_at", "") or "",
-            }
-            for uid, s in store.ah.S.items()
-        },
-        "stats": g["stats"],
-        "hyperedges": g["hyperedges"],
-        "links": [
-            {
-                "uid": l.uid,
-                "id": l.id,
-                "w": l.w,
-                "e1": l.e1.target_uid,
-                "e2": l.e2.target_uid,
-            }
-            for l in store.ah.L.values()
-        ],
-        "relations": store.relations.to_dict(),
-        "semantic_factors": [
-            {
-                "uid": factor.uid,
-                "relation": (
-                    factor.relation.canonical_label
-                    if factor.relation is not None
-                    else None
-                ),
-                "variables": list(factor.variables),
-                "roles": dict(factor.roles),
-                "weight": factor.weight,
-                "confidence": factor.confidence,
-                "parameters": (
-                    factor.parameters.to_dict()
-                    if factor.parameters is not None
-                    else None
-                ),
-                "metadata": dict(factor.metadata),
-            }
-            for factor in store.list_semantic_factors()
-        ],
-        "events": [event.to_dict() for event in store.list_events()],
-        "state": store.state.to_dict(),
-        "state_transitions": list(store.state_transitions),
-    }
+    payload = snapshot_store(store)
+    payload["stats"] = g["stats"]
+    payload["hyperedges"] = g["hyperedges"]
+    payload["links"] = [
+        {
+            "uid": l.uid,
+            "id": l.id,
+            "w": l.w,
+            "e1": l.e1.target_uid,
+            "e2": l.e2.target_uid,
+        }
+        for l in store.ah.L.values()
+    ]
+    return payload
 
 
 def _short(uid: str) -> str:

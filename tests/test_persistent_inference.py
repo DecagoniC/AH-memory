@@ -49,6 +49,40 @@ def test_same_graph_supports_independent_query_states() -> None:
     assert b_state.activation["B"] > b_state.activation["A"]
 
 
+def test_query_factor_gates_suppress_unselected_paths() -> None:
+    graph = FactorGraph(
+        variables=["A", "B", "C"],
+        factors=[
+            Factor(
+                fid="SELECTED",
+                kind=FactorKind.PAIR,
+                variables=["A", "B"],
+                w=1.0,
+                potential_key="assoc",
+            ),
+            Factor(
+                fid="UNSELECTED",
+                kind=FactorKind.PAIR,
+                variables=["A", "C"],
+                w=1.0,
+                potential_key="assoc",
+            ),
+        ],
+    )
+    bp = BeliefPropagation(damp=0.0)
+    state = bp.initialize(graph, {"A": 3.0})
+
+    result = bp.step(
+        graph,
+        state,
+        state.evidence,
+        factor_gates={"SELECTED": 1.0},
+    )
+
+    assert result.activation["B"] > result.activation["C"]
+    assert result.factor_to_variable[("UNSELECTED", "C")] == (0.5, 0.5)
+
+
 def test_counterfactual_logit_contribution_mode() -> None:
     graph = _pair_graph()
     bp = BeliefPropagation(damp=0.0, contribution_mode="counterfactual_logit")

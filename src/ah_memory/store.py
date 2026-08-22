@@ -64,6 +64,18 @@ class AHStore:
         self.state = State()
         self.state_transitions = []
 
+    def replace_from(self, other: "AHStore") -> None:
+        """Adopt another store's contents while keeping this object identity."""
+        self.ah = other.ah
+        self._uid_seq = other._uid_seq
+        self._s_refs = other._s_refs
+        self._m_refs = other._m_refs
+        self.relations = other.relations
+        self.semantic_factors = other.semantic_factors
+        self.events = other.events
+        self.state = other.state
+        self.state_transitions = other.state_transitions
+
     def _touch_structure(self) -> None:
         # Зачем: UI/кэши могут инвалидироваться по revision без полного diff.
         self.ah.revision += 1

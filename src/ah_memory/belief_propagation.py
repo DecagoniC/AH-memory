@@ -163,6 +163,7 @@ class BeliefPropagation:
         state: BPState,
         evidence: Mapping[str, float] | None = None,
         parameters: PotentialParameters | None = None,
+        factor_gates: Mapping[str, float] | None = None,
     ) -> BPState:
         """Advance one synchronous round using messages from the previous state."""
         started = time.perf_counter()
@@ -218,6 +219,18 @@ class BeliefPropagation:
                     incoming,
                     potential_parameters,
                 )
+                if (
+                    factor_gates is not None
+                    and factor.kind not in {FactorKind.PRIOR, FactorKind.OBS}
+                ):
+                    gate = min(
+                        1.0,
+                        max(0.0, float(factor_gates.get(factor.fid, 0.0))),
+                    )
+                    proposed = (
+                        0.5 + (proposed[0] - 0.5) * gate,
+                        0.5 + (proposed[1] - 0.5) * gate,
+                    )
                 old = state.factor_to_variable[(factor.fid, target)]
                 message = _damp(old, proposed, self.damp)
                 new_f2v[(factor.fid, target)] = message

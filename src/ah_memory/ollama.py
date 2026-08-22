@@ -10,9 +10,8 @@ from ah_memory.gigachat_llm import _parse_json
 from ah_memory.morph import seeds_from_roles, slug_uid
 from ah_memory.perception import (
     PerceptionResult,
-    _is_question,
-    _norm,
     candidates_from_llm_json,
+    classify_utterance,
     content_entity_uids,
     gate_candidates,
     llm_payload_errors,
@@ -149,14 +148,12 @@ class OllamaPerception:
             f"candidate rejected: {item.get('reason', 'validation')}"
             for item in gate_report.get("dropped", [])
         )
-        kind = data.get("kind", "fact")
-        if kind not in {"fact", "question", "message"}:
-            kind = "fact"
-        normalized = _norm(text.strip())
-        if _is_question(text.strip(), normalized):
-            kind = "question"
-        elif gated:
-            kind = "fact"
+        kind = classify_utterance(
+            text,
+            declared_kind=str(data.get("kind") or ""),
+            candidates=gated,
+            query=data.get("query"),
+        )
         seeds = seeds_from_roles(
             gated,
             extra=[slug_uid(str(seed)) for seed in data.get("seed_tokens", [])][:12],

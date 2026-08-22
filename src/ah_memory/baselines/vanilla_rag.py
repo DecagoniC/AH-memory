@@ -1,15 +1,16 @@
-"""Vanilla vector RAG baseline (M4): chunk corpus → TF-IDF retrieve → LLM/extractive answer.
+"""Vanilla RAG: chunk corpus → FAISS dense retrieve → LLM/extractive answer.
 
 No actant roles, no AH hypergraph, no ignition. Same corpus as AH agent.
 """
 from __future__ import annotations
 
-import math
 import re
-from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 
+from ah_memory.baselines.rag_embedder import RagEmbedder, resolve_rag_embedder
+from ah_memory.baselines.vector_store import FaissVectorStore
 from ah_memory.config import DeepSeekConfig
 from ah_memory.deepseek import DeepSeekClient
 
@@ -22,12 +23,10 @@ RAG_SYSTEM = """Ты — классический RAG-ассистент пов�
 можно опираться на общие знания, но помечай это явно.
 Отвечай по-русски кратко."""
 
-# Живой UI-compare: только фрагменты, без «общих знаний» и без чужих тем
 RAG_SYSTEM_STRICT = """Ты отвечаешь ТОЛЬКО по приведённым фрагментам корпуса.
 Если во фрагментах нет ответа — ответь ровно: неизвестно
 Если вопрос просит перечислить факты — перечисли ВСЕ факты из фрагментов, кратко, по пунктам.
-Запрещено: выдумывать факты; упоминать зайца/животных/энциклопедию, если их нет во фрагментах.
-Не используй внешние знания. Отвечай по-русски кратко."""
+Запрещено выдумывать факты. Не используй внешние знания. Отвечай по-русски кратко."""
 
 
 @dataclass
@@ -50,48 +49,50 @@ class VanillaRAG:
         deepseek: DeepSeekConfig | None = None,
         strict: bool = False,
         generator: RagGenerator | None = None,
+        embedder: RagEmbedder | None = None,
+        persist_path: str | Path | None = None,
     ) -> None:
         self.corpus = corpus
         self.chunks = _chunk_text(corpus, chunk_size=chunk_size, overlap=chunk_overlap)
         self.top_k = top_k
-        self._df = _doc_freq(self.chunks)
-        self._n = max(1, len(self.chunks))
-        self._vecs = [_tfidf(ch, self._df, self._n) for ch in self.chunks]
+        self.embedder = embedder or resolve_rag_embedder()
+        self.store = FaissVectorStore(persist_path)
+        if self.chunks:
+            vectors = self.embedder.embed_many(self.chunks)
+            self.store.replace(self.chunks, vectors)
         self.generator = generator
         self.client = (
             None
             if generator is not None
             else (DeepSeekClient(deepseek) if deepseek and deepseek.configured else None)
         )
-        if generator is not None:
-            self.backend = "scripted+tfidf"
-        elif self.client is not None:
-            self.backend = "llm+tfidf"
-        else:
-            self.backend = "extractive+tfidf"
+        answerer = (
+            "scripted" if generator is not None else ("llm" if self.client is not None else "extractive")
+        )
+        self.backend = f"{answerer}+faiss:{self.embedder.name}"
         self.system_prompt = RAG_SYSTEM_STRICT if strict else RAG_SYSTEM
 
-    def ask(self, question: str) -> VanillaRAGReply:
-        qv = _tfidf(question, self._df, self._n)
-        ranked = sorted(
-            ((_cosine(qv, v), i) for i, v in enumerate(self._vecs)),
-            reverse=True,
-        )
-        # Малый корпус / сводный вопрос → отдаём все релевантные чанки
+    def ask(
+        self,
+        question: str,
+        *,
+        generate: bool = True,
+    ) -> VanillaRAGReply:
+        if not self.chunks:
+            return VanillaRAGReply(
+                answer="неизвестно",
+                chunks=[],
+                scores=[],
+                source="empty_retrieve",
+            )
+        qv = self.embedder.embed_many([question])[0]
         k = self.top_k
         qlow = question.lower()
         if len(self.chunks) <= 12 or any(
             w in qlow for w in ("все факт", "перечисл", "что известно", "расскажи", "что ты знаешь")
         ):
             k = max(k, len(self.chunks))
-        ranked = ranked[:k]
-        picked = [(self.chunks[i], s) for s, i in ranked if s > 0]
-        # Имя/сущность из вопроса — подтянуть чанки с прямым вхождением
-        q_ents = [t for t in _tokenize(question) if len(t) >= 3]
-        for i, ch in enumerate(self.chunks):
-            ch_l = ch.lower()
-            if any(e in ch_l for e in q_ents) and all(ch != p for p, _ in picked):
-                picked.append((ch, 0.01))
+        picked = self.store.query(qv, top_k=max(k, 8), min_score=-1.0)
         if not picked:
             return VanillaRAGReply(
                 answer="неизвестно",
@@ -99,11 +100,12 @@ class VanillaRAG:
                 scores=[],
                 source="empty_retrieve",
             )
-        # стабильный порядок: по score убыв.
-        picked.sort(key=lambda x: x[1], reverse=True)
         texts = [c for c, _ in picked[: max(k, 8)]]
         scores = [s for _, s in picked[: max(k, 8)]]
-        if self.generator is not None:
+        if not generate:
+            answer = _extractive_answer(question, texts)
+            source = "extractive_rag"
+        elif self.generator is not None:
             answer = self.generator(question, texts).strip()
             source = "scripted_rag"
         elif self.client is not None:
@@ -151,47 +153,19 @@ def _tokenize(text: str) -> list[str]:
     return [t.lower() for t in _TOKEN.findall(text)]
 
 
-def _doc_freq(chunks: list[str]) -> Counter[str]:
-    df: Counter[str] = Counter()
-    for ch in chunks:
-        df.update(set(_tokenize(ch)))
-    return df
-
-
-def _tfidf(text: str, df: Counter[str], n_docs: int) -> dict[str, float]:
-    toks = _tokenize(text)
-    if not toks:
-        return {}
-    tf = Counter(toks)
-    L = len(toks)
-    vec: dict[str, float] = {}
-    for term, c in tf.items():
-        idf = math.log((1 + n_docs) / (1 + df.get(term, 0))) + 1.0
-        vec[term] = (c / L) * idf
-    return vec
-
-
-def _cosine(a: dict[str, float], b: dict[str, float]) -> float:
-    if not a or not b:
-        return 0.0
-    keys = set(a) & set(b)
-    if not keys:
-        return 0.0
-    dot = sum(a[k] * b[k] for k in keys)
-    na = math.sqrt(sum(v * v for v in a.values()))
-    nb = math.sqrt(sum(v * v for v in b.values()))
-    if na == 0 or nb == 0:
-        return 0.0
-    return dot / (na * nb)
-
-
 def _extractive_answer(question: str, chunks: list[str]) -> str:
     if not chunks:
         return "неизвестно"
     q = set(_tokenize(question))
-    # abstain on out-of-corpus traps with no lexical overlap beyond stopwords
     content_q = {t for t in q if len(t) > 3} - {
-        "сколько", "какого", "какая", "какие", "почему", "такой", "такое", "весит", "король"
+        "сколько",
+        "какого",
+        "какая",
+        "какие",
+        "почему",
+        "такой",
+        "такое",
+        "весит",
     }
     blob = " ".join(_tokenize(" ".join(chunks)))
     if content_q and sum(1 for t in content_q if t in blob) < max(1, len(content_q) // 3):
@@ -205,5 +179,5 @@ def _extractive_answer(question: str, chunks: list[str]) -> str:
             best = ch
     if best_s <= 0:
         return "неизвестно"
-    parts = re.split(r"(?<=[.!?])\s+", best)
+    parts = re.split(r"(?<=(?<![A-ZА-ЯЁ])[.!?])\s+", best)
     return parts[0] if parts else best

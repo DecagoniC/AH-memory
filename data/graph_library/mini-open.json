@@ -1,0 +1,759 @@
+{
+  "id": "mini-open",
+  "name": "mini-open",
+  "kind": "fixture",
+  "created_at": "2026-08-22T02:22:59+03:00",
+  "updated_at": "2026-08-22T04:55:11+03:00",
+  "stats": {
+    "S": 3,
+    "C": 3,
+    "P": 0,
+    "H": 2,
+    "L": 4,
+    "hyperedges": 2,
+    "semantic_factors": 2,
+    "relations": 2,
+    "events": 2,
+    "graph_size": 11,
+    "tau": 0
+  },
+  "source_text": "Сущность — это вид. Сущность обитает в месте.",
+  "store": {
+    "format": "ah-store-v1",
+    "tau": 0,
+    "revision": 14,
+    "uid_seq": 6,
+    "S": {
+      "ENTITY": {
+        "R": {
+          "TEXT": [
+            "entity",
+            "сущность"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      },
+      "KIND": {
+        "R": {
+          "TEXT": [
+            "kind",
+            "вид"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      },
+      "PLACE": {
+        "R": {
+          "TEXT": [
+            "place",
+            "место"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      }
+    },
+    "C": {
+      "M_ENTITY": {
+        "type": "M",
+        "uid": "M_ENTITY",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "сущность",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      },
+      "M_KIND": {
+        "type": "M",
+        "uid": "M_KIND",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "вид",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      },
+      "M_PLACE": {
+        "type": "M",
+        "uid": "M_PLACE",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "место",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      }
+    },
+    "P": {},
+    "H": {
+      "EP_1": {
+        "type": "M",
+        "uid": "EP_1",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "episode 1",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [
+          {
+            "name": "kind",
+            "value": "Episode",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      },
+      "EP_2": {
+        "type": "M",
+        "uid": "EP_2",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "episode 2",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [
+          {
+            "name": "kind",
+            "value": "Episode",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      }
+    },
+    "L": {
+      "L_MESH_00002": {
+        "uid": "L_MESH_00002",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ENTITY"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_KIND"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      },
+      "L_BIND_00003": {
+        "uid": "L_BIND_00003",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ENTITY"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ENTITY"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      },
+      "L_MESH_00005": {
+        "uid": "L_MESH_00005",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ENTITY"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_PLACE"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      },
+      "L_FOLLOW_00006": {
+        "uid": "L_FOLLOW_00006",
+        "id": "FOLLOW",
+        "w": 0.8,
+        "e1": {
+          "kind": "M",
+          "target_uid": "EP_1"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "EP_2"
+        },
+        "created_tau": 0,
+        "added_at": "2026-08-22T04:55:11+03:00"
+      }
+    },
+    "relations": {
+      "IS": {
+        "uid": "REL_IS",
+        "raw_label": "IS",
+        "canonical_label": "IS",
+        "embedding": [
+          -0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          -0.2672612419124244,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          0.0,
+          0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244
+        ],
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 0.5,
+          "normalization_strategy": "new_relation",
+          "created_by_normalizer": true
+        }
+      },
+      "LIVE_IN": {
+        "uid": "REL_LIVE_IN",
+        "raw_label": "LIVE_IN",
+        "canonical_label": "LIVE_IN",
+        "embedding": [
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.4364357804719848,
+          0.2182178902359924,
+          0.4364357804719848,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.2182178902359924,
+          0.0,
+          0.2182178902359924,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.4364357804719848
+        ],
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 0.5,
+          "normalization_strategy": "new_relation",
+          "created_by_normalizer": true
+        }
+      }
+    },
+    "semantic_factors": [
+      {
+        "uid": "SF::E_00001",
+        "fid": "SF::E_00001",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_IS",
+          "raw_label": "IS",
+          "canonical_label": "IS",
+          "embedding": [
+            -0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            -0.2672612419124244,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            0.0,
+            0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_ENTITY",
+          "M_KIND"
+        ],
+        "roles": {
+          "SUBJECT": "M_ENTITY",
+          "OBJECT": "M_KIND"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00001",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          -0.2672612419124244,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2672612419124244,
+          0.0,
+          0.5345224838248488,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.2672612419124244
+        ],
+        "metadata": {
+          "event_uid": "E_00001",
+          "raw_relation": "IS",
+          "canonical_relation": "IS",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": null,
+          "source_variable": "M_ENTITY",
+          "added_at": "2026-08-22T04:55:11+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "SF::E_00004",
+        "fid": "SF::E_00004",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_LIVE_IN",
+          "raw_label": "LIVE_IN",
+          "canonical_label": "LIVE_IN",
+          "embedding": [
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.4364357804719848,
+            0.2182178902359924,
+            0.4364357804719848,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.2182178902359924,
+            0.0,
+            0.2182178902359924,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.4364357804719848
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_ENTITY",
+          "M_PLACE",
+          "M_KIND"
+        ],
+        "roles": {
+          "SUBJECT": "M_ENTITY",
+          "LOCATION": "M_PLACE"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 1.0,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00004",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": [
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.4364357804719848,
+          0.2182178902359924,
+          0.4364357804719848,
+          0.0,
+          0.2182178902359924,
+          0.0,
+          0.0,
+          0.2182178902359924,
+          0.2182178902359924,
+          0.0,
+          0.2182178902359924,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          -0.2182178902359924,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.4364357804719848
+        ],
+        "metadata": {
+          "event_uid": "E_00004",
+          "raw_relation": "LIVE_IN",
+          "canonical_relation": "LIVE_IN",
+          "statement_type": "assertion",
+          "source": "user",
+          "context_uid": "M_KIND",
+          "source_variable": "M_ENTITY",
+          "added_at": "2026-08-22T04:55:11+03:00",
+          "created_tau": 0
+        }
+      }
+    ],
+    "events": [
+      {
+        "uid": "E_00001",
+        "predicate": {
+          "uid": "REL_IS",
+          "raw_label": "IS",
+          "canonical_label": "IS",
+          "embedding": [
+            -0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            -0.2672612419124244,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.2672612419124244,
+            0.0,
+            0.5345224838248488,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.2672612419124244
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_ENTITY",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_KIND",
+            "role": "OBJECT"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "IS",
+          "normalization": "new_relation",
+          "normalization_confidence": 0.5,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T04:55:11+03:00",
+          "created_tau": 0
+        }
+      },
+      {
+        "uid": "E_00004",
+        "predicate": {
+          "uid": "REL_LIVE_IN",
+          "raw_label": "LIVE_IN",
+          "canonical_label": "LIVE_IN",
+          "embedding": [
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.4364357804719848,
+            0.2182178902359924,
+            0.4364357804719848,
+            0.0,
+            0.2182178902359924,
+            0.0,
+            0.0,
+            0.2182178902359924,
+            0.2182178902359924,
+            0.0,
+            0.2182178902359924,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            -0.2182178902359924,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.4364357804719848
+          ],
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.5,
+            "normalization_strategy": "new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_ENTITY",
+            "role": "SUBJECT"
+          },
+          "LOCATION": {
+            "uid": "M_PLACE",
+            "role": "LOCATION"
+          }
+        },
+        "timestamp": null,
+        "confidence": 1.0,
+        "raw_span": null,
+        "metadata": {
+          "raw_relation": "LIVE_IN",
+          "normalization": "new_relation",
+          "normalization_confidence": 0.5,
+          "statement_type": "assertion",
+          "source": "user",
+          "added_at": "2026-08-22T04:55:11+03:00",
+          "created_tau": 0
+        }
+      }
+    ],
+    "state": {
+      "values": {},
+      "history": {},
+      "applied_events": [
+        "E_00001",
+        "E_00004"
+      ]
+    },
+    "state_transitions": []
+  }
+}

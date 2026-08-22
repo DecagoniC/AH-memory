@@ -14,6 +14,8 @@
 
 ## Сравнение АГ vs БЯМ+RAG (M4)
 
+Один и тот же корпус `benchmarks/m4/closed_world.txt` (статья Википедии «Тиманский кряж») идёт в чанки RAG и в граф AH после батч-ingest.
+
 Ключ DeepSeek — в `.env` (`DEEPSEEK_API_KEY=...`).
 
 ```bash
@@ -21,7 +23,7 @@
 python scripts/compare_ah_vs_rag.py --m4
 
 # один вопрос
-python scripts/compare_ah_vs_rag.py -q "Кто такой заяц?"
+python scripts/compare_ah_vs_rag.py -q "Что такое Тиманский кряж?"
 ```
 
 В веб-UI: кнопки **Сравнить** и **M4 бенчмарк** (`POST /api/compare`, `/api/compare/m4`).
@@ -81,7 +83,7 @@ export_dataset(world, 'results/synthetic_small_42')
 - `gc` — сборка мусора с TTL
 - `dsl` — интерпретатор запросов
 - `agent` — цикл ingest/ask/step_message
-- `baselines.vanilla_rag` — БЯМ + TF-IDF RAG (контрольный агент M4)
+- `baselines.vanilla_rag` — БЯМ + FAISS RAG (контрольный агент M4)
 - `compare` — side-by-side АГ vs RAG + прогон M4
 - `synthetic` — контролируемый synthetic world + benchmark активации
 - `benchmarks.entity_resolution` / `benchmarks.challenge` — ER и challenge-тесты

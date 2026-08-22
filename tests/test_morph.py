@@ -8,9 +8,30 @@ from ah_memory.perception import (
     JsonLLMPerception,
     SeedPerception,
     candidates_from_llm_json,
+    classify_utterance,
     gate_candidates,
     llm_payload_errors,
 )
+
+
+def test_utterance_classifier_combines_protocol_evidence() -> None:
+    assert classify_utterance("любая строка", interaction="query") == "question"
+    assert classify_utterance("любая строка?") == "question"
+    assert (
+        classify_utterance(
+            "любая строка",
+            declared_kind="question",
+        )
+        == "question"
+    )
+    assert (
+        classify_utterance(
+            "любая строка",
+            query={"relation": "RELATED_TO", "target_role": "OBJECT"},
+        )
+        == "question"
+    )
+    assert classify_utterance("любая строка") == "message"
 
 
 def test_lemma_cases_merge() -> None:

@@ -1,7 +1,7 @@
 """Run M4 comparison: AH-memory vs Vanilla RAG.
 
   python scripts/eval_m4.py          # extractive if no key
-  python scripts/eval_m4.py --llm    # DeepSeek LLM + TF-IDF RAG
+  python scripts/eval_m4.py --llm    # DeepSeek LLM + FAISS RAG
 """
 from __future__ import annotations
 

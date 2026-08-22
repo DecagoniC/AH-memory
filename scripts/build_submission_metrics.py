@@ -11,13 +11,11 @@ from ah_memory.benchmarks.challenge.role_baseline import UngatedLLMPerception
 from ah_memory.benchmarks.challenge_evaluation import run_m1_benchmark
 from ah_memory.config import load_config
 from ah_memory.deepseek import DeepSeekClient, DeepSeekHybridPerception
-from ah_memory.examples.rabbit import (
-    EXPECTED_FACT_KEYS,
-    RABBIT_TEXT,
-    build_rabbit_memory,
+from ah_memory.examples.closed_world import (
+    build_closed_world_memory,
+    closed_world_auto_score,
+    closed_world_text,
     extracted_fact_keys,
-    rabbit_auto_score,
-    syntactic_answer_who_is_hare,
 )
 from ah_memory.graph_export import dump_ah_json, dump_graph
 from ah_memory.perception import SeedPerception
@@ -40,9 +38,9 @@ def _score_only(report) -> dict:
 
 
 def main() -> None:
-    store = build_rabbit_memory()
+    store = build_closed_world_memory()
     corpus_path = OUT / "corpus.txt"
-    corpus_path.write_text(RABBIT_TEXT + "\n", encoding="utf-8")
+    corpus_path.write_text(closed_world_text())
     dump_path = OUT / "ah_dump.json"
     dump_path.write_text(
         json.dumps(dump_ah_json(store), ensure_ascii=False, indent=2),
@@ -54,13 +52,11 @@ def main() -> None:
         json.dumps(graph, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    hit, total = rabbit_auto_score(store)
+    hit, total = closed_world_auto_score(store)
     meta = {
-        "who_is_hare": syntactic_answer_who_is_hare(store),
         "fact_hit": hit,
         "fact_total": total,
         "extracted_keys": sorted(extracted_fact_keys(store)),
-        "expected_keys": list(EXPECTED_FACT_KEYS),
         "stats": graph["stats"],
         "graph_nodes": len(graph["nodes"]),
         "graph_edges": len(graph["edges"]),

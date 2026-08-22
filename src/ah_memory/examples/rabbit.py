@@ -119,6 +119,9 @@ def build_rabbit_memory() -> AHStore:
                 e2=store.m_ref("EP_LESSON_2"),
             )
         )
+    from ah_memory.graph_library import remember_fixture
+
+    remember_fixture("rabbit", store, source_text=RABBIT_TEXT)
     return store
 
 

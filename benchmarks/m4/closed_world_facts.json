@@ -1,0 +1,1608 @@
+{
+  "source": "D:/Go-prog/AH-memory/benchmarks/m4/closed_world.txt",
+  "n_batches": 3,
+  "n_candidates": 43,
+  "candidates": [
+    {
+      "predicate": "LOCATED_IN",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "СЕВЕРО_ВОСТОК_РАВНИНА"
+      },
+      "raw_span": "расположенная на северо-востоке Восточно-Европейской равнины",
+      "confidence": 1.0,
+      "raw_relation": "расположена на северо-востоке Восточно-Европейской равнины",
+      "canonical_relation": "LOCATED_IN",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "EXTENDS_FROM_TO",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "МОРЕ_ИСТОК_РЕКА_ВЫЧЕГДА"
+      },
+      "raw_span": "Тянется на 900 километров от Чёшской губы Баренцева моря на юго-восток до истоков реки Вычегды",
+      "confidence": 1.0,
+      "raw_relation": "тянется на 900 километров от Чёшской губы Баренцева моря на юго-восток до истоков реки Вычегды",
+      "canonical_relation": "EXTENDS_FROM_TO",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "CREATED_MAP",
+      "roles": {
+        "SUBJECT": "КЕЙЗЕРЛИНГ",
+        "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ"
+      },
+      "raw_span": "составили в 1847 году первую карту Тиманского кряжа",
+      "confidence": 1.0,
+      "raw_relation": "составили в 1847 году первую карту Тиманского кряжа",
+      "canonical_relation": "CREATED_MAP",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "NAMED",
+      "roles": {
+        "SUBJECT": "КЕЙЗЕРЛИНГ",
+        "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
+      },
+      "raw_span": "Кейзерлинг первым назвал кряж Тиманским",
+      "confidence": 1.0,
+      "raw_relation": "первым назвал кряж Тиманским",
+      "canonical_relation": "NAMED",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HYPOTHESIZED_AS",
+      "roles": {
+        "SUBJECT": "КЕЙЗЕРЛИНГ",
+        "OBJECT": "САМОСТОЯТЕЛЬНЫЙ_ГОРНЫЙ_СООРУЖЕНИЕ"
+      },
+      "raw_span": "предположив, что это не ответвление Урала, а самостоятельное горное сооружение",
+      "confidence": 1.0,
+      "raw_relation": "предположив, что это не ответвление Урала, а самостоятельное горное сооружение",
+      "canonical_relation": "HYPOTHESIZED_AS",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "CREATED_MAP",
+      "roles": {
+        "SUBJECT": "КРУЗЕНШТЕРН",
+        "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ"
+      },
+      "raw_span": "составили в 1847 году первую карту Тиманского кряжа",
+      "confidence": 1.0,
+      "raw_relation": "составили в 1847 году первую карту Тиманского кряжа",
+      "canonical_relation": "CREATED_MAP",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "DESCRIBED",
+      "roles": {
+        "SUBJECT": "ФОМИН",
+        "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
+      },
+      "raw_span": "первым описал Тиманский кряж",
+      "confidence": 1.0,
+      "raw_relation": "первым описал Тиманский кряж",
+      "canonical_relation": "DESCRIBED",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_LENGTH",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "950_КМ"
+      },
+      "raw_span": "Длина кряжа составляет около 950 км",
+      "confidence": 1.0,
+      "raw_relation": "составляет",
+      "canonical_relation": "HAS_LENGTH",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "SEPARATES",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "ДВИНСКО_ПЕЧОРСКИЙ_БАССЕЙН"
+      },
+      "raw_span": "Разделяет Двинско-Печорский бассейн на две части",
+      "confidence": 1.0,
+      "raw_relation": "разделяет",
+      "canonical_relation": "SEPARATES",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_PART",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "СЕВЕРНЫЙ_ЧАСТЬ"
+      },
+      "raw_span": "В Тиманском кряже выделяют три части: Северная часть",
+      "confidence": 1.0,
+      "raw_relation": "выделяют",
+      "canonical_relation": "HAS_PART",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_PART",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "СРЕДНИЙ_ЧАСТЬ"
+      },
+      "raw_span": "В Тиманском кряже выделяют три части: Средняя часть",
+      "confidence": 1.0,
+      "raw_relation": "выделяют",
+      "canonical_relation": "HAS_PART",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_PART",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "ЮЖНЫЙ_ЧАСТЬ"
+      },
+      "raw_span": "В Тиманском кряже выделяют три части: Южная часть",
+      "confidence": 1.0,
+      "raw_relation": "выделяют",
+      "canonical_relation": "HAS_PART",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "BOUNDED_BY",
+      "roles": {
+        "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+        "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_МЕЗЕНСКИЙ"
+      },
+      "raw_span": "Северная часть — ограничена долиной реки Пижма Мезенская",
+      "confidence": 1.0,
+      "raw_relation": "ограничена",
+      "canonical_relation": "BOUNDED_BY",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_PART",
+      "roles": {
+        "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+        "OBJECT": "КОСМИНСКИЙ_КАМЕНЬ"
+      },
+      "raw_span": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+      "confidence": 1.0,
+      "raw_relation": "состоит из",
+      "canonical_relation": "HAS_PART",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_PART",
+      "roles": {
+        "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+        "OBJECT": "ТИМАНСКИЙ_КАМЕНЬ"
+      },
+      "raw_span": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+      "confidence": 1.0,
+      "raw_relation": "состоит из",
+      "canonical_relation": "HAS_PART",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_HEIGHT",
+      "roles": {
+        "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+        "OBJECT": "303"
+      },
+      "raw_span": "высота достигает 303 м",
+      "confidence": 1.0,
+      "raw_relation": "достигает",
+      "canonical_relation": "HAS_HEIGHT",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "LOCATED_IN",
+      "roles": {
+        "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+        "OBJECT": "ТУНДРА"
+      },
+      "raw_span": "Северная часть расположена в пределах тундры и лесотундры",
+      "confidence": 1.0,
+      "raw_relation": "расположена в пределах",
+      "canonical_relation": "LOCATED_IN",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "LOCATED_IN",
+      "roles": {
+        "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+        "OBJECT": "ЛЕСОТУНДРА"
+      },
+      "raw_span": "Северная часть расположена в пределах тундры и лесотундры",
+      "confidence": 1.0,
+      "raw_relation": "расположена в пределах",
+      "canonical_relation": "LOCATED_IN",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "BOUNDED_BY",
+      "roles": {
+        "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
+        "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_МЕЗЕНСКИЙ"
+      },
+      "raw_span": "Средняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская",
+      "confidence": 1.0,
+      "raw_relation": "ограничена",
+      "canonical_relation": "BOUNDED_BY",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "BOUNDED_BY",
+      "roles": {
+        "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
+        "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_ПЕЧОРСКИЙ"
+      },
+      "raw_span": "Средняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская",
+      "confidence": 1.0,
+      "raw_relation": "ограничена",
+      "canonical_relation": "BOUNDED_BY",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "IS",
+      "roles": {
+        "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
+        "OBJECT": "НАИБОЛЕЕ_ВЫСОКИЙ_ЧАСТЬ_КРЯЖ"
+      },
+      "raw_span": "является наиболее высокой частью кряжа",
+      "confidence": 1.0,
+      "raw_relation": "является",
+      "canonical_relation": "IS",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_HIGHEST_POINT",
+      "roles": {
+        "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
+        "OBJECT": "ЧЕТЛАССКИЙ_КАМЕНЬ"
+      },
+      "raw_span": "высшая точка — Четласский Камень (471 м)",
+      "confidence": 1.0,
+      "raw_relation": "высшая точка",
+      "canonical_relation": "HAS_HIGHEST_POINT",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "IS",
+      "roles": {
+        "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
+        "OBJECT": "ПЛАТО"
+      },
+      "raw_span": "Южная часть — представляет собой плато",
+      "confidence": 1.0,
+      "raw_relation": "представляет собой",
+      "canonical_relation": "IS",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "DISSECTED_BY",
+      "roles": {
+        "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
+        "OBJECT": "ДОЛИНА_РЕКА"
+      },
+      "raw_span": "расчленённое долинами рек",
+      "confidence": 1.0,
+      "raw_relation": "расчленено",
+      "canonical_relation": "DISSECTED_BY",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "LOCATED_IN",
+      "roles": {
+        "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
+        "OBJECT": "ТАЙГА"
+      },
+      "raw_span": "Южная часть располагается в пределах тайги",
+      "confidence": 1.0,
+      "raw_relation": "располагается в пределах",
+      "canonical_relation": "LOCATED_IN",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "FORMED_IN",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "БАЙКАЛЬСКИЙ_ЭПОХА_ТЕКТОГЕНЕЗ"
+      },
+      "raw_span": "Тиманский кряж был сформирован в Байкальскую эпоху тектогенеза",
+      "confidence": 1.0,
+      "raw_relation": "был сформирован в",
+      "canonical_relation": "FORMED_IN",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ"
+      },
+      "raw_span": "россыпи титановых минералов",
+      "confidence": 1.0,
+      "raw_relation": "полезные ископаемые: россыпи титановых минералов",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "LOCATED_AT",
+      "roles": {
+        "SUBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ",
+        "OBJECT": "ЯРЕГ"
+      },
+      "raw_span": "россыпи титановых минералов (Ярега)",
+      "confidence": 1.0,
+      "raw_relation": "россыпи титановых минералов (Ярега)",
+      "canonical_relation": "LOCATED_AT",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "БОКСИТ"
+      },
+      "raw_span": "бокситы",
+      "confidence": 1.0,
+      "raw_relation": "полезные ископаемые: бокситы",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "LOCATED_AT",
+      "roles": {
+        "SUBJECT": "БОКСИТ",
+        "OBJECT": "ЧЕТЛАССКИЙ_КАМЕНЬ"
+      },
+      "raw_span": "бокситы (Четласский Камень)",
+      "confidence": 1.0,
+      "raw_relation": "бокситы (Четласский Камень)",
+      "canonical_relation": "LOCATED_AT",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "АГАТЫ"
+      },
+      "raw_span": "агаты",
+      "confidence": 1.0,
+      "raw_relation": "полезные ископаемые: агаты",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "ASSOCIATED_WITH",
+      "roles": {
+        "SUBJECT": "АГАТЫ",
+        "OBJECT": "ДЕВОНСКИЙ_БАЗАЛЬТ"
+      },
+      "raw_span": "агаты, связанные с девонскими базальтами",
+      "confidence": 1.0,
+      "raw_relation": "агаты, связанные с девонскими базальтами",
+      "canonical_relation": "ASSOCIATED_WITH",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ"
+      },
+      "raw_span": "месторождения нефти",
+      "confidence": 1.0,
+      "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "LOCATED_AT",
+      "roles": {
+        "SUBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
+        "OBJECT": "ЯРЕГ_ПОД_УХТА"
+      },
+      "raw_span": "Ярега под Ухтой",
+      "confidence": 1.0,
+      "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
+      "canonical_relation": "LOCATED_AT",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "LOCATED_AT",
+      "roles": {
+        "SUBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
+        "OBJECT": "ЛАЯВОЖИЙ"
+      },
+      "raw_span": "Лаявож",
+      "confidence": 1.0,
+      "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
+      "canonical_relation": "LOCATED_AT",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "КОНДЕНСАТ"
+      },
+      "raw_span": "конденсата",
+      "confidence": 1.0,
+      "raw_relation": "газа и конденсата (Войвож и Омра)",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "LOCATED_AT",
+      "roles": {
+        "SUBJECT": "КОНДЕНСАТ",
+        "OBJECT": "ВОЙВОЖИЙ"
+      },
+      "raw_span": "Войвож",
+      "confidence": 1.0,
+      "raw_relation": "газа и конденсата (Войвож и Омра)",
+      "canonical_relation": "LOCATED_AT",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "LOCATED_AT",
+      "roles": {
+        "SUBJECT": "КОНДЕНСАТ",
+        "OBJECT": "ОМР"
+      },
+      "raw_span": "Омра",
+      "confidence": 1.0,
+      "raw_relation": "газа и конденсата (Войвож и Омра)",
+      "canonical_relation": "LOCATED_AT",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "БИТУМ"
+      },
+      "raw_span": "битумы",
+      "confidence": 1.0,
+      "raw_relation": "битумы и горючие сланцы",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "ГОРЮЧИЙ_СЛАНЦЫ"
+      },
+      "raw_span": "горючие сланцы",
+      "confidence": 1.0,
+      "raw_relation": "битумы и горючие сланцы",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "ТОРФ"
+      },
+      "raw_span": "торф",
+      "confidence": 1.0,
+      "raw_relation": "торф",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "СТРОИТЕЛЬНЫЙ_КАМНИ"
+      },
+      "raw_span": "строительные камни",
+      "confidence": 1.0,
+      "raw_relation": "строительные камни",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    },
+    {
+      "predicate": "HAS_MINERAL",
+      "roles": {
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "ГАЗА"
+      },
+      "raw_span": "газа",
+      "confidence": 0.8,
+      "raw_relation": "полезные ископаемые: россыпи титановых минералов",
+      "canonical_relation": "HAS_MINERAL",
+      "statement_type": "assertion",
+      "source": "user"
+    }
+  ],
+  "batches": [
+    {
+      "index": 0,
+      "text": "Тиманский кряж (Тиман) — крупная возвышенность, кряж, расположенная на северо-востоке Восточно-Европейской равнины. Тянется на 900 километров от Чёшской губы Баренцева моря на юго-восток до истоков реки Вычегды.\n\nА. А. Кейзерлинг и П. И. Крузенштерн составили в 1847 году первую карту Тиманского кряжа.\nКейзерлинг первым назвал кряж Тиманским, предположив, что это не ответвление Урала, а самостоятельное горное сооружение.\nПятьдесят пять годами ранее А. И. Фомин в книге «Описание Белого моря с его берегами и островами…» (1797) первым описал Тиманский кряж (называя его камнем).",
+      "backend": "hybrid-llm",
+      "candidates": [
+        {
+          "predicate": "LOCATED_IN",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "СЕВЕРО_ВОСТОК_РАВНИНА"
+          },
+          "raw_span": "расположенная на северо-востоке Восточно-Европейской равнины",
+          "confidence": 1.0,
+          "raw_relation": "расположена на северо-востоке Восточно-Европейской равнины",
+          "canonical_relation": "LOCATED_IN",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "EXTENDS_FROM_TO",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "МОРЕ_ИСТОК_РЕКА_ВЫЧЕГДА"
+          },
+          "raw_span": "Тянется на 900 километров от Чёшской губы Баренцева моря на юго-восток до истоков реки Вычегды",
+          "confidence": 1.0,
+          "raw_relation": "тянется на 900 километров от Чёшской губы Баренцева моря на юго-восток до истоков реки Вычегды",
+          "canonical_relation": "EXTENDS_FROM_TO",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "CREATED_MAP",
+          "roles": {
+            "SUBJECT": "КЕЙЗЕРЛИНГ",
+            "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ"
+          },
+          "raw_span": "составили в 1847 году первую карту Тиманского кряжа",
+          "confidence": 1.0,
+          "raw_relation": "составили в 1847 году первую карту Тиманского кряжа",
+          "canonical_relation": "CREATED_MAP",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "NAMED",
+          "roles": {
+            "SUBJECT": "КЕЙЗЕРЛИНГ",
+            "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
+          },
+          "raw_span": "Кейзерлинг первым назвал кряж Тиманским",
+          "confidence": 1.0,
+          "raw_relation": "первым назвал кряж Тиманским",
+          "canonical_relation": "NAMED",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HYPOTHESIZED_AS",
+          "roles": {
+            "SUBJECT": "КЕЙЗЕРЛИНГ",
+            "OBJECT": "САМОСТОЯТЕЛЬНЫЙ_ГОРНЫЙ_СООРУЖЕНИЕ"
+          },
+          "raw_span": "предположив, что это не ответвление Урала, а самостоятельное горное сооружение",
+          "confidence": 1.0,
+          "raw_relation": "предположив, что это не ответвление Урала, а самостоятельное горное сооружение",
+          "canonical_relation": "HYPOTHESIZED_AS",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "CREATED_MAP",
+          "roles": {
+            "SUBJECT": "КРУЗЕНШТЕРН",
+            "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ"
+          },
+          "raw_span": "составили в 1847 году первую карту Тиманского кряжа",
+          "confidence": 1.0,
+          "raw_relation": "составили в 1847 году первую карту Тиманского кряжа",
+          "canonical_relation": "CREATED_MAP",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "DESCRIBED",
+          "roles": {
+            "SUBJECT": "ФОМИН",
+            "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
+          },
+          "raw_span": "первым описал Тиманский кряж",
+          "confidence": 1.0,
+          "raw_relation": "первым описал Тиманский кряж",
+          "canonical_relation": "DESCRIBED",
+          "statement_type": "assertion",
+          "source": "user"
+        }
+      ],
+      "created_n": [
+        "SF::E_00001",
+        "SF::E_00004",
+        "SF::E_00006",
+        "SF::E_00009",
+        "SF::E_00011",
+        "SF::E_00013",
+        "SF::E_00016"
+      ],
+      "skipped": [],
+      "segments": [
+        {
+          "index": 0,
+          "start": 0,
+          "end": 114,
+          "text": "Тиманский кряж (Тиман) — крупная возвышенность, кряж, расположенная на северо-востоке Восточно-Европейской равнины",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1,
+            2,
+            3,
+            5,
+            6
+          ]
+        },
+        {
+          "index": 1,
+          "start": 116,
+          "end": 210,
+          "text": "Тянется на 900 километров от Чёшской губы Баренцева моря на юго-восток до истоков реки Вычегды",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1
+          ]
+        },
+        {
+          "index": 2,
+          "start": 213,
+          "end": 301,
+          "text": "А. А. Кейзерлинг и П. И. Крузенштерн составили в 1847 году первую карту Тиманского кряжа",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "index": 3,
+          "start": 303,
+          "end": 422,
+          "text": "Кейзерлинг первым назвал кряж Тиманским, предположив, что это не ответвление Урала, а самостоятельное горное сооружение",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        },
+        {
+          "index": 4,
+          "start": 424,
+          "end": 579,
+          "text": "Пятьдесят пять годами ранее А. И. Фомин в книге «Описание Белого моря с его берегами и островами…» (1797) первым описал Тиманский кряж (называя его камнем)",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1,
+            2,
+            3,
+            5,
+            6
+          ]
+        }
+      ],
+      "uncovered_segments": [],
+      "repair_attempts": 0,
+      "coverage_ratio": 1.0
+    },
+    {
+      "index": 1,
+      "text": "Длина кряжа составляет около 950 км. Разделяет Двинско-Печорский бассейн на две части.\nВ Тиманском кряже выделяют три части:\n\nСеверная часть — ограничена долиной реки Пижма Мезенская, состоит из невысоких гряд Косминский Камень, Тиманский Камень и других, высота достигает 303 м. Северная часть расположена в пределах тундры и лесотундры.\nСредняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская, является наиболее высокой частью кряжа, высшая точка — Четласский Камень (471 м).\nЮжная часть — представляет собой плато, расчленённое долинами рек на несколько отдельных возвышенностей (высота до 300—350 м). Южная часть располагается в пределах тайги.",
+      "backend": "hybrid-llm",
+      "candidates": [
+        {
+          "predicate": "HAS_LENGTH",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "950_КМ"
+          },
+          "raw_span": "Длина кряжа составляет около 950 км",
+          "confidence": 1.0,
+          "raw_relation": "составляет",
+          "canonical_relation": "HAS_LENGTH",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "SEPARATES",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "ДВИНСКО_ПЕЧОРСКИЙ_БАССЕЙН"
+          },
+          "raw_span": "Разделяет Двинско-Печорский бассейн на две части",
+          "confidence": 1.0,
+          "raw_relation": "разделяет",
+          "canonical_relation": "SEPARATES",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_PART",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "СЕВЕРНЫЙ_ЧАСТЬ"
+          },
+          "raw_span": "В Тиманском кряже выделяют три части: Северная часть",
+          "confidence": 1.0,
+          "raw_relation": "выделяют",
+          "canonical_relation": "HAS_PART",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_PART",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "СРЕДНИЙ_ЧАСТЬ"
+          },
+          "raw_span": "В Тиманском кряже выделяют три части: Средняя часть",
+          "confidence": 1.0,
+          "raw_relation": "выделяют",
+          "canonical_relation": "HAS_PART",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_PART",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "ЮЖНЫЙ_ЧАСТЬ"
+          },
+          "raw_span": "В Тиманском кряже выделяют три части: Южная часть",
+          "confidence": 1.0,
+          "raw_relation": "выделяют",
+          "canonical_relation": "HAS_PART",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "BOUNDED_BY",
+          "roles": {
+            "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+            "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_МЕЗЕНСКИЙ"
+          },
+          "raw_span": "Северная часть — ограничена долиной реки Пижма Мезенская",
+          "confidence": 1.0,
+          "raw_relation": "ограничена",
+          "canonical_relation": "BOUNDED_BY",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_PART",
+          "roles": {
+            "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+            "OBJECT": "КОСМИНСКИЙ_КАМЕНЬ"
+          },
+          "raw_span": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+          "confidence": 1.0,
+          "raw_relation": "состоит из",
+          "canonical_relation": "HAS_PART",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_PART",
+          "roles": {
+            "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+            "OBJECT": "ТИМАНСКИЙ_КАМЕНЬ"
+          },
+          "raw_span": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+          "confidence": 1.0,
+          "raw_relation": "состоит из",
+          "canonical_relation": "HAS_PART",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_HEIGHT",
+          "roles": {
+            "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+            "OBJECT": "303"
+          },
+          "raw_span": "высота достигает 303 м",
+          "confidence": 1.0,
+          "raw_relation": "достигает",
+          "canonical_relation": "HAS_HEIGHT",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "LOCATED_IN",
+          "roles": {
+            "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+            "OBJECT": "ТУНДРА"
+          },
+          "raw_span": "Северная часть расположена в пределах тундры и лесотундры",
+          "confidence": 1.0,
+          "raw_relation": "расположена в пределах",
+          "canonical_relation": "LOCATED_IN",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "LOCATED_IN",
+          "roles": {
+            "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
+            "OBJECT": "ЛЕСОТУНДРА"
+          },
+          "raw_span": "Северная часть расположена в пределах тундры и лесотундры",
+          "confidence": 1.0,
+          "raw_relation": "расположена в пределах",
+          "canonical_relation": "LOCATED_IN",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "BOUNDED_BY",
+          "roles": {
+            "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
+            "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_МЕЗЕНСКИЙ"
+          },
+          "raw_span": "Средняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская",
+          "confidence": 1.0,
+          "raw_relation": "ограничена",
+          "canonical_relation": "BOUNDED_BY",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "BOUNDED_BY",
+          "roles": {
+            "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
+            "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_ПЕЧОРСКИЙ"
+          },
+          "raw_span": "Средняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская",
+          "confidence": 1.0,
+          "raw_relation": "ограничена",
+          "canonical_relation": "BOUNDED_BY",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "IS",
+          "roles": {
+            "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
+            "OBJECT": "НАИБОЛЕЕ_ВЫСОКИЙ_ЧАСТЬ_КРЯЖ"
+          },
+          "raw_span": "является наиболее высокой частью кряжа",
+          "confidence": 1.0,
+          "raw_relation": "является",
+          "canonical_relation": "IS",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_HIGHEST_POINT",
+          "roles": {
+            "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
+            "OBJECT": "ЧЕТЛАССКИЙ_КАМЕНЬ"
+          },
+          "raw_span": "высшая точка — Четласский Камень (471 м)",
+          "confidence": 1.0,
+          "raw_relation": "высшая точка",
+          "canonical_relation": "HAS_HIGHEST_POINT",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "IS",
+          "roles": {
+            "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
+            "OBJECT": "ПЛАТО"
+          },
+          "raw_span": "Южная часть — представляет собой плато",
+          "confidence": 1.0,
+          "raw_relation": "представляет собой",
+          "canonical_relation": "IS",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "DISSECTED_BY",
+          "roles": {
+            "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
+            "OBJECT": "ДОЛИНА_РЕКА"
+          },
+          "raw_span": "расчленённое долинами рек",
+          "confidence": 1.0,
+          "raw_relation": "расчленено",
+          "canonical_relation": "DISSECTED_BY",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "LOCATED_IN",
+          "roles": {
+            "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
+            "OBJECT": "ТАЙГА"
+          },
+          "raw_span": "Южная часть располагается в пределах тайги",
+          "confidence": 1.0,
+          "raw_relation": "располагается в пределах",
+          "canonical_relation": "LOCATED_IN",
+          "statement_type": "assertion",
+          "source": "user"
+        }
+      ],
+      "created_n": [
+        "SF::E_00019",
+        "SF::E_00021",
+        "SF::E_00023",
+        "SF::E_00025",
+        "SF::E_00027",
+        "SF::E_00029",
+        "SF::E_00032",
+        "SF::E_00034",
+        "SF::E_00036",
+        "SF::E_00038",
+        "SF::E_00040",
+        "SF::E_00042",
+        "SF::E_00045",
+        "SF::E_00047",
+        "SF::E_00049",
+        "SF::E_00051",
+        "SF::E_00054",
+        "SF::E_00056"
+      ],
+      "skipped": [],
+      "segments": [
+        {
+          "index": 0,
+          "start": 0,
+          "end": 85,
+          "text": "Длина кряжа составляет около 950 км. Разделяет Двинско-Печорский бассейн на две части",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            11,
+            12,
+            13
+          ]
+        },
+        {
+          "index": 1,
+          "start": 87,
+          "end": 124,
+          "text": "В Тиманском кряже выделяют три части:",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            13
+          ]
+        },
+        {
+          "index": 2,
+          "start": 126,
+          "end": 337,
+          "text": "Северная часть — ограничена долиной реки Пижма Мезенская, состоит из невысоких гряд Косминский Камень, Тиманский Камень и других, высота достигает 303 м. Северная часть расположена в пределах тундры и лесотундры",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ]
+        },
+        {
+          "index": 3,
+          "start": 339,
+          "end": 494,
+          "text": "Средняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская, является наиболее высокой частью кряжа, высшая точка — Четласский Камень (471 м)",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ]
+        },
+        {
+          "index": 4,
+          "start": 496,
+          "end": 621,
+          "text": "Южная часть — представляет собой плато, расчленённое долинами рек на несколько отдельных возвышенностей (высота до 300—350 м)",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ]
+        },
+        {
+          "index": 5,
+          "start": 623,
+          "end": 665,
+          "text": "Южная часть располагается в пределах тайги",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ]
+        }
+      ],
+      "uncovered_segments": [],
+      "repair_attempts": 0,
+      "coverage_ratio": 1.0
+    },
+    {
+      "index": 2,
+      "text": "Тиманский кряж был сформирован в Байкальскую эпоху тектогенеза.\nПолезные ископаемые: россыпи титановых минералов (Ярега), бокситы (Четласский Камень), агаты, связанные с девонскими базальтами; месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож), газа и конденсата (Войвож и Омра), битумы и горючие сланцы, торф, строительные камни.",
+      "backend": "hybrid-llm",
+      "candidates": [
+        {
+          "predicate": "FORMED_IN",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "БАЙКАЛЬСКИЙ_ЭПОХА_ТЕКТОГЕНЕЗ"
+          },
+          "raw_span": "Тиманский кряж был сформирован в Байкальскую эпоху тектогенеза",
+          "confidence": 1.0,
+          "raw_relation": "был сформирован в",
+          "canonical_relation": "FORMED_IN",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ"
+          },
+          "raw_span": "россыпи титановых минералов",
+          "confidence": 1.0,
+          "raw_relation": "полезные ископаемые: россыпи титановых минералов",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "LOCATED_AT",
+          "roles": {
+            "SUBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ",
+            "OBJECT": "ЯРЕГ"
+          },
+          "raw_span": "россыпи титановых минералов (Ярега)",
+          "confidence": 1.0,
+          "raw_relation": "россыпи титановых минералов (Ярега)",
+          "canonical_relation": "LOCATED_AT",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "БОКСИТ"
+          },
+          "raw_span": "бокситы",
+          "confidence": 1.0,
+          "raw_relation": "полезные ископаемые: бокситы",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "LOCATED_AT",
+          "roles": {
+            "SUBJECT": "БОКСИТ",
+            "OBJECT": "ЧЕТЛАССКИЙ_КАМЕНЬ"
+          },
+          "raw_span": "бокситы (Четласский Камень)",
+          "confidence": 1.0,
+          "raw_relation": "бокситы (Четласский Камень)",
+          "canonical_relation": "LOCATED_AT",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "АГАТЫ"
+          },
+          "raw_span": "агаты",
+          "confidence": 1.0,
+          "raw_relation": "полезные ископаемые: агаты",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "ASSOCIATED_WITH",
+          "roles": {
+            "SUBJECT": "АГАТЫ",
+            "OBJECT": "ДЕВОНСКИЙ_БАЗАЛЬТ"
+          },
+          "raw_span": "агаты, связанные с девонскими базальтами",
+          "confidence": 1.0,
+          "raw_relation": "агаты, связанные с девонскими базальтами",
+          "canonical_relation": "ASSOCIATED_WITH",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ"
+          },
+          "raw_span": "месторождения нефти",
+          "confidence": 1.0,
+          "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "LOCATED_AT",
+          "roles": {
+            "SUBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
+            "OBJECT": "ЯРЕГ_ПОД_УХТА"
+          },
+          "raw_span": "Ярега под Ухтой",
+          "confidence": 1.0,
+          "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
+          "canonical_relation": "LOCATED_AT",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "LOCATED_AT",
+          "roles": {
+            "SUBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
+            "OBJECT": "ЛАЯВОЖИЙ"
+          },
+          "raw_span": "Лаявож",
+          "confidence": 1.0,
+          "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
+          "canonical_relation": "LOCATED_AT",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "КОНДЕНСАТ"
+          },
+          "raw_span": "конденсата",
+          "confidence": 1.0,
+          "raw_relation": "газа и конденсата (Войвож и Омра)",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "LOCATED_AT",
+          "roles": {
+            "SUBJECT": "КОНДЕНСАТ",
+            "OBJECT": "ВОЙВОЖИЙ"
+          },
+          "raw_span": "Войвож",
+          "confidence": 1.0,
+          "raw_relation": "газа и конденсата (Войвож и Омра)",
+          "canonical_relation": "LOCATED_AT",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "LOCATED_AT",
+          "roles": {
+            "SUBJECT": "КОНДЕНСАТ",
+            "OBJECT": "ОМР"
+          },
+          "raw_span": "Омра",
+          "confidence": 1.0,
+          "raw_relation": "газа и конденсата (Войвож и Омра)",
+          "canonical_relation": "LOCATED_AT",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "БИТУМ"
+          },
+          "raw_span": "битумы",
+          "confidence": 1.0,
+          "raw_relation": "битумы и горючие сланцы",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "ГОРЮЧИЙ_СЛАНЦЫ"
+          },
+          "raw_span": "горючие сланцы",
+          "confidence": 1.0,
+          "raw_relation": "битумы и горючие сланцы",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "ТОРФ"
+          },
+          "raw_span": "торф",
+          "confidence": 1.0,
+          "raw_relation": "торф",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "СТРОИТЕЛЬНЫЙ_КАМНИ"
+          },
+          "raw_span": "строительные камни",
+          "confidence": 1.0,
+          "raw_relation": "строительные камни",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        },
+        {
+          "predicate": "HAS_MINERAL",
+          "roles": {
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "ГАЗА"
+          },
+          "raw_span": "газа",
+          "confidence": 0.8,
+          "raw_relation": "полезные ископаемые: россыпи титановых минералов",
+          "canonical_relation": "HAS_MINERAL",
+          "statement_type": "assertion",
+          "source": "user"
+        }
+      ],
+      "created_n": [
+        "SF::E_00058",
+        "SF::E_00060",
+        "SF::E_00062",
+        "SF::E_00065",
+        "SF::E_00067",
+        "SF::E_00070",
+        "SF::E_00072",
+        "SF::E_00075",
+        "SF::E_00077",
+        "SF::E_00080",
+        "SF::E_00082",
+        "SF::E_00084",
+        "SF::E_00087",
+        "SF::E_00089",
+        "SF::E_00091",
+        "SF::E_00093",
+        "SF::E_00095",
+        "SF::E_00097"
+      ],
+      "skipped": [],
+      "segments": [
+        {
+          "index": 0,
+          "start": 0,
+          "end": 62,
+          "text": "Тиманский кряж был сформирован в Байкальскую эпоху тектогенеза",
+          "kind": "sentence",
+          "covered": true,
+          "candidate_indexes": [
+            0,
+            1,
+            3,
+            5,
+            7,
+            10,
+            13,
+            14,
+            15,
+            16,
+            17
+          ]
+        },
+        {
+          "index": 1,
+          "start": 85,
+          "end": 120,
+          "text": "россыпи титановых минералов (Ярега)",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            1,
+            2,
+            7,
+            8,
+            9,
+            17
+          ]
+        },
+        {
+          "index": 2,
+          "start": 122,
+          "end": 149,
+          "text": "бокситы (Четласский Камень)",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            3,
+            4
+          ]
+        },
+        {
+          "index": 3,
+          "start": 151,
+          "end": 156,
+          "text": "агаты",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            5,
+            6
+          ]
+        },
+        {
+          "index": 4,
+          "start": 158,
+          "end": 191,
+          "text": "связанные с девонскими базальтами",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            6
+          ]
+        },
+        {
+          "index": 5,
+          "start": 193,
+          "end": 255,
+          "text": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            2,
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "index": 6,
+          "start": 257,
+          "end": 261,
+          "text": "газа",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            10,
+            11,
+            12,
+            17
+          ]
+        },
+        {
+          "index": 7,
+          "start": 264,
+          "end": 290,
+          "text": "конденсата (Войвож и Омра)",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            10,
+            11,
+            12
+          ]
+        },
+        {
+          "index": 8,
+          "start": 292,
+          "end": 298,
+          "text": "битумы",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            13,
+            14
+          ]
+        },
+        {
+          "index": 9,
+          "start": 301,
+          "end": 315,
+          "text": "горючие сланцы",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            13,
+            14
+          ]
+        },
+        {
+          "index": 10,
+          "start": 317,
+          "end": 321,
+          "text": "торф",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            15
+          ]
+        },
+        {
+          "index": 11,
+          "start": 323,
+          "end": 341,
+          "text": "строительные камни",
+          "kind": "list_item",
+          "covered": true,
+          "candidate_indexes": [
+            16
+          ]
+        }
+      ],
+      "uncovered_segments": [],
+      "repair_attempts": 1,
+      "coverage_ratio": 1.0
+    }
+  ],
+  "coverage": {
+    "segments": 23,
+    "covered": 23,
+    "ratio": 1.0,
+    "uncovered": []
+  },
+  "graph": {
+    "semantic_factors": 43,
+    "events": 43,
+    "S": 42,
+    "graph_size": 140
+  }
+}

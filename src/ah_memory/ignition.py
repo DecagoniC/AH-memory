@@ -124,6 +124,7 @@ class IgnitionEngine:
         self.traces: list[TickTrace] = []
         self._pending_seeds: list[ActivationSeed] = []
         self._evidence: dict[str, float] = {}
+        self._factor_gates: dict[str, float] | None = None
         self.graph = graph or build_structural_factor_graph(store)
         self._structural_revision = (
             getattr(store.ah, "revision", 0) if store is not None else None
@@ -187,6 +188,25 @@ class IgnitionEngine:
     def seed(self, seeds: list[ActivationSeed]) -> None:
         self._pending_seeds.extend(seeds)
 
+    def set_factor_gates(
+        self,
+        gates: Mapping[str, float] | None,
+        *,
+        reset_state: bool = False,
+    ) -> None:
+        """Restrict message passing to query-relevant factors."""
+        self._factor_gates = (
+            None
+            if gates is None
+            else {
+                str(uid): min(1.0, max(0.0, float(score)))
+                for uid, score in gates.items()
+            }
+        )
+        if reset_state:
+            self.initialize()
+            self.wm.sync({}, tick=self.state.tick)
+
     def tick(
         self,
         state: BPState | None = None,
@@ -195,7 +215,12 @@ class IgnitionEngine:
         """With an explicit state return BPState; without it preserve legacy TickTrace."""
         self._ensure_graph()
         if state is not None:
-            return self.bp.step(self.graph, state, evidence)
+            return self.bp.step(
+                self.graph,
+                state,
+                evidence,
+                factor_gates=self._factor_gates,
+            )
         return self._legacy_tick(evidence)
 
     def run(
@@ -218,7 +243,12 @@ class IgnitionEngine:
         )
         state = self.initialize(evidence_map)
         for _ in range(ticks or 20):
-            state = self.bp.step(self.graph, state, state.evidence)
+            state = self.bp.step(
+                self.graph,
+                state,
+                state.evidence,
+                factor_gates=self._factor_gates,
+            )
         self.state = state
         return state
 
@@ -231,7 +261,12 @@ class IgnitionEngine:
         seeds_applied = self._prepare_evidence(evidence)
         before_activation = dict(self.state.activation)
         bp_started = time.perf_counter()
-        self.state = self.bp.step(self.graph, self.state, self._evidence)
+        self.state = self.bp.step(
+            self.graph,
+            self.state,
+            self._evidence,
+            factor_gates=self._factor_gates,
+        )
         bp_ms = (time.perf_counter() - bp_started) * 1000.0
         new_events = [
             event for event in self.state.trace if event.tick == self.state.tick

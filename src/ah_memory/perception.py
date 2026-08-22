@@ -160,9 +160,12 @@ def _llm_role_value_is_compound(value: str) -> bool:
     identifiers = [
         token
         for token in tokens
-        if re.fullmatch(r"[A-ZА-Я0-9_.-]{2,}", token)
-        or re.search(r"[a-zа-я][A-ZА-Я]", token)
-        or re.search(r"\d", token)
+        if not re.fullmatch(r"[A-ZА-Я]\.", token)
+        and (
+            re.fullmatch(r"[A-ZА-Я0-9_.-]{2,}", token)
+            or re.search(r"[a-zа-я][A-ZА-Я]", token)
+            or re.search(r"\d", token)
+        )
     ]
     return len(tokens) >= 3 and len(identifiers) >= 2
 
@@ -340,13 +343,38 @@ def _text_tokens(raw: str) -> set[str]:
     return set(_TOKEN_RE.findall(low))
 
 
-def _is_question(raw: str, low: str) -> bool:
-    if raw.endswith("?"):
-        return True
-    return low.startswith(
-        ("кто ", "что ", "где ", "когда ", "почему ", "как ", "зачем ",
-         "what ", "when ", "where ", "why ", "how ")
-    )
+def classify_utterance(
+    text: str,
+    *,
+    declared_kind: str | None = None,
+    candidates: list[FactCandidate] | None = None,
+    query: Any = None,
+    interaction: Literal["auto", "query"] = "auto",
+) -> Literal["fact", "question", "message"]:
+    """Combine protocol evidence without language-specific phrase lists."""
+    if interaction == "query":
+        return "question"
+    if text.rstrip().endswith("?"):
+        return "question"
+    if declared_kind == "question":
+        return "question"
+    if isinstance(query, dict) and any(
+        str(query.get(field) or "").strip()
+        for field in ("relation", "target_role")
+    ):
+        return "question"
+    candidates_now = candidates or []
+    if any(
+        candidate.statement_type in {"topic", "open_question"}
+        for candidate in candidates_now
+    ):
+        return "question"
+    if any(
+        candidate.statement_type in {"assertion", "decision"}
+        for candidate in candidates_now
+    ):
+        return "fact"
+    return "message"
 
 
 def _collect_text_lemmas(text: str) -> set[str]:
@@ -555,15 +583,8 @@ class SeedPerception:
 
     def parse(self, text: str, wm_context: list[str] | None = None) -> PerceptionResult:
         raw = text.strip()
-        low = _norm(raw)
-        question = _is_question(raw, low)
         seeds = content_entity_uids(raw)[:8]
-        if question:
-            kind: Literal["fact", "question", "message"] = "question"
-        elif seeds:
-            kind = "message"
-        else:
-            kind = "message"
+        kind = classify_utterance(raw)
         return PerceptionResult(
             kind=kind,
             candidates=[],
@@ -626,14 +647,12 @@ class JsonLLMPerception:
             f"candidate rejected: {item.get('reason', 'validation')}"
             for item in gate_report.get("dropped", [])
         )
-        kind = data.get("kind", "fact")
-        if kind not in {"fact", "question", "message"}:
-            kind = "fact"
-        low = _norm(text.strip())
-        if _is_question(text.strip(), low):
-            kind = "question"
-        elif gated:
-            kind = "fact"
+        kind = classify_utterance(
+            text,
+            declared_kind=str(data.get("kind") or ""),
+            candidates=gated,
+            query=data.get("query"),
+        )
         seeds = seeds_from_roles(
             gated,
             extra=filter_entity_uids(

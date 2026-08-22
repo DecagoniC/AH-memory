@@ -1,242 +1,115 @@
 # AH-memory
 
-Прототип ассоциативно-гетерархической памяти до уровня **Senior («Воспламенение»)**.
+Решение хакатона **«Воспламенение 1.0»** (ЭЦР): гибридный нейросимвольный агент на **ассоциативно-гетерархической памяти** (монография Р. В. Душкина).
 
-## Уровни
+БЯМ — модуль **восприятия**. АГ-память — **долговременная память и вывод**. Классический «БЯМ + векторный RAG» — только **контрольный** агент (постановка, §3). Без гиперграфа, ролей актантов и тактового фокуса решение условиям задачи не отвечает.
 
-| Уровень | Статус |
-|---------|--------|
-| Junior — скелет AH | готово |
-| Middle — парсинг + шаблоны T | готово |
-| Senior — Ignition / GC / DSL | готово |
+**Проверяемая гипотеза (§1).** Нейросимвольный контур превосходит Vanilla RAG по объяснимости и устойчивости к галлюцинациям.
 
-Документы: [DOMAIN](docs/DOMAIN.md) · [INTERFACES](docs/INTERFACES.md) · [HYPERPARAMS](docs/HYPERPARAMS.md)
+**Измеренный ответ (M4, 2026-08-20).** Против DeepSeek + TF-IDF: Δ explain **+0,667**, Δ hall **+0,500** — гипотеза **подтверждена**. Против extractive RAG без генератора: объяснимость та же, галлюцинации — ничья.
 
-## Сравнение АГ vs БЯМ+RAG (M4)
+Комплект сдачи: [`docs/submission/`](docs/submission/). Записка: [`POYASNITELNAYA_ZAPISKA.md`](docs/submission/POYASNITELNAYA_ZAPISKA.md).
 
-Один и тот же корпус `benchmarks/m4/closed_world.txt` (статья Википедии «Тиманский кряж») идёт в чанки RAG и в граф AH после батч-ingest.
+---
 
-Ключ DeepSeek — в `.env` (`DEEPSEEK_API_KEY=...`).
+## Четыре обязательных контура (§2)
 
-```bash
-# полный gold-бенчмарк + LLM RAG
-python scripts/compare_ah_vs_rag.py --m4
+| № | Контур постановки | В продукте |
+|---|-------------------|------------|
+| 1 | Модуль восприятия (БЯМ-парсер) | DeepSeek / GigaChat → `FactCandidate` (предикат + роли) → gate заземления в тексте. Perception **не пишет** в граф |
+| 2 | АГ-память `AH = ⟨S, C, P, H, L⟩` | `AHStore`: символы `s = ⟨UID, R⟩`, вторые порядки в C/P/H, гиперсвязи N (семантические факторы с ролями), связи L (IS-A, FOLLOW, ASSOC) |
+| 3 | Подсистема операций (DSL) | операции таблицы 3: add/get/find символов, элементов, связей, гиперсвязей, `findRoles`; композиция запросов |
+| 4 | Ignition Engine | такт §8: импульсы по L и N, сумма z, затухание g, порог t → WM, Хебб h, pacemaker ν. Реализация — фактор-граф + BP; `x ∈ [0,1]` зеркалируется для UI |
 
-# один вопрос
-python scripts/compare_ah_vs_rag.py -q "Что такое Тиманский кряж?"
-```
-
-В веб-UI: кнопки **Сравнить** и **M4 бенчмарк** (`POST /api/compare`, `/api/compare/m4`).
-
-
-## Веб-интерфейс
-
-1. Ключи в `.env` (не коммить): `DEEPSEEK_API_KEY=...` и/или `GIGACHAT_CREDENTIALS=...`
-   (алиас `GIGACHAT_API_KEY`; scope: `GIGACHAT_SCOPE=GIGACHAT_API_PERS`).
-2. Установка и запуск:
-
-```bash
-pip install -e ".[dev]"
-ah-web
-```
-
-Открой http://127.0.0.1:8000 — чат слева, граф справа, кнопка «Скачать JSON» для дампа.
-
-### Entity Resolution Benchmark
-
-Отдельный benchmark разрешения упоминаний на символы графа
-(морфология / синонимы / negative false-merge / contextual), без изменения synthetic aggregation.
-
-```bash
-python -m benchmark.entity_resolution
-# или
-python -m ah_memory.benchmarks.entity_resolution
-```
-
-Результаты: `results/entity_resolution/{summary,threshold_sweep,cases,activation_traces}.json`.
-В UI — вкладка **Entity Resolution**.
-
-### Synthetic Graph
-
-Кнопка **«Синтезировать граф»** создаёт контролируемый synthetic world с ground truth
-(сущности, факторы, события, документы, вопросы, proof paths), загружает его в АГ-память
-и позволяет запустить benchmark активации.
-
-CLI (Small, seed=42):
-
-```bash
-python -c "
-from ah_memory.synthetic import get_preset, SyntheticGraphGenerator, ingest_world, run_benchmark, export_dataset
-world = SyntheticGraphGenerator(get_preset('small')).generate()
-print(world.stats(), round(world.generation_time_sec, 3))
-ingest = ingest_world(world)
-report = run_benchmark(ingest.store, world, ingest, limit=20)
-print(report.aggregate)
-export_dataset(world, 'results/synthetic_small_42')
-"
-```
-
-## Модули
-
-- `perception` / `transform` — текст → open relations (Event / Factor)
-- `ignition` — такт активации + WM
-- `gc` — сборка мусора с TTL
-- `dsl` — интерпретатор запросов
-- `agent` — цикл ingest/ask/step_message
-- `baselines.vanilla_rag` — БЯМ + FAISS RAG (контрольный агент M4)
-- `compare` — side-by-side АГ vs RAG + прогон M4
-- `synthetic` — контролируемый synthetic world + benchmark активации
-- `benchmarks.entity_resolution` / `benchmarks.challenge` — ER и challenge-тесты
-
-## Architecture
+Ответ строится интерпретатором из WM и UID-трассы, не свободной генерацией модели.
 
 ```text
-AH Memory (S, C, P, H, L)
-    ↓ structural adapter
-Immutable FactorGraph
-    ↓ initialize / step
-Persistent BPState
-    ↓ ActivationFunction + CompetitionFunction
-Continuous activation x ∈ [0,1]
-    ↓ threshold
-Structured Working Memory
-    ↓ message attribution
-Contribution Trace
+ЕЯ-текст → Perception (БЯМ) → gate
+        → Transform → AHStore ⟨S, C, P, H, L⟩
+        → FactorGraph → BPState → активация / WM
+        → ответ + трасса UID по тактам
 ```
 
-`AHStore` содержит структуру памяти. Один `FactorGraph` можно использовать
-для нескольких независимых запросов (`BPState`) без копирования AH. Поля
-`x` в старых типах пока зеркалируются `IgnitionEngine` для совместимости
-с UI, но источником истины является `BPState.activation`.
+Контроль M4: `VanillaRAG` (чанки → TF-IDF → extractive или та же БЯМ). Нет гиперграфа, нет ролей, `trace_uids` всегда пуст — поэтому ExplainScore RAG по постановке равен нулю.
 
-Топология фактор-графа кешируется между тактами и перестраивается только
-после структурного изменения AH. Evidence не является частью топологии.
+---
 
-## Mathematical Model
+## Уровни сложности (§4)
 
-Обозначения:
+Заявка на **Senior («Воспламенение»)**: нижестоящие уровни входят в архитектуру.
 
-- `x_v^t ∈ [0,1]` — continuous activation variable `v`;
-- `m_{v→f}^t` — сообщение variable → factor;
-- `m_{f→v}^t` — сообщение factor → variable;
-- `e_v^t` — внешнее evidence;
-- `θ` — параметры potential/dynamics;
-- `z_v^t = Σ_f contribution(m_{f→v}^t)` — входной сигнал.
+| Уровень | Требование постановки | Статус продукта |
+|---------|----------------------|-----------------|
+| **Junior** | кортеж AH, R по модальностям, IS-A (ОАГ), эпизод FOLLOW (ОАГ), эталон «заяц» (рис. 14) | выполнено: 8/8 фактов, `answer_who(M_HARE)` = «зверёк маленький животное», инварианты в тестах |
+| **Middle** | текст → БЯМ → гиперсвязь N; роли SUBJECT / OBJECT / LOCATION / TIME / CAUSE; `findRoles`; QA «кто такой заяц?»; M1 ≥ 0,6 | выполнено: M1 = **0,705**; закрытый набор шаблонов T заменён открытым `RelationRegistry` (роли и N сохраняются, код не ветвится по домену) |
+| **Senior** | 8-шаговый ignition, GC + TTL, DSL, распространение S ↔ C/P, непрерывный диалог | выполнено: такт + трасса в UI; M3 = **1,0**; поток реплик в чате с подпиткой активации |
 
-Один такт:
+Критерий Senior — сценарий «вопрос → активация → объяснимый ответ с трассой» (M2). На цепочках d = 1…4 трасса полная; на d = 5…6 активация не дотягивает (M2 = 0,258).
 
-```text
-m(v→f)^{t+1} = F_V(e_v^t, x_v^t, {m(f'→v)^t}, θ)
-m(f→v)^{t+1} = Potential_f({m(u→f)^{t+1}}, θ_f)
-x_v^{t+1} = Activation(x_v^t, z_v^t, e_v^t, θ)
-WM^{t+1} = {v | x_v^{t+1} ≥ threshold}
-```
+---
 
-Доступны `LinearDecayActivation`, `SigmoidActivation`,
-`SaturatedReLUActivation`; `NoCompetition`, local/global inhibition и
-top-k; potentials BIND, ASSOC, IS_A, FOLLOW, CAUSE и Hypernode.
+## Предметная область (§5)
 
-IS_A и FOLLOW направлены и имеют независимые forward/backward веса.
-Hypernode работает как настоящий n-арный фактор в режимах `and`,
-`soft_and`, `pairwise`. Exact inference никогда не обрезает арность;
-`auto` явно переключается на approximate выше `exact_max_arity`.
+**Вариант В** — база знаний учебного курса / энциклопедии (иерархии IS-A поверх учебного текста).
 
-## Simulation API
+Эталон монографии §7 (рис. 14) — короткий текст о зайце: таксономия, n-арные факты, CAUSE («лапы → бегает быстро»), отказ «неизвестно» на вопросе вне корпуса. Это носитель механизмов памяти, не «зоологический» продукт: производственный код не ветвится по именам сущностей.
 
-```python
-from ah_memory.activation import SigmoidActivation
-from ah_memory.benchmarks.synthetic import competing_concepts
-from ah_memory.ignition import IgnitionEngine
+Корпус и дамп: [`docs/submission/corpus.txt`](docs/submission/corpus.txt), [`ah_dump.json`](docs/submission/ah_dump.json). После ingest: |S| = 15, |H| = 2, |L| = 19, 10 гиперрёбер, **8/8** эталонных ключей.
 
-scenario = competing_concepts()
-engine = IgnitionEngine(
-    graph=scenario.graph,
-    activation=SigmoidActivation(),
-)
-state = engine.initialize({"DOG": 1.0, "BARK": 0.8})
+Жёсткие NFR §6 (N ≥ 1000, корпус ≥ 15 000 слов, |S| ≥ 150) на сданном дампе **не выполнены** — демонстрационный граф эталона, не полноразмерная энциклопедия. Такт ignition на N = 1000 — отдельный бенчмарк защиты (`scripts/bench_perf.py`).
 
-for _ in range(20):
-    state = engine.tick(state)
+---
 
-print(state.activation)
-print(state.trace)
-print(state.activation_history)
-```
+## Метрики оценки (§7)
 
-Смена activation function или registry factor potentials не изменяет AH
-и `FactorGraph`.
+Ожидание постановки по M4: Δ_explainability > 0 (векторный поиск возвращает чанки, не трассируемый граф). M5: жёсткая типизация ролей как ограничитель SLM; опровержение при корректном эксперименте тоже засчитывается.
 
-## Experiments
+| ID | Определение постановки | Измерение | Вердикт |
+|----|------------------------|-----------|---------|
+| **M1** | взвешенный F1 ролей SUBJECT / OBJECT / LOCATION (веса 2 / 2 / 1) | **0,705** (DeepSeek, n=16; clean / typo / inversion) | порог Middle 0,6 **пройден** |
+| **M2** | (1/20) Σ correct · (d / 6) · trace_complete | **0,258** (13/20; d=1…4 все, d=5–6 ноль) | сценарий с трассой есть; длинные цепи — предел g и t |
+| **M3** | 1 − orphans_after / orphans_before; 200 сирот, T=50, живые 100 % | **1,0**; ложных удалений 0 | **пройден** |
+| **M4** | ΔE = E_AH − E_RAG; ΔH = H_RAG − H_AH | vs DeepSeek: **+0,667 / +0,500**; vs extractive: **+0,667 / 0** | гипотеза vs БЯМ+RAG **да**; vs extractive H2 не доказана |
+| **M5** | F1_AH/F1_RAG на SLM минус то же на LLM | — | **не измерен** (Ollama на localhost не был доступен) |
 
-Шесть synthetic-сценариев: chain, branching, IS_A, competing concepts,
-episodic FOLLOW и 7-арный hypernode.
+### Доказательство M4 (золото «заяц», n = 6)
 
-```bash
-python scripts/run_experiments.py --output results/synthetic.json
-python scripts/run_experiments.py --grid --output results/grid.csv
-python scripts/plot_experiment.py --scenario chain
-python scripts/bench_perf.py --output results/performance.csv
-```
+| Система | ExplainScore | Hallucination | ΔE | ΔH |
+|---------|--------------|---------------|----|----|
+| **АГ-память** | 0,667 | 0 | | |
+| Vanilla RAG (DeepSeek + TF-IDF) | 0 | 0,50 | **+0,667** | **+0,500** |
+| Vanilla RAG (extractive) | 0 | 0 | **+0,667** | 0 |
 
-Grid search перебирает activation/decay/threshold/factor strength и
-сохраняет CSV+JSON. Метрики: propagation latency, peak, half-life,
-spread, selectivity, stability, oscillation, convergence. Performance
-runner отдельно измеряет construction, BP step, activation update и
-total tick для N=100…10000.
+| Вопрос | АГ-память | Vanilla RAG (БЯМ) |
+|--------|-----------|-------------------|
+| Кто такой заяц? | «зверёк маленький животное», трасса `EP_LESSON_1 → HARE → M_BEAST → M_HARE` | пересказ абзаца, UID-трассы нет |
+| Король зайцев на Луне? | **неизвестно** | «зайцы весят от 2 до 5 кг…» — факт вне корпуса |
 
-Конфигурация находится в секции `experiment` файла `config.yaml`.
-Платформа не предполагает, что одна модель заранее верна: отсутствие
-распространения, excessive spread и instability являются допустимыми
-результатами эксперимента.
+Расширенный протокол (ловушки отдельно от in-corpus): [`hypothesis_logs.json`](docs/submission/hypothesis_logs.json), `tests/test_hypothesis_ah_vs_rag.py`. H1 всегда supported. H2 supported против генератора и против extractive на ловушках; на официальных 6 пунктах без БЯМ — ничья.
 
-Итоговые измерения и ограничения: [docs/IMPLEMENTATION_REPORT.md](docs/IMPLEMENTATION_REPORT.md).
+---
 
-## Open relation semantics
+## Пять гиперпараметров §8 (требование №4)
 
-Relations are runtime data rather than a closed enum:
+| № | Имя | Значение | Зачем |
+|---|-----|----------|--------|
+| 1 | TTL | 32 такта | новый узел успевает получить связь; в TTL GC живое не трогает (M3) |
+| 2 | g | x · exp(−λΔt), λ = 0,15 | полураспад ~4,6 такта |
+| 3 | t | 0,55 | порог переноса в WM |
+| 4 | h | clip(w + η x_out x_in, 0, 1), η = 0,05 | Хебб |
+| 5 | ν | 1 импульс / 8 тактов | pacemaker; ν = 0 → коллапс без входа |
 
-```python
-from ah_memory.relation_normalizer import ExactNormalizer, RelationNormalizer
-from ah_memory.relation_registry import default_relation_registry
+Обоснование и калибровка на защите: [`docs/HYPERPARAMS.md`](docs/HYPERPARAMS.md). Функция активации f — сигмоида (линейный / ReLU-sat — в `config.yaml:experiment`).
 
-registry = default_relation_registry()
-normalizer = RelationNormalizer(registry, [ExactNormalizer()])
-relation = normalizer.normalize("приобрёл")
+---
 
-assert relation.raw_label == "приобрёл"
-assert relation.canonical_label == "PURCHASE"
-```
 
-`RelationRegistry.register_relation()` adds a new canonical relation
-without changing source code. Exact, embedding and LLM strategies are
-independent from parsing, graph storage and activation. The LLM can
-suggest or create a canonical relation, but only `Transform` mutates
-memory.
+## Документы
 
-Semantic factors remain n-ary and receive serializable parameters from
-`FixedParameterGenerator`, `RuleBasedParameterGenerator` or
-`EmbeddingParameterGenerator`. The new activation engine has one
-relation-agnostic formula; direction, temporal/causal bias, selectivity
-and persistence come from factor parameters.
-
-State transitions are deterministic runtime rules. The default rules
-implement PURCHASE/SELL ownership, last purchase and purchase history.
-
-Architecture details: [ARCHITECTURE.md](ARCHITECTURE.md).
-
-### Memory aggregation experiment
-
-```bash
-python benchmark.py --mode fixed
-python benchmark.py --mode normalized
-python benchmark.py --mode learned
-python benchmark.py --mode learned --trace
-```
-
-The fixtures in `benchmarks/memory_aggregation` cover purchase/sell,
-multiple assets, temporal order, parallel ownership, conflicts,
-synonyms, coreference, noise and a long chain. Results are written to
-`results/memory_aggregation.json`.
-
-Audit, formulas and measured comparison:
-[docs/OPEN_SEMANTICS_REPORT.md](docs/OPEN_SEMANTICS_REPORT.md).
+| | |
+|--|--|
+| [docs/DOMAIN.md](docs/DOMAIN.md) | вариант В |
+| [docs/HYPERPARAMS.md](docs/HYPERPARAMS.md) | TTL, g, t, h, ν |
+| [docs/FACTOR_GRAPH_ACTIVATION.md](docs/FACTOR_GRAPH_ACTIVATION.md) | такт BP |
+| [docs/INTERFACES.md](docs/INTERFACES.md) | контракты модулей |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | контур + open semantics |

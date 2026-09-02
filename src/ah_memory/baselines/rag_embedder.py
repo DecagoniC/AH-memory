@@ -100,8 +100,10 @@ def _try_remote_embedder() -> RagEmbedder | None:
 
     ollama_names = {"ollama", "nomic-embed-text", "nomic_embed_text"}
     if name in ollama_names or model == cfg.ollama.embedding_model:
-        from ah_memory.ollama import OllamaClient
+        from ah_memory.ollama import OllamaClient, is_ollama_available
 
+        if not is_ollama_available(cfg.ollama):
+            return None
         return OllamaRagEmbedder(
             OllamaClient(cfg.ollama),
             model=cfg.ollama.embedding_model,

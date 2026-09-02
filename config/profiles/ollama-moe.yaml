@@ -1,0 +1,16 @@
+# Profile: Qwen3 MoE (~30B / 3B active). Slow on 12GB VRAM (RAM offload).
+llm_provider: ollama
+
+agent:
+  llm_provider: ollama
+
+ollama:
+  base_url: "http://127.0.0.1:11434"
+  model: "qwen3:30b-a3b"
+  embedding_model: "nomic-embed-text"
+  timeout_sec: 300
+  temperature: 0.1
+  num_ctx: 2048
+
+embedding:
+  model: nomic-embed-text

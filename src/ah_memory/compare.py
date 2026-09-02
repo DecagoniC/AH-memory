@@ -82,12 +82,14 @@ class CompareEngine:
         *,
         ticks: int = 6,
         deepseek: DeepSeekConfig | None = None,
+        chat_client: Any | None = None,
         history: list[dict[str, str]] | None = None,
         source_docs: list[str] | None = None,
     ) -> None:
         self.agent = agent
         self.ticks = ticks
         self.deepseek = deepseek
+        self.chat_client = chat_client
         self.history = history if history is not None else []
         self._extra_docs: list[str] = []
         self.source_docs: list[str] = [
@@ -99,6 +101,8 @@ class CompareEngine:
             self._embedder: RagEmbedder = getattr(rag, "embedder", None) or resolve_rag_embedder()
             if not self.source_docs and rag.corpus.strip() and rag.corpus != "Корпус пуст.":
                 self.source_docs = [rag.corpus]
+            if chat_client is not None and getattr(self.rag, "client", None) is None:
+                self.rag.client = chat_client
         else:
             self._embedder = resolve_rag_embedder()
             self.rag = VanillaRAG(
@@ -108,6 +112,7 @@ class CompareEngine:
                 ),
                 top_k=4,
                 deepseek=ds if ds and ds.configured else None,
+                chat_client=chat_client,
                 strict=True,
                 embedder=self._embedder,
             )
@@ -160,6 +165,7 @@ class CompareEngine:
             corpus,
             top_k=6,
             deepseek=self.deepseek if self.deepseek and self.deepseek.configured else None,
+            chat_client=self.chat_client,
             strict=True,
             embedder=self._embedder,
         )

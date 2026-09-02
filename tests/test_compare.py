@@ -95,6 +95,24 @@ def test_compare_modes_separate_raw_and_shared_generation() -> None:
     )
 
 
+def test_compare_engine_rebuild_keeps_injected_chat_client() -> None:
+    class RecordingClient:
+        def chat(self, messages, *, json_mode=False) -> str:
+            return "сгенерированный ответ"
+
+    client = RecordingClient()
+    eng = CompareEngine.from_m4_gold(DeepSeekConfig(api_key=""), ticks=4)
+    wired = CompareEngine(
+        eng.agent,
+        ticks=4,
+        chat_client=client,
+        source_docs=list(eng.source_docs),
+    )
+    assert wired.rag.client is client
+    wired.rebuild_rag()
+    assert wired.rag.client is client
+
+
 def test_live_rag_summarizes_multi_fact() -> None:
     from ah_memory.config import load_config
 

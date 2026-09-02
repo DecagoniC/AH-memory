@@ -6,6 +6,10 @@ from ah_memory.examples.closed_world import (
     build_closed_world_memory,
     closed_world_text,
 )
+from ah_memory.examples.openai_hf_incident import (
+    build_openai_hf_memory,
+    openai_hf_text,
+)
 from ah_memory.examples.rabbit import RABBIT_TEXT, build_rabbit_memory
 
 _ABSTAIN = ["неизвестно", "нет данных", "не знаю"]
@@ -278,6 +282,80 @@ def rabbit_trap_gold() -> list[GoldItem]:
     ]
 
 
+def openai_hf_gold() -> list[GoldItem]:
+    """In-corpus probes on the Aug 2026 OpenAI HF incident post (post-cutoff)."""
+    return [
+        GoldItem(
+            question="What is Internal Model 1 (IM1)?",
+            answer_keywords=["internal", "research", "model", "im1", "openai"],
+            gold_trace=["M_IM1", "M_INTERNAL_RESEARCH_MODEL"],
+            d=2,
+            evidence_spans=["Internal Model 1", "IM1", "research model"],
+        ),
+        GoldItem(
+            question="Which evaluation drove the Hugging Face incident?",
+            answer_keywords=["exploitgym", "cybersecurity", "evaluation"],
+            gold_trace=["M_EXPLOITGYM", "M_IM1"],
+            d=2,
+            evidence_spans=["ExploitGym", "evaluation that drove"],
+        ),
+        GoldItem(
+            question="Where did agents create an unauthorized message board?",
+            answer_keywords=["artifactory", "message board", "package"],
+            gold_trace=["M_ARTIFACTORY", "M_MESSAGE_BOARD"],
+            d=1,
+            evidence_spans=["Artifactory", "message board"],
+        ),
+        GoldItem(
+            question="Which Hugging Face file-format zero-day did agents exploit?",
+            answer_keywords=["hdf5", "zero-day", "worker"],
+            gold_trace=["M_HDF5_ZERO_DAY", "M_IM1"],
+            d=2,
+            evidence_spans=["HDF5", "zero-day"],
+        ),
+        GoldItem(
+            question="What ultimately resulted from the security alert cascade toward Astra?",
+            answer_keywords=["astra", "pause", "training", "hold"],
+            gold_trace=["M_SECURITY_ALERT", "M_ASTRA_TRAINING_PAUSE"],
+            d=2,
+            evidence_spans=["Astra", "pause", "training"],
+        ),
+        GoldItem(
+            question="What is the secret launch code of Internal Model 1?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+    ]
+
+
+def openai_hf_trap_gold() -> list[GoldItem]:
+    return [
+        GoldItem(
+            question="What is the admin password for Hugging Face production?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="How many kilograms does Artifactory weigh?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+        GoldItem(
+            question="Who invented the Timan Ridge in 1847?",
+            answer_keywords=_ABSTAIN,
+            gold_trace=[],
+            d=1,
+            evidence_spans=["__none__"],
+        ),
+    ]
+
+
 def build_m4_fixture(*, use_llm: bool = False) -> tuple:
     """AH agent on the closed-world graph + VanillaRAG on the same bulletin."""
     from ah_memory.agent import Agent
@@ -309,3 +387,20 @@ def build_rabbit_m4_fixture(*, use_llm: bool = False) -> tuple:
         ds = cfg.deepseek if cfg.deepseek.configured else None
     rag = VanillaRAG(RABBIT_TEXT, top_k=4, deepseek=ds)
     return agent, rag, rabbit_gold(), None
+
+
+def build_openai_hf_m4_fixture(*, use_llm: bool = False) -> tuple:
+    """AH + VanillaRAG on the Aug 2026 OpenAI Hugging Face incident corpus."""
+    from ah_memory.agent import Agent
+    from ah_memory.baselines.vanilla_rag import VanillaRAG
+    from ah_memory.config import load_config
+
+    store = build_openai_hf_memory()
+    corpus = openai_hf_text()
+    agent = Agent(store=store)
+    ds = None
+    if use_llm:
+        cfg = load_config()
+        ds = cfg.deepseek if cfg.deepseek.configured else None
+    rag = VanillaRAG(corpus, top_k=4, deepseek=ds)
+    return agent, rag, openai_hf_gold(), None

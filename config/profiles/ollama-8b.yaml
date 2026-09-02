@@ -1,0 +1,16 @@
+# Profile: Qwen3 8B dense — fits RTX 3080 12GB VRAM, faster UI.
+llm_provider: ollama
+
+agent:
+  llm_provider: ollama
+
+ollama:
+  base_url: "http://127.0.0.1:11434"
+  model: "qwen3:8b"
+  embedding_model: "nomic-embed-text"
+  timeout_sec: 120
+  temperature: 0.1
+  num_ctx: 4096
+
+embedding:
+  model: nomic-embed-text

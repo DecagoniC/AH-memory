@@ -1,14 +1,16 @@
 """FastAPI web UI: chat + graph dump + live AH vs RAG compare."""
 from __future__ import annotations
 
+import json
 import tempfile
 import time
-from dataclasses import asdict
+from collections.abc import Iterator as TypingIterator
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -26,6 +28,13 @@ from ah_memory.factor_parameters import (
 from ah_memory.gigachat_llm import GigaChatClient, HybridPerception
 from ah_memory.graph_export import dump_ah_json, dump_graph
 from ah_memory.graph_library import GraphLibrary
+from ah_memory.ollama import (
+    OllamaClient,
+    OllamaHybridPerception,
+    is_likely_embedding_model,
+    is_ollama_available,
+    list_ollama_models,
+)
 from ah_memory.perception import SeedPerception
 from ah_memory.relation_normalizer import (
     EmbeddingNormalizer,
@@ -65,7 +74,11 @@ def _provider_ready(provider: LlmProvider) -> bool:
         return False
     if provider == "deepseek":
         return cfg.deepseek.configured
-    return cfg.gigachat.configured
+    if provider == "ollama":
+        return is_ollama_available(cfg.ollama)
+    if provider == "gigachat":
+        return cfg.gigachat.configured
+    return False
 
 
 def _make_perception(provider: LlmProvider | None = None) -> Any:
@@ -76,6 +89,8 @@ def _make_perception(provider: LlmProvider | None = None) -> Any:
         return DeepSeekHybridPerception(cfg.deepseek, fallback=cfg.agent.fallback_rules)
     if p == "gigachat" and cfg.gigachat.configured:
         return HybridPerception(cfg.gigachat, fallback=cfg.agent.fallback_rules)
+    if p == "ollama" and is_ollama_available(cfg.ollama):
+        return OllamaHybridPerception(cfg.ollama, fallback=cfg.agent.fallback_rules)
     return SeedPerception()
 
 
@@ -87,6 +102,8 @@ def _make_chat_client(provider: LlmProvider | None = None) -> tuple[Any | None, 
         return DeepSeekClient(cfg.deepseek), "deepseek"
     if p == "gigachat" and cfg.gigachat.configured:
         return GigaChatClient(cfg.gigachat), "gigachat"
+    if p == "ollama" and is_ollama_available(cfg.ollama):
+        return OllamaClient(cfg.ollama), "ollama"
     return None, "rules"
 
 
@@ -157,7 +174,7 @@ def _build_dialogue(core: Agent) -> DialogueAgent:
 
 def _apply_llm_provider(provider: LlmProvider) -> None:
     """Swap perception + dialogue client; keep current AH store/graph."""
-    global agent, dialogue, llm_provider
+    global agent, dialogue, llm_provider, comparer
     llm_provider = provider
     agent.perception = _make_perception(provider)
     hist = list(dialogue.history)
@@ -170,12 +187,65 @@ def _apply_llm_provider(provider: LlmProvider) -> None:
     dialogue._turn = turn
     dialogue.last_activation = last_act
     dialogue.last_graph_build_json = last_gb
+    rag_history = list(comparer.history)
+    source_docs = list(comparer.source_docs)
+    extra_docs = list(comparer._extra_docs)
+    comparer = _build_compare(agent)
+    comparer.history = rag_history
+    comparer.source_docs = source_docs
+    comparer._extra_docs = extra_docs
+    comparer.rebuild_rag()
+
+
+def _set_ollama_chat_model(model: str) -> None:
+    """Update runtime Ollama chat model and rebuild LLM clients."""
+    global cfg
+    name = model.strip()
+    if not name:
+        raise ValueError("model name is empty")
+    if is_likely_embedding_model(name):
+        raise ValueError(f"refusing embedding model as chat backend: {name}")
+    cfg = replace(cfg, ollama=replace(cfg.ollama, model=name))
+    if llm_provider == "ollama":
+        _apply_llm_provider("ollama")
+
+
+def _ollama_models_payload() -> dict[str, Any]:
+    if not is_ollama_available(cfg.ollama):
+        return {
+            "ok": False,
+            "configured": False,
+            "current": cfg.ollama.model,
+            "models": [],
+            "chat_models": [],
+        }
+    try:
+        models = list_ollama_models(cfg.ollama)
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "ok": False,
+            "configured": True,
+            "current": cfg.ollama.model,
+            "models": [],
+            "chat_models": [],
+            "error": str(exc),
+        }
+    chat_models = [
+        item for item in models if not is_likely_embedding_model(str(item["name"]))
+    ]
+    return {
+        "ok": True,
+        "configured": True,
+        "current": cfg.ollama.model,
+        "models": models,
+        "chat_models": chat_models,
+    }
 
 
 def _build_compare(core: Agent) -> CompareEngine:
     """Сравнение на том же живом агенте, что и чат (корпус = диалог + факты)."""
-    ds = cfg.deepseek if (cfg.agent.use_llm and cfg.deepseek.configured) else None
-    return CompareEngine(core, ticks=cfg.agent.ticks, deepseek=ds)
+    client, _name = _make_chat_client()
+    return CompareEngine(core, ticks=cfg.agent.ticks, chat_client=client)
 
 
 agent = _build_core()
@@ -225,7 +295,11 @@ class SaveGraphIn(BaseModel):
 
 
 class ProviderIn(BaseModel):
-    provider: Literal["gigachat", "deepseek"]
+    provider: Literal["gigachat", "deepseek", "ollama"]
+
+
+class OllamaModelIn(BaseModel):
+    model: str = Field(min_length=1)
 
 
 def _graph_library() -> GraphLibrary:
@@ -293,6 +367,9 @@ def health() -> dict[str, Any]:
         model = cfg.deepseek.model
     elif llm_provider == "gigachat" and cfg.gigachat.configured:
         model = cfg.gigachat.model
+    elif llm_provider == "ollama" and ready:
+        model = cfg.ollama.model
+    ollama_ready = bool(cfg.agent.use_llm and is_ollama_available(cfg.ollama))
     return {
         "ok": True,
         "version": "0.4.4-merged",
@@ -309,6 +386,10 @@ def health() -> dict[str, Any]:
                 "configured": cfg.deepseek.configured,
                 "model": cfg.deepseek.model if cfg.deepseek.configured else None,
             },
+            "ollama": {
+                "configured": ollama_ready,
+                "model": cfg.ollama.model,
+            },
         },
         "preload": cfg.agent.preload,
         "rag_backend": comparer.rag.backend,
@@ -324,11 +405,46 @@ def health() -> dict[str, Any]:
 @app.post("/api/llm-provider")
 def set_llm_provider(body: ProviderIn) -> dict[str, Any]:
     if not _provider_ready(body.provider):
+        if body.provider == "ollama":
+            raise HTTPException(
+                400,
+                f"Ollama is not reachable at {cfg.ollama.base_url}",
+            )
         raise HTTPException(
             400,
             f"provider '{body.provider}' not configured (check API key / credentials)",
         )
     _apply_llm_provider(body.provider)
+    return health()
+
+
+@app.get("/api/ollama/models")
+def get_ollama_models() -> dict[str, Any]:
+    payload = _ollama_models_payload()
+    if not payload["configured"]:
+        raise HTTPException(503, f"Ollama is not reachable at {cfg.ollama.base_url}")
+    return payload
+
+
+@app.post("/api/ollama/model")
+def set_ollama_model(body: OllamaModelIn) -> dict[str, Any]:
+    if not is_ollama_available(cfg.ollama):
+        raise HTTPException(503, f"Ollama is not reachable at {cfg.ollama.base_url}")
+    name = body.model.strip()
+    available = {str(item["name"]) for item in list_ollama_models(cfg.ollama)}
+    resolved = None
+    for candidate in (name, f"{name}:latest", name.removesuffix(":latest")):
+        if candidate in available:
+            resolved = candidate
+            break
+    if resolved is None:
+        raise HTTPException(400, f"model '{name}' is not installed in Ollama")
+    try:
+        _set_ollama_chat_model(resolved)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    if llm_provider != "ollama":
+        _apply_llm_provider("ollama")
     return health()
 
 
@@ -450,6 +566,69 @@ def chat(body: ChatIn) -> ChatOut:
         activation=turn.activation,
         graph_build_json=turn.graph_build_json,
         full_trace=turn.full_trace,
+    )
+
+
+def _chat_out_payload(turn: Any) -> dict[str, Any]:
+    return {
+        "reply": turn.reply,
+        "kind": "dialogue",
+        "trace_uids": turn.trace_uids,
+        "wm": turn.wm,
+        "backend": turn.backend,
+        "stats": dump_graph(
+            agent.store,
+            limit_nodes=1,
+            activation=agent.ignition.state.activation,
+        )["stats"],
+        "user_facts": turn.user_facts,
+        "assistant_facts": turn.assistant_facts,
+        "system_prompt": turn.system_prompt,
+        "activation": turn.activation,
+        "graph_build_json": turn.graph_build_json,
+        "full_trace": turn.full_trace,
+    }
+
+
+@app.post("/api/chat/stream")
+def chat_stream(body: ChatIn) -> StreamingResponse:
+    """SSE stream: status / token / done (TurnResult payload) / error."""
+    text = body.message.strip()
+    if not text:
+        raise HTTPException(400, "empty message")
+    ticks = body.ticks or cfg.agent.ticks
+
+    def events() -> TypingIterator[str]:
+        try:
+            for event in dialogue.talk_stream(text, ticks=ticks):
+                kind = event.get("event")
+                if kind == "done":
+                    turn = event["turn"]
+                    comparer.bind_history(dialogue.history)
+                    comparer.rebuild_rag()
+                    payload = {"event": "done", **_chat_out_payload(turn)}
+                elif kind == "token":
+                    payload = {"event": "token", "text": event.get("text") or ""}
+                elif kind == "status":
+                    payload = {
+                        "event": "status",
+                        "phase": event.get("phase") or "",
+                    }
+                else:
+                    payload = {"event": "status", "phase": str(kind or "")}
+                yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+        except Exception as exc:  # noqa: BLE001
+            err = {"event": "error", "detail": f"dialogue failed: {exc}"}
+            yield f"data: {json.dumps(err, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(
+        events(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )
 
 

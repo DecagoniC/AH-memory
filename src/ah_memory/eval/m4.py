@@ -119,6 +119,39 @@ def evaluate_m4(
     )
 
 
+def evaluate_m4_on_fresh_store(
+    build_store,
+    rag: VanillaRAG,
+    gold: list[GoldItem],
+    *,
+    ticks: int = 6,
+) -> M4Report:
+    """Rebuild the AH graph from scratch, then score it against one RAG backend.
+
+    Each comparison gets its own store and Agent so leftover activation,
+    working memory, or GC from a previous backend cannot leak.
+    """
+    return evaluate_m4(Agent(store=build_store()), rag, gold, ticks=ticks)
+
+
+def item_payloads(report: M4Report) -> list[dict]:
+    return [
+        {
+            "question": item.question,
+            "ah_answer": item.ah_answer,
+            "rag_answer": item.rag_answer,
+            "ah_correct": item.ah_correct,
+            "rag_correct": item.rag_correct,
+            "ah_trace_complete": item.ah_trace_complete,
+            "ah_hallucinated": item.ah_hallucinated,
+            "rag_hallucinated": item.rag_hallucinated,
+            "ah_explain": round(item.ah_explain, 4),
+            "ah_trace": item.ah_trace[:16],
+        }
+        for item in report.items
+    ]
+
+
 def _norm(s: str) -> str:
     return s.lower().replace("ё", "е")
 

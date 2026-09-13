@@ -46,6 +46,20 @@ def test_vanilla_rag_uses_faiss_backend() -> None:
     assert reply.scores[0] > 0
 
 
+def test_vanilla_rag_prompt_forbids_parametric_knowledge() -> None:
+    rag = VanillaRAG(
+        "Тиманский кряж тянется на 900 километров.",
+        top_k=1,
+        embedder=DeterministicRagEmbedder(),
+        strict=False,
+    )
+    prompt = rag.system_prompt.casefold()
+    assert "можно опираться" not in prompt
+    assert "неизвестн" in prompt
+    assert "внешние знания" in prompt
+    assert "только" in prompt
+
+
 def test_vanilla_rag_uses_injected_chat_client() -> None:
     class RecordingClient:
         def chat(self, messages, *, json_mode=True) -> str:

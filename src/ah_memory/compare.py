@@ -141,7 +141,7 @@ class CompareEngine:
             source,
             top_k=4,
             deepseek=ds if ds.configured else None,
-            strict=False,
+            strict=True,
         )
         engine = cls(agent, rag, ticks=ticks, deepseek=ds, source_docs=[source])
         return engine

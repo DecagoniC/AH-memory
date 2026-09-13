@@ -24,7 +24,7 @@ from ah_memory.benchmarks.challenge_metrics import robustness_gain  # noqa: E402
 from ah_memory.config import load_config  # noqa: E402
 from ah_memory.deepseek import DeepSeekClient, DeepSeekHybridPerception  # noqa: E402
 from ah_memory.eval.gold import openai_hf_gold  # noqa: E402
-from ah_memory.eval.m4 import evaluate_m4  # noqa: E402
+from ah_memory.eval.m4 import evaluate_m4_on_fresh_store, item_payloads  # noqa: E402
 from ah_memory.examples.openai_hf_incident import (  # noqa: E402
     build_openai_hf_memory,
     openai_hf_text,
@@ -35,7 +35,6 @@ from ah_memory.ollama import (  # noqa: E402
     OllamaHybridPerception,
     is_ollama_available,
 )
-from ah_memory.agent import Agent  # noqa: E402
 
 
 FRESH_ROLES = ROOT / "benchmarks" / "fresh" / "openai_hf_2026" / "m1_roles.jsonl"
@@ -87,29 +86,36 @@ def run_probes(cfg) -> dict[str, Any]:
 
 
 def run_m4(cfg) -> dict[str, Any]:
-    store = build_openai_hf_memory()
     corpus = openai_hf_text()
     gold = openai_hf_gold()
-    agent = Agent(store=store)
     backends: dict[str, VanillaRAG] = {
-        "extractive+nomic": VanillaRAG(corpus, top_k=4),
+        "extractive+nomic": VanillaRAG(corpus, top_k=4, strict=True),
         "ollama:qwen3:8b": VanillaRAG(
-            corpus, top_k=4, chat_client=OllamaClient(cfg.ollama)
+            corpus, top_k=4, chat_client=OllamaClient(cfg.ollama), strict=True
         ),
         "deepseek-chat": VanillaRAG(
-            corpus, top_k=4, chat_client=DeepSeekClient(cfg.deepseek)
+            corpus, top_k=4, chat_client=DeepSeekClient(cfg.deepseek), strict=True
         ),
         "gigachat-2-pro": VanillaRAG(
-            corpus, top_k=4, chat_client=GigaChatClient(cfg.gigachat)
+            corpus, top_k=4, chat_client=GigaChatClient(cfg.gigachat), strict=True
         ),
     }
     out: dict[str, Any] = {}
     for name, rag in backends.items():
         t0 = time.perf_counter()
-        report = evaluate_m4(agent, rag, gold, ticks=6)
+        # Independent graph+agent per RAG backend: leftover WM/activation
+        # from the previous comparison must not change AH scores.
+        report = evaluate_m4_on_fresh_store(
+            build_openai_hf_memory,
+            rag,
+            gold,
+            ticks=6,
+        )
         payload = report.as_dict()
         payload["rag_backend"] = rag.backend
         payload["sec"] = round(time.perf_counter() - t0, 2)
+        payload["graph_rebuilt"] = True
+        payload["items"] = item_payloads(report)
         out[name] = payload
     return out
 
@@ -188,6 +194,11 @@ def main() -> int:
     )
     args = ap.parse_args()
 
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
     cfg = load_config()
     if not cfg.deepseek.configured:
         print("ERROR: DeepSeek not configured", file=sys.stderr)
@@ -215,17 +226,20 @@ def main() -> int:
         print(f"probe failed; wrote {args.out}", flush=True)
         return 1
 
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+
     if not args.skip_m4:
         print("running M4…", flush=True)
         report["m4"] = run_m4(cfg)
-        print(json.dumps(report["m4"], ensure_ascii=False, indent=2), flush=True)
+        args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(report["m4"], ensure_ascii=True, indent=2), flush=True)
 
     if not args.skip_m1:
         print(f"running M1/M5 on {args.m1_limit} roles…", flush=True)
         report["m1_m5"] = run_m1_m5(cfg, limit=args.m1_limit)
-        print(json.dumps(report["m1_m5"], ensure_ascii=False, indent=2), flush=True)
+        args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(report["m1_m5"], ensure_ascii=True, indent=2), flush=True)
 
-    args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"wrote {args.out}", flush=True)
     return 0

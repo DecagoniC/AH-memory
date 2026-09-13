@@ -389,15 +389,20 @@ def build_rabbit_m4_fixture(*, use_llm: bool = False) -> tuple:
     return agent, rag, rabbit_gold(), None
 
 
+def fresh_openai_hf_agent():
+    """Independent AH agent on a newly built Hugging Face incident graph."""
+    from ah_memory.agent import Agent
+
+    return Agent(store=build_openai_hf_memory())
+
+
 def build_openai_hf_m4_fixture(*, use_llm: bool = False) -> tuple:
     """AH + VanillaRAG on the Aug 2026 OpenAI Hugging Face incident corpus."""
-    from ah_memory.agent import Agent
     from ah_memory.baselines.vanilla_rag import VanillaRAG
     from ah_memory.config import load_config
 
-    store = build_openai_hf_memory()
+    agent = fresh_openai_hf_agent()
     corpus = openai_hf_text()
-    agent = Agent(store=store)
     ds = None
     if use_llm:
         cfg = load_config()

@@ -19,15 +19,13 @@ RagGenerator = Callable[[str, list[str]], str]
 
 _TOKEN = re.compile(r"[a-zA-Zа-яА-ЯёЁ0-9_]+", re.UNICODE)
 
-RAG_SYSTEM = """Ты — классический RAG-ассистент поверх векторного поиска.
-Используй фрагменты корпуса как основной источник. Если фрагментов недостаточно —
-можно опираться на общие знания, но помечай это явно.
-Отвечай по-русски кратко."""
-
-RAG_SYSTEM_STRICT = """Ты отвечаешь ТОЛЬКО по приведённым фрагментам корпуса.
+RAG_SYSTEM = """Ты отвечаешь ТОЛЬКО по приведённым фрагментам корпуса.
 Если во фрагментах нет ответа — ответь ровно: неизвестно
 Если вопрос просит перечислить факты — перечисли ВСЕ факты из фрагментов, кратко, по пунктам.
-Запрещено выдумывать факты. Не используй внешние знания. Отвечай по-русски кратко."""
+Запрещено выдумывать факты. Не используй внешние знания и не восполняй пробелы
+общими знаниями, даже если они кажутся очевидными. Отвечай по-русски кратко."""
+
+RAG_SYSTEM_STRICT = RAG_SYSTEM
 
 
 @dataclass
@@ -49,7 +47,7 @@ class VanillaRAG:
         top_k: int = 8,
         deepseek: DeepSeekConfig | None = None,
         chat_client: Any | None = None,
-        strict: bool = False,
+        strict: bool = True,
         generator: RagGenerator | None = None,
         embedder: RagEmbedder | None = None,
         persist_path: str | Path | None = None,
@@ -73,7 +71,9 @@ class VanillaRAG:
             "scripted" if generator is not None else ("llm" if self.client is not None else "extractive")
         )
         self.backend = f"{answerer}+faiss:{self.embedder.name}"
-        self.system_prompt = RAG_SYSTEM_STRICT if strict else RAG_SYSTEM
+        # Generation is always closed-world; `strict` remains in the signature.
+        self.strict = True
+        self.system_prompt = RAG_SYSTEM
 
     def ask(
         self,

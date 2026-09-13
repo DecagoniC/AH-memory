@@ -4,32 +4,87 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AH Memory</title>
+  <meta name="theme-color" content="#F5F5F7" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
   <style>
     :root {
-      --bg: #0f1419;
-      --panel: #1a222c;
-      --line: #2c3a47;
-      --text: #e7eef5;
-      --muted: #8aa0b4;
-      --accent: #3d9c84;
-      --accent2: #c4a35a;
-      --user: #243041;
-      --bot: #1e2a24;
+      color-scheme: light;
+      --bg: #F5F5F7;
+      --surface: #FFFFFF;
+      --surface-alt: #F5F5F7;
+      --fill: #E8E8ED;
+      --fill-hover: #DEDEE3;
+      --line: #D2D2D7;
+      --text: #1D1D1F;
+      --muted: #6E6E73;
+      --accent: #0071E3;
+      --accent-hover: #0077ED;
+      --on-accent: #FFFFFF;
+      --user: #0071E3;
+      --on-user: #FFFFFF;
+      --bot: #E8E8ED;
+      --on-bot: #1D1D1F;
+      --ring: #0071E3;
+      --destructive: #FF3B30;
+      --tau: #0071E3;
+      --code: #F5F5F7;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --header-h: 56px;
+      --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --dur: 200ms;
+      --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --bg: #000000;
+        --surface: #1C1C1E;
+        --surface-alt: #000000;
+        --fill: #3A3A3C;
+        --fill-hover: #48484A;
+        --line: #38383A;
+        --text: #F5F5F7;
+        --muted: #98989D;
+        --accent: #0A84FF;
+        --accent-hover: #409CFF;
+        --on-accent: #FFFFFF;
+        --user: #0A84FF;
+        --on-user: #FFFFFF;
+        --bot: #2C2C2E;
+        --on-bot: #F5F5F7;
+        --ring: #0A84FF;
+        --destructive: #FF453A;
+        --tau: #0A84FF;
+        --code: #000000;
+      }
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
+    html { scroll-padding-top: var(--header-h); }
     body {
-      font-family: "Segoe UI", "IBM Plex Sans", system-ui, sans-serif;
-      background: radial-gradient(1200px 600px at 10% -10%, #1c2b28 0%, transparent 50%),
-                  radial-gradient(900px 500px at 100% 0%, #2a2430 0%, transparent 45%),
-                  var(--bg);
+      font-family: var(--font);
+      background: var(--bg);
       color: var(--text);
+      font-size: 15px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.011em;
     }
     .layout {
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: var(--header-h) 1fr;
       height: 100%;
       gap: 0;
     }
@@ -37,53 +92,76 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 12px;
-      padding: 14px 18px;
+      gap: 8px 16px;
+      min-height: var(--header-h);
+      padding: 0 20px;
       border-bottom: 1px solid var(--line);
-      background: rgba(15,20,25,.85);
-      backdrop-filter: blur(8px);
+      background: var(--surface);
+    }
+    header .brand {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1px;
+      min-width: 0;
+      flex: 1;
     }
     header h1 {
-      font-size: 1.1rem;
-      font-weight: 650;
-      letter-spacing: .02em;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.022em;
       margin: 0;
+      line-height: 1.2;
     }
-    header .meta { color: var(--muted); font-size: .85rem; flex: 1; min-width: 160px; }
+    header .meta {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
     .llm-switch {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
     .llm-switch .label {
-      font-size: .75rem;
-      text-transform: uppercase;
-      letter-spacing: .06em;
+      font-size: 12px;
+      font-weight: 500;
       color: var(--muted);
     }
     .llm-switch .seg {
       display: inline-flex;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      overflow: hidden;
-      background: #121920;
+      padding: 2px;
+      border-radius: 9px;
+      background: var(--fill);
+      gap: 2px;
     }
     .llm-switch .seg button {
-      min-height: 36px;
+      min-height: 32px;
       padding: 0 12px;
-      border: none;
-      border-radius: 0;
+      border: 1px solid transparent;
+      border-radius: 7px;
       background: transparent;
-      color: var(--muted);
-      font-size: .8rem;
-      font-weight: 650;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
     }
-    .llm-switch .seg button + button { border-left: 1px solid var(--line); }
     .llm-switch .seg button.active {
-      background: var(--accent);
-      color: #06120e;
-      outline: none;
+      background: var(--surface);
+      border-color: var(--line);
+      color: var(--text);
+      font-weight: 600;
+    }
+    .llm-switch .seg button:hover:not(:disabled):not(.active) {
+      background: var(--fill-hover);
+    }
+    .llm-switch .seg button.active:hover:not(:disabled) {
+      background: var(--surface);
     }
     .llm-switch .seg button:disabled {
       opacity: .35;
@@ -96,6 +174,20 @@
       margin-left: auto;
       flex-wrap: wrap;
     }
+    .llm-switch select#ollamaModel {
+      min-height: 36px;
+      max-width: 180px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+    }
+    .llm-switch select#ollamaModel:disabled {
+      opacity: .35;
+    }
     .main {
       display: grid;
       grid-template-columns: 1fr;
@@ -106,7 +198,7 @@
       min-height: 0;
       display: flex;
       flex-direction: column;
-      background: rgba(26,34,44,.72);
+      background: var(--surface);
     }
     .chat {
       min-width: 0;
@@ -138,7 +230,7 @@
     .drawer .trace-wrap,
     .drawer .graph-wrap {
       height: 100%;
-      background: var(--panel);
+      background: var(--surface);
     }
     .drawer-head {
       display: flex;
@@ -159,17 +251,17 @@
       color: var(--text);
     }
     .pane-title {
-      padding: 10px 14px;
-      font-size: .8rem;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--muted);
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
       border-bottom: 1px solid var(--line);
     }
     #log {
       flex: 1;
       overflow: auto;
-      padding: 14px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -181,10 +273,28 @@
       line-height: 1.4;
       white-space: pre-wrap;
       word-break: break-word;
+      font-size: 15px;
     }
-    .msg.user { align-self: flex-end; background: var(--user); border: 1px solid var(--line); }
-    .msg.bot { align-self: flex-start; background: var(--bot); border: 1px solid #2f4a40; }
-    .msg .tag { display:block; font-size:.72rem; color: var(--muted); margin-bottom: 4px; }
+    .msg.user {
+      align-self: flex-end;
+      background: var(--user);
+      color: var(--on-user);
+      border-bottom-right-radius: 6px;
+    }
+    .msg.user .tag { color: rgba(255, 255, 255, 0.72); }
+    .msg.bot {
+      align-self: flex-start;
+      background: var(--bot);
+      color: var(--on-bot);
+      border-bottom-left-radius: 6px;
+    }
+    .msg .tag {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
     .msg .body { display: block; }
     .msg-actions {
       display: flex;
@@ -195,23 +305,26 @@
     .msg-actions button {
       min-height: 32px;
       padding: 0 10px;
-      font-size: .75rem;
-      font-weight: 600;
-      background: #2a3a48;
-      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--surface);
+      color: var(--text);
     }
-    .msg-actions button:hover { color: var(--text); }
-    .msg-actions button.open { color: var(--accent2); outline: 1px solid var(--accent2); }
+    .msg-actions button:hover { background: var(--fill-hover); }
+    .msg-actions button.open {
+      color: var(--accent);
+      background: var(--surface);
+    }
     .prompt-panel {
       display: none;
       margin-top: 8px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: #0c1218;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--code);
       border: 1px solid var(--line);
-      color: #b7c7d6;
-      font-size: .72rem;
-      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      color: var(--text);
+      font-size: 12px;
+      font-family: var(--font-mono);
       white-space: pre-wrap;
       word-break: break-word;
       max-height: min(70vh, 900px);
@@ -221,47 +334,53 @@
     #traceView {
       flex: 1;
       overflow: auto;
-      padding: 10px 12px;
-      font-size: .78rem;
-      line-height: 1.45;
-      color: #c5d3e3;
+      padding: 12px 16px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text);
     }
     #traceView .phase {
-      margin-bottom: 12px;
-      padding-bottom: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--line);
     }
     #traceView .phase h3 {
-      margin: 0 0 6px;
-      font-size: .72rem;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--accent2);
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--muted);
     }
     #traceView .tick {
-      margin: 6px 0;
-      padding: 6px 8px;
-      border-radius: 8px;
-      background: #12181f;
+      margin: 8px 0;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
       border: 1px solid var(--line);
     }
-    #traceView .tick .tau { color: var(--accent); font-weight: 650; }
-    #traceView code {
-      font-family: ui-monospace, Consolas, monospace;
-      font-size: .72rem;
-      color: #9ec5ff;
+    #traceView .tick .tau { color: var(--tau); font-weight: 600; }
+    #traceView code,
+    code.uid {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--fill);
+      padding: 1px 6px;
+      border-radius: 6px;
     }
-    #traceView .muted { color: var(--muted); }
-    #traceView .empty { color: var(--muted); padding: 12px 0; }
+    code.uid { cursor: pointer; }
+    #traceView .muted, .muted { color: var(--muted); }
+    #traceView .empty { color: var(--muted); padding: 16px 0; }
     #traceView ol.chains {
       margin: 4px 0 8px 1.1rem;
       padding: 0;
     }
     #traceView .chain-line {
       margin: 3px 0;
-      font-family: ui-monospace, Consolas, monospace;
-      font-size: .72rem;
-      color: #d7e6f7;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text);
       white-space: pre-wrap;
       word-break: break-word;
     }
@@ -269,8 +388,9 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       gap: 10px;
-      padding: 12px;
+      padding: 12px 16px 16px;
       border-top: 1px solid var(--line);
+      background: var(--surface);
     }
     .composer textarea {
       box-sizing: border-box;
@@ -278,12 +398,20 @@
       resize: none;
       min-height: 64px;
       max-height: 140px;
-      border-radius: 10px;
+      border-radius: var(--radius-md);
       border: 1px solid var(--line);
-      background: #12181f;
+      background: var(--surface-alt);
       color: var(--text);
-      padding: 10px 12px;
+      padding: 10px 14px;
       font: inherit;
+      font-size: 15px;
+    }
+    .composer textarea::placeholder {
+      color: var(--muted);
+    }
+    .composer textarea:focus {
+      border-color: var(--accent);
+      background: var(--surface);
     }
     .composer-actions {
       display: flex;
@@ -295,63 +423,86 @@
     .compare-group {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: rgba(255,255,255,.025);
+      gap: 2px;
+      padding: 2px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--fill);
     }
     .compare-label {
-      padding: 0 5px;
+      padding: 0 8px;
       color: var(--muted);
-      font-size: .75rem;
+      font-size: 12px;
+      font-weight: 500;
       white-space: nowrap;
     }
     button {
       border: 0;
-      border-radius: 10px;
+      border-radius: 980px;
       padding: 0 16px;
       background: var(--accent);
-      color: #04140f;
-      font-weight: 650;
+      color: var(--on-accent);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
-      min-height: 44px;
+      min-height: 36px;
+      transition: background var(--dur) var(--ease), color var(--dur) var(--ease), opacity var(--dur) var(--ease);
     }
-    button.secondary { background: #334155; color: var(--text); }
+    button:hover:not(:disabled) { background: var(--accent-hover); }
+    button.secondary {
+      background: var(--fill);
+      color: var(--text);
+    }
+    button.secondary:hover:not(:disabled) { background: var(--fill-hover); }
     button.compare-btn {
-      background: var(--accent2);
-      color: #1a1408;
+      background: transparent;
+      color: var(--text);
       min-width: 82px;
-      min-height: 38px;
+      min-height: 32px;
       padding: 0 12px;
+      font-weight: 500;
+      border-radius: 7px;
     }
+    button.compare-btn:hover:not(:disabled) { background: var(--surface); }
     @media (max-width: 720px) {
       .composer-actions #send {
         width: 100%;
         margin-right: 0;
+        min-height: 44px;
       }
       .compare-group {
         flex: 1;
         justify-content: flex-end;
       }
+      button, .llm-switch .seg button, .toolbar button {
+        min-height: 44px;
+      }
     }
-    button:disabled { opacity: .5; cursor: wait; }
+    button:disabled { opacity: .45; cursor: wait; }
     #network, #networkTrace {
       flex: 1;
       min-height: 320px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.04), transparent),
-        #151c26;
+      background: var(--surface-alt);
     }
     #networkTrace { display: none; }
+    .empty-graph {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--muted);
+      font-size: 15px;
+    }
     #graphSelect, #graphName {
-      background: #12181f;
+      background: var(--surface);
       color: var(--text);
       border: 1px solid var(--line);
-      border-radius: 10px;
+      border-radius: 9px;
       min-height: 36px;
       padding: 0 10px;
       font: inherit;
+      font-size: 13px;
     }
     #graphSelect { min-width: 180px; max-width: 260px; }
     #graphName { width: 150px; }
@@ -369,14 +520,17 @@
       border-radius: 0;
       min-height: 40px;
       padding: 8px 14px;
-      font-size: .78rem;
-      text-transform: uppercase;
-      letter-spacing: .06em;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .graph-tabs button:hover:not(:disabled) {
+      background: transparent;
+      color: var(--text);
     }
     .graph-tabs button.active {
-      color: var(--accent2);
-      border-bottom-color: var(--accent2);
-      outline: none;
+      color: var(--text);
+      border-bottom-color: var(--text);
+      font-weight: 600;
     }
     #traceGraphEmpty {
       display: none;
@@ -384,24 +538,58 @@
       align-items: center;
       justify-content: center;
       color: var(--muted);
-      font-size: .9rem;
+      font-size: 15px;
       padding: 24px;
       text-align: center;
     }
     .toolbar {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 8px;
-      padding: 8px 12px;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--line);
     }
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .toolbar button.secondary.active {
+      background: var(--text);
+      color: var(--surface);
+    }
     .legend {
-      padding: 8px 12px;
-      font-size: .78rem;
-      color: #c5d3e3;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--text);
       border-bottom: 1px solid var(--line);
       line-height: 1.45;
     }
+    .legend > summary {
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      list-style: none;
+    }
+    .legend > summary::-webkit-details-marker { display: none; }
+    .legend > summary::after {
+      content: "";
+      float: right;
+      width: 7px;
+      height: 7px;
+      margin-top: 5px;
+      border-right: 1.5px solid var(--muted);
+      border-bottom: 1.5px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform var(--dur) var(--ease);
+    }
+    .legend[open] > summary::after {
+      transform: rotate(-135deg);
+      margin-top: 8px;
+    }
+    .legend[open] > summary { margin-bottom: 10px; }
     .legend-grid {
       display: flex;
       flex-wrap: wrap;
@@ -413,38 +601,61 @@
       align-items: center;
       gap: 6px;
       white-space: nowrap;
+      color: var(--muted);
     }
     .swatch {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       border-radius: 3px;
-      border: 1px solid rgba(255,255,255,.45);
+      border: 1px solid var(--line);
       flex-shrink: 0;
     }
     .swatch.round { border-radius: 50%; }
-    .swatch.box { border-radius: 2px; width: 14px; height: 10px; }
+    .swatch.box { border-radius: 2px; width: 12px; height: 10px; }
     .legend-note {
-      margin-top: 6px;
+      margin-top: 8px;
       color: var(--muted);
-      font-size: .72rem;
+      font-size: 12px;
     }
-    button.active { outline: 2px solid var(--accent2); }
+    button:focus { outline: none; }
+    button:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    input:focus-visible,
+    code.uid:focus-visible {
+      outline: 3px solid var(--ring);
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="layout">
     <header>
-      <h1>AH Memory</h1>
-      <span class="meta" id="health">загрузка…</span>
+      <div class="brand">
+        <h1>AH Memory</h1>
+        <span class="meta" id="health">загрузка…</span>
+      </div>
       <div class="header-actions">
         <button type="button" class="secondary" id="openTrace" title="Трассировка активации">Трасса</button>
         <button type="button" class="secondary" id="openGraph" title="Граф АГ-памяти">Граф</button>
         <div class="llm-switch" title="Провайдер LLM для восприятия и диалога">
           <span class="label">LLM</span>
-          <div class="seg">
-            <button type="button" id="llmGiga" data-provider="gigachat">GigaChat</button>
-            <button type="button" id="llmDeep" data-provider="deepseek">DeepSeek</button>
+          <div class="seg" role="group" aria-label="Провайдер LLM">
+            <button type="button" id="llmGiga" data-provider="gigachat" aria-pressed="false">GigaChat</button>
+            <button type="button" id="llmDeep" data-provider="deepseek" aria-pressed="false">DeepSeek</button>
+            <button type="button" id="llmOllama" data-provider="ollama" aria-pressed="false">Ollama</button>
           </div>
+          <select id="ollamaModel" title="Модель Ollama" aria-label="Модель Ollama" disabled>
+            <option value="">модель…</option>
+          </select>
         </div>
       </div>
     </header>
@@ -455,8 +666,8 @@
         <div class="composer">
           <textarea id="input" placeholder="Факт или вопрос…"></textarea>
           <div class="composer-actions">
-            <button id="send">Отправить</button>
-            <button class="secondary" id="runM4">M4</button>
+            <button type="button" id="send">Отправить</button>
+            <button type="button" class="secondary" id="runM4">M4</button>
             <div class="compare-group" aria-label="Режим сравнения">
               <span class="compare-label">Сравнить</span>
               <button type="button" class="compare-btn" id="compareRaw" title="Без LLM-генерации ответа; perception остаётся общим с чатом">Без LLM-генерации</button>
@@ -484,25 +695,30 @@
         <div class="pane-title">Дамп графа АГ-памяти</div>
         <button type="button" class="drawer-close" id="closeGraph">Закрыть</button>
       </div>
-        <div class="graph-tabs">
-          <button type="button" class="active" id="tabGraph">Граф</button>
-          <button type="button" id="tabTraceGraph">Трассировка (w)</button>
+        <div class="graph-tabs" role="tablist" aria-label="Вид графа">
+          <button type="button" class="active" id="tabGraph" role="tab" aria-selected="true">Граф</button>
+          <button type="button" id="tabTraceGraph" role="tab" aria-selected="false">Трассировка (w)</button>
         </div>
         <div class="toolbar" id="graphToolbar">
-          <button class="secondary" id="refresh">Обновить</button>
-          <button class="secondary" id="modeHyper">Гиперрёбра</button>
-          <button class="secondary" id="modeAll">Все связи</button>
-          <button class="secondary" id="expandS" title="Показать все словоформы TEXT у узлов S">Формы S</button>
-          <button class="secondary" id="dump">JSON</button>
-          <button class="secondary" id="reset">Сброс</button>
-          <select id="graphSelect" title="Сохранённые графы">
-            <option value="">библиотека графов…</option>
-          </select>
-          <input id="graphName" type="text" placeholder="имя графа" />
-          <button class="secondary" id="graphSave">Сохранить</button>
-          <button class="secondary" id="graphLoad">Загрузить</button>
+          <div class="toolbar-row">
+            <button type="button" class="secondary" id="refresh">Обновить</button>
+            <button type="button" class="secondary" id="modeHyper">Гиперрёбра</button>
+            <button type="button" class="secondary" id="modeAll">Все связи</button>
+            <button type="button" class="secondary" id="expandS" title="Показать все словоформы TEXT у узлов S">Формы S</button>
+            <button type="button" class="secondary" id="dump">JSON</button>
+            <button type="button" class="secondary" id="reset">Сброс</button>
+          </div>
+          <div class="toolbar-row">
+            <select id="graphSelect" title="Сохранённые графы">
+              <option value="">библиотека графов…</option>
+            </select>
+            <input id="graphName" type="text" placeholder="имя графа" />
+            <button type="button" class="secondary" id="graphSave">Сохранить</button>
+            <button type="button" class="secondary" id="graphLoad">Загрузить</button>
+          </div>
         </div>
-        <div class="legend" id="legend">
+        <details class="legend" id="legend">
+          <summary>Легенда графа</summary>
           <div class="legend-grid">
             <span class="legend-item"><span class="swatch round" style="background:#4f8cff"></span>S — лексика (1-й порядок)</span>
             <span class="legend-item"><span class="swatch" style="background:#1ec9a8"></span>C — общий мир (знания/m)</span>
@@ -523,7 +739,7 @@
             <span class="legend-item"><span class="swatch" style="background:#c5d0de"></span>L — бинарные связи</span>
           </div>
           <div class="legend-note">Гиперребро N — n-арный факт: жёлтый хаб + цветные роли + пунктирный mesh между всеми актантами одной микротемы. ASSOC-mesh также пишется в L. Кнопка «Формы S» разворачивает все словоформы TEXT; клик по синему узлу — только этот S.</div>
-        </div>
+        </details>
         <div class="legend" id="traceGraphLegend" style="display:none">
           Подграф активации: рёбра подписаны типом и силой <code>w</code>. Источник — seeds / WM / цепочки последнего хода.
         </div>
@@ -819,18 +1035,75 @@
       const j = await r.json();
       const llm = j.llm_configured
         ? `${j.llm_provider}:${j.model}`
-        : `${j.llm_provider || "?"} (нет ключа)`;
+        : `${j.llm_provider || "?"} (не готов)`;
       document.getElementById("health").textContent =
         `${j.version || "?"} · ${llm} · RAG=${j.rag_backend || "?"} · corpus=${j.corpus_chars ?? "?"} · preload=${j.preload} · |S|=${j["|S|"] ?? "?"} · τ=${j.tau}`;
       const gigaBtn = document.getElementById("llmGiga");
       const deepBtn = document.getElementById("llmDeep");
+      const ollamaBtn = document.getElementById("llmOllama");
+      const ollamaSelect = document.getElementById("ollamaModel");
       const prov = j.providers || {};
       gigaBtn.disabled = !(prov.gigachat && prov.gigachat.configured);
       deepBtn.disabled = !(prov.deepseek && prov.deepseek.configured);
+      ollamaBtn.disabled = !(prov.ollama && prov.ollama.configured);
       gigaBtn.classList.toggle("active", j.llm_provider === "gigachat");
       deepBtn.classList.toggle("active", j.llm_provider === "deepseek");
+      ollamaBtn.classList.toggle("active", j.llm_provider === "ollama");
+      gigaBtn.setAttribute("aria-pressed", String(j.llm_provider === "gigachat"));
+      deepBtn.setAttribute("aria-pressed", String(j.llm_provider === "deepseek"));
+      ollamaBtn.setAttribute("aria-pressed", String(j.llm_provider === "ollama"));
       gigaBtn.title = prov.gigachat?.model || "GigaChat";
       deepBtn.title = prov.deepseek?.model || "DeepSeek";
+      ollamaBtn.title = prov.ollama?.model || "Ollama";
+      await refreshOllamaModels(j);
+    }
+
+    async function refreshOllamaModels(health) {
+      const select = document.getElementById("ollamaModel");
+      const ollamaReady = !!(health?.providers?.ollama?.configured);
+      const active = health?.llm_provider === "ollama";
+      select.disabled = !ollamaReady;
+      if (!ollamaReady) {
+        select.innerHTML = '<option value="">Ollama offline</option>';
+        return;
+      }
+      try {
+        const r = await fetch("/api/ollama/models");
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(j.detail || "models failed");
+        const models = j.chat_models || j.models || [];
+        const current = j.current || health?.providers?.ollama?.model || "";
+        select.innerHTML = "";
+        if (!models.length) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "нет моделей";
+          select.appendChild(opt);
+          return;
+        }
+        for (const item of models) {
+          const name = item.name || item;
+          const opt = document.createElement("option");
+          opt.value = name;
+          const gb = item.size ? ` (${(item.size / 1e9).toFixed(1)}GB)` : "";
+          opt.textContent = `${name}${gb}`;
+          if (name === current || name === `${current}:latest` || current === `${name}:latest`) {
+            opt.selected = true;
+          }
+          select.appendChild(opt);
+        }
+        if (current && ![...select.options].some((o) => o.value === current)) {
+          const opt = document.createElement("option");
+          opt.value = current;
+          opt.textContent = current;
+          opt.selected = true;
+          select.prepend(opt);
+        }
+        select.disabled = false;
+      } catch (e) {
+        select.innerHTML = `<option value="">ошибка списка</option>`;
+        select.disabled = true;
+      }
     }
 
     async function setLlmProvider(provider) {
@@ -844,14 +1117,35 @@
       await loadHealth();
     }
 
+    async function setOllamaModel(model) {
+      const r = await fetch("/api/ollama/model", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.detail || "model switch failed");
+      await loadHealth();
+    }
+
+    function isDarkTheme() {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+
+    function canvasInk() {
+      return isDarkTheme()
+        ? { fill: "#F5F5F7", stroke: "#000000", muted: "#98989D", frame: "#6E6E73" }
+        : { fill: "#1D1D1F", stroke: "#F5F5F7", muted: "#6E6E73", frame: "#86868B" };
+    }
+
     function labelFont(color = "#ffffff", size = 12) {
       return {
         color,
         size,
-        face: "Segoe UI",
+        face: "Inter",
         bold: true,
-        strokeWidth: 5,
-        strokeColor: "#05080c",
+        strokeWidth: 4,
+        strokeColor: isDarkTheme() ? "#000000" : "#1D1D1F",
         multi: true,
       };
     }
@@ -928,9 +1222,9 @@
           shape: "box",
           size: 28 + Math.min(10, act * 12),
           font: {
-            color: "#0b1020",
+            color: "#1D1D1F",
             size: 12,
-            face: "Segoe UI",
+            face: "Inter",
             bold: true,
             multi: true,
             strokeWidth: 0,
@@ -944,7 +1238,7 @@
               },
           borderWidth: hi ? 3 : 3,
           margin: 10,
-          shadow: { enabled: true, color: "rgba(0,0,0,0.55)", size: 8, x: 0, y: 2 },
+          shadow: { enabled: false },
         };
       }
       if (n.kind === "template") {
@@ -955,7 +1249,7 @@
           color: { background: "#7b5cff", border: "#ffffff" },
           font: labelFont("#ffffff", 11),
           borderWidth: 2,
-          shadow: { enabled: true, color: "rgba(0,0,0,0.5)", size: 6, x: 0, y: 2 },
+          shadow: { enabled: false },
         };
       }
       const colors = {
@@ -988,7 +1282,7 @@
         },
         margin: sOpen ? 8 : 2,
         widthConstraint: sOpen ? { maximum: 240 } : false,
-        shadow: { enabled: true, color: "rgba(0,0,0,0.45)", size: 6, x: 0, y: 2 },
+        shadow: { enabled: false },
       };
     }
 
@@ -1065,19 +1359,20 @@
           if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         });
         ctx.closePath();
-        ctx.fillStyle = nAct >= 3 ? "rgba(255, 229, 102, 0.22)" : "rgba(255, 229, 102, 0.12)";
-        ctx.strokeStyle = "rgba(255, 229, 102, 0.9)";
-        ctx.lineWidth = nAct >= 3 ? 3.2 : 2.2;
+        ctx.fillStyle = nAct >= 3 ? "rgba(255, 204, 0, 0.14)" : "rgba(255, 204, 0, 0.08)";
+        ctx.strokeStyle = "rgba(180, 140, 0, 0.85)";
+        ctx.lineWidth = nAct >= 3 ? 2 : 1.5;
         ctx.setLineDash([6, 4]);
         ctx.fill();
         ctx.stroke();
         ctx.setLineDash([]);
         const text = "⟦" + (he.predicate || "") + "⟧ n=" + nAct;
-        ctx.font = "bold 13px Segoe UI";
+        const ink = canvasInk();
+        ctx.font = "600 13px Inter, sans-serif";
         ctx.lineWidth = 4;
-        ctx.strokeStyle = "#05080c";
+        ctx.strokeStyle = ink.stroke;
         ctx.strokeText(text, cx - 28, cy - 8);
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = ink.fill;
         ctx.fillText(text, cx - 28, cy - 8);
       }
     }
@@ -1098,18 +1393,19 @@
         const pad = c.isolated ? 18 : 46;
         ctx.save();
         ctx.setLineDash(c.isolated ? [3, 5] : [12, 10]);
-        ctx.strokeStyle = c.isolated ? "rgba(120,140,160,0.35)" : "rgba(154, 200, 255, 0.55)";
-        ctx.lineWidth = c.isolated ? 1.2 : 2;
+        const ink = canvasInk();
+        ctx.strokeStyle = c.isolated ? ink.muted : ink.frame;
+        ctx.lineWidth = c.isolated ? 1 : 1.5;
         ctx.strokeRect(minX - pad, minY - pad, maxX - minX + 2 * pad, maxY - minY + 2 * pad);
         ctx.setLineDash([]);
         const label = c.isolated
           ? `изолированные ×${c.ids.length}`
           : `CC${c.idx} · ${c.ids.length} узлов`;
-        ctx.font = "bold 12px Segoe UI";
+        ctx.font = "600 12px Inter, sans-serif";
         ctx.lineWidth = 3;
-        ctx.strokeStyle = "#05080c";
+        ctx.strokeStyle = ink.stroke;
         ctx.strokeText(label, minX - pad, minY - pad - 6);
-        ctx.fillStyle = c.isolated ? "#8aa0b4" : "#9ec5ff";
+        ctx.fillStyle = c.isolated ? ink.muted : ink.fill;
         ctx.fillText(label, minX - pad, minY - pad - 6);
         ctx.restore();
       }
@@ -1269,7 +1565,7 @@
         ...base,
         label: weightLabel(e),
         width: Math.max(1.5, 1 + w * 4),
-        font: labelFont("#ffe8a0", 11),
+        font: labelFont("#ffffff", 11),
         color: {
           ...(base.color || {}),
           color: e.kind === "binary"
@@ -1285,6 +1581,8 @@
       const isGraph = pane === "graph";
       document.getElementById("tabGraph").classList.toggle("active", isGraph);
       document.getElementById("tabTraceGraph").classList.toggle("active", !isGraph);
+      document.getElementById("tabGraph").setAttribute("aria-selected", String(isGraph));
+      document.getElementById("tabTraceGraph").setAttribute("aria-selected", String(!isGraph));
       document.getElementById("graphToolbar").style.display = isGraph ? "flex" : "none";
       document.getElementById("legend").style.display = isGraph ? "block" : "none";
       document.getElementById("traceGraphLegend").style.display = isGraph ? "none" : "block";
@@ -1367,7 +1665,7 @@
             stabilization: { enabled: true, iterations: 80, fit: true },
           },
           edges: {
-            font: { size: 11, multi: true, strokeWidth: 3, strokeColor: "#05080c" },
+            font: { size: 11, face: "Inter", multi: true, strokeWidth: 3, strokeColor: isDarkTheme() ? "#000000" : "#F5F5F7" },
             selectionWidth: 2,
           },
           interaction: { hover: true, tooltipDelay: 60 },
@@ -1397,7 +1695,7 @@
         lastGraphData = { nodes: [], edges: [], hyperedges: [], stats: data.stats };
         h.textContent = `${base} · |S|=${data.stats.S} N=${data.stats.hyperedges} graph=${data.stats.graph_size}`;
         container.innerHTML =
-          '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#8aa0b4;font-size:0.95rem;">граф пуст</div>';
+          '<div class="empty-graph">граф пуст</div>';
         if (graphPane === "trace") renderTraceGraph();
         return;
       }
@@ -1462,6 +1760,116 @@
       });
     }
 
+    const STREAM_PHASE = {
+      perception: "восприятие…",
+      activation: "активация…",
+      reply: "ответ…",
+      ingest: "запись в память…",
+    };
+
+    function startBotStream() {
+      const el = document.createElement("div");
+      el.className = "msg bot";
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = "streaming…";
+      el.appendChild(tag);
+      const body = document.createElement("div");
+      body.className = "body";
+      body.textContent = "";
+      el.appendChild(body);
+      log.appendChild(el);
+      log.scrollTop = log.scrollHeight;
+      return {
+        setStatus(phase) {
+          tag.textContent = STREAM_PHASE[phase] || phase || "…";
+        },
+        appendToken(text) {
+          body.textContent += text;
+          log.scrollTop = log.scrollHeight;
+        },
+        fail(err) {
+          tag.textContent = "error";
+          body.textContent = String(err);
+        },
+        finish(j) {
+          tag.textContent = `${j.kind} · ${j.backend} · userN=${(j.user_facts||[]).length} asstN=${(j.assistant_facts||[]).length} · WM=${(j.wm||[]).length}`;
+          if (j.reply != null && j.reply !== "") body.textContent = j.reply;
+          const extras = {
+            systemPrompt: j.system_prompt || "",
+            activation: j.activation || null,
+            graphBuildJson: j.graph_build_json || null,
+          };
+          if (!(extras.systemPrompt || extras.activation || extras.graphBuildJson)) return;
+          const actions = document.createElement("div");
+          actions.className = "msg-actions";
+          el.appendChild(actions);
+          if (extras.systemPrompt) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.textContent = "системный промпт";
+            const panel = document.createElement("pre");
+            panel.className = "prompt-panel";
+            panel.textContent = extras.systemPrompt;
+            btn.addEventListener("click", () => {
+              const open = panel.classList.toggle("show");
+              btn.classList.toggle("open", open);
+              btn.textContent = open ? "скрыть промпт" : "системный промпт";
+            });
+            actions.appendChild(btn);
+            el.appendChild(panel);
+          }
+          if (extras.graphBuildJson) {
+            const btnG = document.createElement("button");
+            btnG.type = "button";
+            btnG.textContent = "JSON графа";
+            const panelG = document.createElement("pre");
+            panelG.className = "prompt-panel";
+            panelG.textContent = JSON.stringify(extras.graphBuildJson, null, 2);
+            btnG.addEventListener("click", () => {
+              const open = panelG.classList.toggle("show");
+              btnG.classList.toggle("open", open);
+              btnG.textContent = open ? "скрыть JSON графа" : "JSON графа";
+            });
+            actions.appendChild(btnG);
+            el.appendChild(panelG);
+          }
+          if (extras.activation) {
+            const btnT = document.createElement("button");
+            btnT.type = "button";
+            btnT.textContent = "показать трассировку";
+            btnT.addEventListener("click", () => {
+              lastActivation = extras.activation;
+              renderActivation(lastActivation);
+              traceView.scrollTop = 0;
+            });
+            actions.appendChild(btnT);
+          }
+        },
+      };
+    }
+
+    async function readSseEvents(response, onEvent) {
+      if (!response.body) throw new Error("no response body");
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const parts = buf.split("\n\n");
+        buf = parts.pop() || "";
+        for (const part of parts) {
+          const lines = part.split("\n");
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            onEvent(JSON.parse(line.slice(6)));
+          }
+        }
+      }
+    }
+
     async function send() {
       const message = input.value.trim();
       if (!message) return;
@@ -1469,23 +1877,35 @@
       addMsg("user", message);
       input.value = "";
       setBusy(true);
+      const stream = startBotStream();
       try {
-        const r = await fetch("/api/chat", {
+        const r = await fetch("/api/chat/stream", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message }),
         });
-        const j = await r.json();
-        if (!r.ok) throw new Error(j.detail || "error");
-        addMsg(
-          "bot",
-          j.reply,
-          `${j.kind} · ${j.backend} · userN=${(j.user_facts||[]).length} asstN=${(j.assistant_facts||[]).length} · WM=${(j.wm||[]).length}`,
-          { systemPrompt: j.system_prompt || "", activation: j.activation || null, graphBuildJson: j.graph_build_json || null }
-        );
-        lastActivation = j.activation || null;
+        if (!r.ok) {
+          let detail = "error";
+          try {
+            const j = await r.json();
+            detail = j.detail || detail;
+          } catch (_) {
+            detail = await r.text();
+          }
+          throw new Error(detail);
+        }
+        let donePayload = null;
+        await readSseEvents(r, (ev) => {
+          if (ev.event === "status") stream.setStatus(ev.phase);
+          else if (ev.event === "token") stream.appendToken(ev.text || "");
+          else if (ev.event === "error") throw new Error(ev.detail || "stream error");
+          else if (ev.event === "done") donePayload = ev;
+        });
+        if (!donePayload) throw new Error("stream ended without done");
+        stream.finish(donePayload);
+        lastActivation = donePayload.activation || null;
         renderActivation(lastActivation);
-        highlight = new Set(j.trace_uids || []);
+        highlight = new Set(donePayload.trace_uids || []);
         await loadHealth();
         if (graphOpen) {
           graphLoaded = false;
@@ -1496,7 +1916,7 @@
           graphLoaded = false;
         }
       } catch (e) {
-        addMsg("bot", String(e), "error");
+        stream.fail(e);
       } finally {
         setBusy(false);
         input.focus();
@@ -1707,6 +2127,21 @@
     document.getElementById("llmDeep").addEventListener("click", async () => {
       try { await setLlmProvider("deepseek"); }
       catch (e) { addMsg("bot", String(e), "error"); }
+    });
+    document.getElementById("llmOllama").addEventListener("click", async () => {
+      try { await setLlmProvider("ollama"); }
+      catch (e) { addMsg("bot", String(e), "error"); }
+    });
+    document.getElementById("ollamaModel").addEventListener("change", async (ev) => {
+      const model = ev.target.value;
+      if (!model) return;
+      try { await setOllamaModel(model); }
+      catch (e) { addMsg("bot", String(e), "error"); await loadHealth(); }
+    });
+
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+      if (graphPane === "trace") renderTraceGraph();
+      else loadGraph();
     });
 
     document.getElementById("openTrace").addEventListener("click", () => {

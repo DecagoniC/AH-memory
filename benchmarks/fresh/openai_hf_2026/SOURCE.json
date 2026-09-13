@@ -1,0 +1,21 @@
+{
+  "title": "The Hugging Face incident and the road ahead",
+  "publisher": "OpenAI",
+  "url": "https://openai.com/index/hugging-face-incident-and-the-road-ahead/",
+  "published": "2026-08-26",
+  "why_fresh": "Published 2026-08-26 with unique entities (IM1, ExploitGym, Artifactory SSRF side channel, Hugging Face HDF5/RefJinja zero-days, Astra pause). Unlikely in pre-2026-08 training corpora.",
+  "domain_variant": "B incident journal / XAI + C taxonomy",
+  "metrics": [
+    "M1",
+    "M2",
+    "M3",
+    "M4"
+  ],
+  "word_count": 4771,
+  "char_count": 31701,
+  "files": {
+    "corpus": "corpus.txt",
+    "m1": "m1_roles.jsonl",
+    "m2_m4": "m2_m4_qa.jsonl"
+  }
+}

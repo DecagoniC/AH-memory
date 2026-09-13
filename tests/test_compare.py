@@ -23,11 +23,11 @@ def test_rag_corpus_does_not_include_graph_dump() -> None:
     store = build_closed_world_memory()
     corpus = build_rag_corpus(source_docs=[source])
     assert "полезные ископаемые" in corpus.lower() or "боксит" in corpus.lower()
-    assert "HAS_MINERAL" not in corpus
+    assert "HAS_RESOURCE" not in corpus
     eng = CompareEngine.from_m4_gold(DeepSeekConfig(api_key=""), ticks=4)
-    assert "HAS_MINERAL" not in eng.rag.corpus
+    assert "HAS_RESOURCE" not in eng.rag.corpus
     assert any(
-        "HAS_MINERAL" in (
+        "HAS_RESOURCE" in (
             f.relation.canonical_label.upper() if f.relation else ""
         )
         for f in store.list_semantic_factors()
@@ -135,6 +135,24 @@ def test_live_compare_reuses_dialogue_ah_prompt_pipeline() -> None:
     assert compared.ah_perception["kind"] == "question"
     assert compared.ah_answer == "единый ответ"
     assert compared.rag_answer == "единый ответ"
+
+
+def test_compare_engine_rebuild_keeps_injected_chat_client() -> None:
+    class RecordingClient:
+        def chat(self, messages, *, json_mode=False) -> str:
+            return "сгенерированный ответ"
+
+    client = RecordingClient()
+    eng = CompareEngine.from_m4_gold(DeepSeekConfig(api_key=""), ticks=4)
+    wired = CompareEngine(
+        eng.agent,
+        ticks=4,
+        chat_client=client,
+        source_docs=list(eng.source_docs),
+    )
+    assert wired.rag.client is client
+    wired.rebuild_rag()
+    assert wired.rag.client is client
 
 
 def test_live_rag_summarizes_multi_fact() -> None:

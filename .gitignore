@@ -1,5 +1,8 @@
 .env
 config.local.yaml
+.ollama/
+tools/OllamaSetup.exe
+tools/ollama/
 __pycache__/
 *.pyc
 .pytest_cache/

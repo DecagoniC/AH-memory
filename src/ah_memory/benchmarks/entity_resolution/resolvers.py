@@ -462,6 +462,29 @@ def make_embed_fn(
         probe = embedder("тест")
         return api_model, embedder, len(probe)
 
+    ollama_names = {"ollama", "nomic-embed-text", "nomic_embed_text"}
+    if name in ollama_names:
+        from ah_memory.config import load_config
+        from ah_memory.ollama import OllamaClient, is_ollama_available
+
+        cfg = load_config()
+        if not is_ollama_available(cfg.ollama):
+            raise RuntimeError(
+                "Ollama is not reachable "
+                f"({cfg.ollama.base_url}) for embedding model {model!r}"
+            )
+        client = OllamaClient(cfg.ollama)
+        api_model = cfg.ollama.embedding_model
+        probe = client.embeddings(["probe"], model=api_model)
+        if not probe or not probe[0]:
+            raise RuntimeError(f"Ollama embedding model {api_model!r} returned an empty vector")
+
+        def embed(text: str, _client=client, _model=api_model) -> list[float]:
+            vectors = _client.embeddings([text], model=_model)
+            return list(vectors[0])
+
+        return api_model, embed, len(probe[0])
+
     if name in {"deterministic_ngram_128", "ngram_128"}:
         dims = 128
         name = "deterministic_ngram_128"
@@ -473,6 +496,7 @@ def make_embed_fn(
     else:
         raise ValueError(
             f"Unknown embedding model {model!r}. "
-            "Use deterministic_ngram | Embeddings | Embeddings-2 | EmbeddingsGigaR"
+            "Use deterministic_ngram | ollama | nomic-embed-text | "
+            "Embeddings | Embeddings-2 | EmbeddingsGigaR"
         )
     return name, (lambda text, d=dims: deterministic_embedding(text, d)), dims

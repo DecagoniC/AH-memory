@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime
-from typing import Any
+from typing import Any, Iterator
 
 from ah_memory.config import GigaChatConfig
 from ah_memory.context_ranker import GraphContextRanker, lexical_relevance, symbol_label
@@ -226,23 +226,65 @@ class DialogueAgent:
         self.last_graph_build_json = {}
 
     def talk(self, user_text: str, ticks: int = 6) -> TurnResult:
+        final: TurnResult | None = None
+        for event in self.talk_stream(user_text, ticks=ticks):
+            if event.get("event") == "done":
+                final = event["turn"]
+        if final is None:
+            raise RuntimeError("dialogue stream ended without a done event")
+        return final
+
+    def talk_stream(self, user_text: str, ticks: int = 6) -> Iterator[dict[str, Any]]:
+        """Yield status/token/done events; final ``done.turn`` is a TurnResult."""
         # Порядок важен: сначала ответить по СТАРОМУ графу, потом ingest реплик
         # (иначе вопрос пользователя уже «загрязняет» контекст ответа).
         user_text = user_text.strip()
         self._turn += 1
         ign = self.agent.ignition
 
-        # This exact read-only path is also used by UI comparison.
-        prepared = self.answer_read_only(user_text, ticks=ticks, generate=True)
+        # Shared read-only path (also used by UI comparison), then stream reply.
+        yield {"event": "status", "phase": "perception"}
+        prepared = self.answer_read_only(user_text, ticks=ticks, generate=False)
         user_perc = prepared.user_perception
         ask = prepared.ask
         ask_ticks = prepared.ask_ticks
         graph_hint = prepared.graph_hint
         mem = prepared.memory_context
-        reply = prepared.reply
-        system_prompt = prepared.system_prompt
-        backend = prepared.backend
 
+        yield {"event": "status", "phase": "reply"}
+        if self.client is not None:
+            messages, system_prompt = self._reply_messages(
+                user_text,
+                mem,
+                graph_hint,
+                ask.full_trace,
+            )
+            stream_fn = getattr(self.client, "chat_stream", None)
+            if callable(stream_fn):
+                chunks: list[str] = []
+                for piece in stream_fn(messages, json_mode=False):
+                    if not piece:
+                        continue
+                    chunks.append(piece)
+                    yield {"event": "token", "text": piece}
+                reply = "".join(chunks).strip()
+            else:
+                reply = self.client.chat(messages, json_mode=False).strip()
+                if reply:
+                    yield {"event": "token", "text": reply}
+            backend = f"{self.provider}+ah"
+        else:
+            reply, system_prompt = self._fallback_reply(
+                user_text,
+                mem,
+                graph_hint,
+                ask.full_trace,
+            )
+            if reply:
+                yield {"event": "token", "text": reply}
+            backend = "rules+ah"
+
+        yield {"event": "status", "phase": "ingest"}
         # 2) Запись user и assistant в Section.H
         i0 = len(ign.traces)
         user_rep = self.agent.ingest(
@@ -334,7 +376,7 @@ class DialogueAgent:
         }
         self.last_activation = activation
         self.last_graph_build_json = graph_build_json
-        return TurnResult(
+        turn = TurnResult(
             reply=reply,
             user_facts=user_rep.created_n,
             assistant_facts=asst_rep.created_n,
@@ -347,6 +389,7 @@ class DialogueAgent:
             graph_build_json=graph_build_json,
             full_trace=full_trace,
         )
+        yield {"event": "done", "turn": turn}
 
     def answer_read_only(
         self,
@@ -793,13 +836,13 @@ class DialogueAgent:
         readable_value = self._label(str(value)) if isinstance(value, str) else value
         return f"{readable_key} = {readable_value}"
 
-    def _llm_reply(
+    def _reply_messages(
         self,
         user_text: str,
         mem: str,
         graph_hint: str,
         prepared_context: dict | None = None,
-    ) -> tuple[str, str]:
+    ) -> tuple[list[dict[str, str]], str]:
         sys_blocks = self._compose_system_blocks(
             mem,
             graph_hint,
@@ -810,6 +853,21 @@ class DialogueAgent:
             {"role": "system", "content": system_content},
             {"role": "user", "content": user_text},
         ]
+        return messages, system_content
+
+    def _llm_reply(
+        self,
+        user_text: str,
+        mem: str,
+        graph_hint: str,
+        prepared_context: dict | None = None,
+    ) -> tuple[str, str]:
+        messages, system_content = self._reply_messages(
+            user_text,
+            mem,
+            graph_hint,
+            prepared_context,
+        )
         reply = self.client.chat(messages, json_mode=False).strip()
         return reply, system_content
 

@@ -3,7 +3,7 @@
   "name": "mini-open",
   "kind": "fixture",
   "created_at": "2026-08-22T02:22:59+03:00",
-  "updated_at": "2026-08-24T09:52:44+03:00",
+  "updated_at": "2026-09-02T22:45:15+03:00",
   "stats": {
     "S": 3,
     "C": 3,
@@ -33,7 +33,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       },
       "KIND": {
         "R": {
@@ -44,7 +44,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       },
       "PLACE": {
         "R": {
@@ -55,7 +55,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       }
     },
     "C": {
@@ -73,7 +73,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       },
       "M_KIND": {
         "type": "M",
@@ -89,7 +89,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       },
       "M_PLACE": {
         "type": "M",
@@ -105,7 +105,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       }
     },
     "P": {},
@@ -131,7 +131,7 @@
         ],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       },
       "EP_2": {
         "type": "M",
@@ -154,7 +154,7 @@
         ],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       }
     },
     "L": {
@@ -171,7 +171,7 @@
           "target_uid": "M_KIND"
         },
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       },
       "L_BIND_00003": {
         "uid": "L_BIND_00003",
@@ -186,7 +186,7 @@
           "target_uid": "ENTITY"
         },
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       },
       "L_MESH_00005": {
         "uid": "L_MESH_00005",
@@ -201,7 +201,7 @@
           "target_uid": "M_PLACE"
         },
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       },
       "L_FOLLOW_00006": {
         "uid": "L_FOLLOW_00006",
@@ -216,7 +216,7 @@
           "target_uid": "EP_2"
         },
         "created_tau": 0,
-        "added_at": "2026-08-24T09:52:44+03:00"
+        "added_at": "2026-09-02T22:45:15+03:00"
       }
     },
     "relations": {
@@ -448,14 +448,12 @@
         "metadata": {
           "event_uid": "E_00001",
           "raw_relation": "IS",
-          "raw_span": null,
           "canonical_relation": "IS",
           "statement_type": "assertion",
           "source": "user",
-          "candidate_metadata": {},
           "context_uid": null,
           "source_variable": "M_ENTITY",
-          "added_at": "2026-08-24T09:52:44+03:00",
+          "added_at": "2026-09-02T22:45:15+03:00",
           "created_tau": 0
         }
       },
@@ -580,14 +578,12 @@
         "metadata": {
           "event_uid": "E_00004",
           "raw_relation": "LIVE_IN",
-          "raw_span": null,
           "canonical_relation": "LIVE_IN",
           "statement_type": "assertion",
           "source": "user",
-          "candidate_metadata": {},
           "context_uid": "M_KIND",
           "source_variable": "M_ENTITY",
-          "added_at": "2026-08-24T09:52:44+03:00",
+          "added_at": "2026-09-02T22:45:15+03:00",
           "created_tau": 0
         }
       }
@@ -667,8 +663,7 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "candidate_metadata": {},
-          "added_at": "2026-08-24T09:52:44+03:00",
+          "added_at": "2026-09-02T22:45:15+03:00",
           "created_tau": 0
         }
       },
@@ -746,8 +741,7 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "candidate_metadata": {},
-          "added_at": "2026-08-24T09:52:44+03:00",
+          "added_at": "2026-09-02T22:45:15+03:00",
           "created_tau": 0
         }
       }

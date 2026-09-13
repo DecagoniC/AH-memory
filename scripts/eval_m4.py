@@ -21,10 +21,26 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--llm", action="store_true", help="RAG answers via DeepSeek if key set")
     ap.add_argument("--ticks", type=int, default=6)
-    ap.add_argument("-o", "--out", type=Path, default=ROOT / "data" / "m4_report.json")
+    ap.add_argument(
+        "--fresh-openai-hf",
+        action="store_true",
+        help="use Aug 2026 OpenAI Hugging Face incident corpus",
+    )
+    ap.add_argument("-o", "--out", type=Path, default=None)
     args = ap.parse_args()
+    if args.out is None:
+        args.out = (
+            ROOT / "data" / "m4_openai_hf_report.json"
+            if args.fresh_openai_hf
+            else ROOT / "data" / "m4_report.json"
+        )
 
-    agent, rag, gold, _ = build_m4_fixture(use_llm=args.llm)
+    if args.fresh_openai_hf:
+        from ah_memory.eval.gold import build_openai_hf_m4_fixture
+
+        agent, rag, gold, _ = build_openai_hf_m4_fixture(use_llm=args.llm)
+    else:
+        agent, rag, gold, _ = build_m4_fixture(use_llm=args.llm)
     print(f"RAG backend: {rag.backend}")
 
     report = evaluate_m4(agent, rag, gold, ticks=args.ticks)

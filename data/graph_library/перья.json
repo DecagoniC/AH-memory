@@ -1,0 +1,658 @@
+{
+  "id": "перья",
+  "name": "перья",
+  "kind": "user",
+  "created_at": "2026-09-13T15:01:44+03:00",
+  "updated_at": "2026-09-13T15:01:44+03:00",
+  "stats": {
+    "S": 5,
+    "C": 4,
+    "P": 0,
+    "H": 0,
+    "L": 8,
+    "hyperedges": 3,
+    "semantic_factors": 3,
+    "relations": 2,
+    "events": 3,
+    "graph_size": 15,
+    "tau": 10
+  },
+  "source_text": "у ворона есть перо\n\nДа, у ворона есть перо.\n\nна письменном столе стоит письменное перо\n\nНеизвестно.",
+  "store": {
+    "format": "ah-store-v1",
+    "tau": 10,
+    "revision": 20,
+    "uid_seq": 11,
+    "S": {
+      "ВОРОН": {
+        "R": {
+          "TEXT": [
+            "ворон"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 2,
+        "added_at": "2026-09-13T15:00:14+03:00"
+      },
+      "ПЕРО": {
+        "R": {
+          "TEXT": [
+            "перо"
+          ]
+        },
+        "x": 0.3266594681343286,
+        "created_tau": 2,
+        "added_at": "2026-09-13T15:00:14+03:00"
+      },
+      "ПИСЬМЕННЫЙ_ПЕРО": {
+        "R": {
+          "TEXT": [
+            "письменный перо"
+          ]
+        },
+        "x": 1.0,
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      },
+      "ПИСЬМЕННЫЙ_СТОЛ": {
+        "R": {
+          "TEXT": [
+            "письменный стол"
+          ]
+        },
+        "x": 1.0,
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      },
+      "СТОЛ": {
+        "R": {
+          "TEXT": [
+            "стол"
+          ]
+        },
+        "x": 0.3371571001261799,
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      }
+    },
+    "C": {
+      "M_ВОРОН": {
+        "type": "M",
+        "uid": "M_ВОРОН",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "ворон",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.0,
+        "created_tau": 2,
+        "added_at": "2026-09-13T15:00:14+03:00"
+      },
+      "M_ПЕРО": {
+        "type": "M",
+        "uid": "M_ПЕРО",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "перо",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 0.1806197873917508,
+        "created_tau": 2,
+        "added_at": "2026-09-13T15:00:14+03:00"
+      },
+      "M_ПИСЬМЕННЫЙ_ПЕРО": {
+        "type": "M",
+        "uid": "M_ПИСЬМЕННЫЙ_ПЕРО",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "письменный перо",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 1.0,
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      },
+      "M_ПИСЬМЕННЫЙ_СТОЛ": {
+        "type": "M",
+        "uid": "M_ПИСЬМЕННЫЙ_СТОЛ",
+        "Pr": [
+          {
+            "name": "label",
+            "value": "письменный стол",
+            "type": "",
+            "unit": ""
+          }
+        ],
+        "Mt": [],
+        "x": 1.0,
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      }
+    },
+    "P": {},
+    "H": {},
+    "L": {
+      "L_BIND_00001": {
+        "uid": "L_BIND_00001",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ВОРОН"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ВОРОН"
+        },
+        "created_tau": 2,
+        "added_at": "2026-09-13T15:00:14+03:00"
+      },
+      "L_BIND_00002": {
+        "uid": "L_BIND_00002",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ПЕРО"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ПЕРО"
+        },
+        "created_tau": 2,
+        "added_at": "2026-09-13T15:00:14+03:00"
+      },
+      "L_MESH_00004": {
+        "uid": "L_MESH_00004",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ВОРОН"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_ПЕРО"
+        },
+        "created_tau": 2,
+        "added_at": "2026-09-13T15:00:14+03:00"
+      },
+      "L_BIND_00006": {
+        "uid": "L_BIND_00006",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ПИСЬМЕННЫЙ_ПЕРО"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ПИСЬМЕННЫЙ_ПЕРО"
+        },
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      },
+      "L_BIND_00007": {
+        "uid": "L_BIND_00007",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ПИСЬМЕННЫЙ_ПЕРО"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ПЕРО"
+        },
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      },
+      "L_BIND_00008": {
+        "uid": "L_BIND_00008",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ПИСЬМЕННЫЙ_СТОЛ"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ПИСЬМЕННЫЙ_СТОЛ"
+        },
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      },
+      "L_BIND_00009": {
+        "uid": "L_BIND_00009",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ПИСЬМЕННЫЙ_СТОЛ"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "СТОЛ"
+        },
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      },
+      "L_MESH_00011": {
+        "uid": "L_MESH_00011",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ПИСЬМЕННЫЙ_ПЕРО"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_ПИСЬМЕННЫЙ_СТОЛ"
+        },
+        "created_tau": 8,
+        "added_at": "2026-09-13T15:01:25+03:00"
+      }
+    },
+    "relations": {
+      "HAS_PART": {
+        "uid": "REL_HAS_PART",
+        "raw_label": "есть",
+        "canonical_label": "HAS_PART",
+        "embedding": null,
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 0.95,
+          "normalization_strategy": "parser_new_relation",
+          "created_by_normalizer": true
+        }
+      },
+      "LOCATED_ON": {
+        "uid": "REL_LOCATED_ON",
+        "raw_label": "стоит",
+        "canonical_label": "LOCATED_ON",
+        "embedding": null,
+        "arity": 2,
+        "properties": {
+          "directional": true,
+          "symmetric": false,
+          "transitive": false,
+          "temporal": false,
+          "causal": false,
+          "state_changing": false
+        },
+        "metadata": {
+          "normalization_confidence": 0.95,
+          "normalization_strategy": "parser_new_relation",
+          "created_by_normalizer": true
+        }
+      }
+    },
+    "semantic_factors": [
+      {
+        "uid": "SF::E_00003",
+        "fid": "SF::E_00003",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_HAS_PART",
+          "raw_label": "есть",
+          "canonical_label": "HAS_PART",
+          "embedding": null,
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.95,
+            "normalization_strategy": "parser_new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_ВОРОН",
+          "M_ПЕРО"
+        ],
+        "roles": {
+          "SUBJECT": "M_ВОРОН",
+          "OBJECT": "M_ПЕРО"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 0.95,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00003",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": null,
+        "metadata": {
+          "event_uid": "E_00003",
+          "raw_relation": "есть",
+          "raw_span": "у ворона есть перо",
+          "canonical_relation": "HAS_PART",
+          "statement_type": "assertion",
+          "source": "user",
+          "candidate_metadata": {},
+          "context_uid": null,
+          "source_variable": "M_ВОРОН",
+          "added_at": "2026-09-13T15:00:14+03:00",
+          "created_tau": 2
+        }
+      },
+      {
+        "uid": "SF::E_00005",
+        "fid": "SF::E_00005",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_HAS_PART",
+          "raw_label": "есть",
+          "canonical_label": "HAS_PART",
+          "embedding": null,
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.95,
+            "normalization_strategy": "parser_new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_ВОРОН",
+          "M_ПЕРО"
+        ],
+        "roles": {
+          "SUBJECT": "M_ВОРОН",
+          "OBJECT": "M_ПЕРО"
+        },
+        "weight": 0.2,
+        "w": 0.2,
+        "confidence": 0.95,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00005",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": null,
+        "metadata": {
+          "event_uid": "E_00005",
+          "raw_relation": "ворон имеет перо",
+          "raw_span": "у ворона есть перо",
+          "canonical_relation": "HAS_PART",
+          "statement_type": "explanation",
+          "source": "assistant",
+          "candidate_metadata": {},
+          "context_uid": "M_ПЕРО",
+          "source_variable": "M_ВОРОН",
+          "added_at": "2026-09-13T15:00:16+03:00",
+          "created_tau": 4
+        }
+      },
+      {
+        "uid": "SF::E_00010",
+        "fid": "SF::E_00010",
+        "kind": "hyper",
+        "relation": {
+          "uid": "REL_LOCATED_ON",
+          "raw_label": "стоит",
+          "canonical_label": "LOCATED_ON",
+          "embedding": null,
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.95,
+            "normalization_strategy": "parser_new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "variables": [
+          "M_ПИСЬМЕННЫЙ_ПЕРО",
+          "M_ПИСЬМЕННЫЙ_СТОЛ",
+          "M_ПЕРО"
+        ],
+        "roles": {
+          "SUBJECT": "M_ПИСЬМЕННЫЙ_ПЕРО",
+          "OBJECT": "M_ПИСЬМЕННЫЙ_СТОЛ"
+        },
+        "weight": 0.5,
+        "w": 0.5,
+        "confidence": 0.95,
+        "activation": 0.0,
+        "link_id": "",
+        "lambda_obs": 0.0,
+        "epsilon": 0.05,
+        "potential_key": "semantic",
+        "source_uid": "E_00010",
+        "parameters": {
+          "transmission_strength": 0.5,
+          "decay": 0.1,
+          "directionality": 0.9,
+          "selectivity": 0.5,
+          "temporal_bias": 0.0,
+          "causal_bias": 0.0,
+          "persistence": 0.5
+        },
+        "embedding": null,
+        "metadata": {
+          "event_uid": "E_00010",
+          "raw_relation": "стоит",
+          "raw_span": "на письменном столе стоит письменное перо",
+          "canonical_relation": "LOCATED_ON",
+          "statement_type": "assertion",
+          "source": "user",
+          "candidate_metadata": {},
+          "context_uid": "M_ПЕРО",
+          "source_variable": "M_ПИСЬМЕННЫЙ_ПЕРО",
+          "added_at": "2026-09-13T15:01:25+03:00",
+          "created_tau": 8
+        }
+      }
+    ],
+    "events": [
+      {
+        "uid": "E_00003",
+        "predicate": {
+          "uid": "REL_HAS_PART",
+          "raw_label": "есть",
+          "canonical_label": "HAS_PART",
+          "embedding": null,
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.95,
+            "normalization_strategy": "parser_new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_ВОРОН",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_ПЕРО",
+            "role": "OBJECT"
+          }
+        },
+        "timestamp": null,
+        "confidence": 0.95,
+        "raw_span": "у ворона есть перо",
+        "metadata": {
+          "raw_relation": "есть",
+          "normalization": "parser_new_relation",
+          "normalization_confidence": 0.95,
+          "statement_type": "assertion",
+          "source": "user",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T15:00:14+03:00",
+          "created_tau": 2
+        }
+      },
+      {
+        "uid": "E_00005",
+        "predicate": {
+          "uid": "REL_HAS_PART",
+          "raw_label": "есть",
+          "canonical_label": "HAS_PART",
+          "embedding": null,
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.95,
+            "normalization_strategy": "parser_new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_ВОРОН",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_ПЕРО",
+            "role": "OBJECT"
+          }
+        },
+        "timestamp": null,
+        "confidence": 0.95,
+        "raw_span": "у ворона есть перо",
+        "metadata": {
+          "raw_relation": "ворон имеет перо",
+          "normalization": "parser_hint",
+          "normalization_confidence": 0.95,
+          "statement_type": "explanation",
+          "source": "assistant",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T15:00:16+03:00",
+          "created_tau": 4
+        }
+      },
+      {
+        "uid": "E_00010",
+        "predicate": {
+          "uid": "REL_LOCATED_ON",
+          "raw_label": "стоит",
+          "canonical_label": "LOCATED_ON",
+          "embedding": null,
+          "arity": 2,
+          "properties": {
+            "directional": true,
+            "symmetric": false,
+            "transitive": false,
+            "temporal": false,
+            "causal": false,
+            "state_changing": false
+          },
+          "metadata": {
+            "normalization_confidence": 0.95,
+            "normalization_strategy": "parser_new_relation",
+            "created_by_normalizer": true
+          }
+        },
+        "arguments": {
+          "SUBJECT": {
+            "uid": "M_ПИСЬМЕННЫЙ_ПЕРО",
+            "role": "SUBJECT"
+          },
+          "OBJECT": {
+            "uid": "M_ПИСЬМЕННЫЙ_СТОЛ",
+            "role": "OBJECT"
+          }
+        },
+        "timestamp": null,
+        "confidence": 0.95,
+        "raw_span": "на письменном столе стоит письменное перо",
+        "metadata": {
+          "raw_relation": "стоит",
+          "normalization": "parser_new_relation",
+          "normalization_confidence": 0.95,
+          "statement_type": "assertion",
+          "source": "user",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T15:01:25+03:00",
+          "created_tau": 8
+        }
+      }
+    ],
+    "state": {
+      "values": {},
+      "history": {},
+      "applied_events": [
+        "E_00003",
+        "E_00010"
+      ]
+    },
+    "state_transitions": []
+  }
+}

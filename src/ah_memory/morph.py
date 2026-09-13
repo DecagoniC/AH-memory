@@ -64,6 +64,20 @@ def _parse(word: str) -> Any:
     return _get_morph().parse(_norm(word))[0]
 
 
+@lru_cache(maxsize=8192)
+def lemma_variants(word: str, *, limit: int = 6) -> frozenset[str]:
+    """Surface + top morph normal forms (covers ambiguous case/gender parses)."""
+    w = _norm(word)
+    if not w:
+        return frozenset()
+    forms = {w, lemma(w).replace("ё", "е")}
+    for parse in _get_morph().parse(w)[: max(1, limit)]:
+        normal = str(getattr(parse, "normal_form", "") or "").lower().replace("ё", "е")
+        if normal:
+            forms.add(normal)
+    return frozenset(form for form in forms if form)
+
+
 def _proper_rank(parse: Any) -> int:
     tag = str(parse.tag)
     best = 10

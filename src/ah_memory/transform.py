@@ -384,7 +384,36 @@ class Transform:
         self.store.ensure_m(m_uid, _label_from_uid(uid))
         if self.identity is not None:
             self.identity.attach_alias(uid, surface)
+        self._bind_subject_surface(m_uid)
+        self._bind_compound_to_head_symbol(m_uid)
         return m_uid
+
+    def _bind_compound_to_head_symbol(self, m_uid: str) -> None:
+        """Head-final compounds also BIND to the head-token S (shared lexical anchor)."""
+        bare = m_uid[2:] if m_uid.startswith("M_") else m_uid
+        parts = [part for part in bare.split("_") if part]
+        if len(parts) < 2:
+            return
+        head = slug_uid(parts[-1])
+        if not head or head == bare:
+            return
+        self.store.ensure_abstract(head, {head.lower()})
+        ends = {m_uid, head}
+        if any(
+            link.id in {LinkId.ASSOC.value, LinkId.BIND.value}
+            and {link.e1.target_uid, link.e2.target_uid} == ends
+            for link in self.store.ah.L.values()
+        ):
+            return
+        self.store.add_link(
+            AssocLink(
+                uid=self.store.new_uid("L_BIND"),
+                id=LinkId.BIND.value,
+                w=1.0,
+                e1=self.store.m_ref(m_uid),
+                e2=self.store.s_ref(head),
+            )
+        )
 
     @staticmethod
     def _m_uid(token: str) -> str:

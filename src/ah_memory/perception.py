@@ -18,6 +18,7 @@ from ah_memory.morph import (
     filter_entity_uids,
     is_entity_token,
     lemma,
+    lemma_variants,
     sanitize_roles,
     seeds_from_roles,
     slug_uid,
@@ -385,9 +386,7 @@ def _collect_text_lemmas(text: str) -> set[str]:
     for w in _TOKEN_RE.findall(low):
         if len(w) < 2 and w not in _SHORT_KEEP:
             continue
-        lem = lemma(w)
-        if lem:
-            lemmas.add(lem.replace("ё", "е"))
+        lemmas.update(lemma_variants(w))
     return lemmas
 
 
@@ -410,8 +409,13 @@ def _uid_grounded(
                 return False
             grounded += 1
             continue
-        pl = lemma(p).replace("ё", "е")
-        if p in raw_tokens or p in text_lemmas or pl in text_lemmas:
+        variants = lemma_variants(p)
+        if (
+            p in raw_tokens
+            or p in text_lemmas
+            or variants.intersection(text_lemmas)
+            or variants.intersection(raw_tokens)
+        ):
             grounded += 1
             continue
         return False

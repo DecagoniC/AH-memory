@@ -69,6 +69,23 @@ def test_humanize_symbol_text_keeps_short_names_and_heads_of_long_slugs() -> Non
     )
 
 
+def test_gate_accepts_role_lemma_from_alternate_morph_parse() -> None:
+    """Genitive surface in text can ground a nominative role filler."""
+    from ah_memory.perception import FactCandidate, gate_candidates
+
+    text = "у ворона есть перо"
+    candidate = FactCandidate(
+        "HAS_PART",
+        {"SUBJECT": "ворон", "OBJECT": "перо"},
+        raw_span=text,
+        confidence=0.95,
+        canonical_relation="HAS_PART",
+    )
+    gated, report = gate_candidates(text, [candidate], report=True)
+    assert len(gated) == 1
+    assert report["dropped"] == []
+
+
 def test_reject_verb_and_conj_subjects() -> None:
     assert sanitize_roles({"SUBJECT": "ЗАНИМАЮСЬ", "OBJECT": "ЛЕПКА"}) is None
     assert sanitize_roles({"SUBJECT": "ЕСЛИ", "OBJECT": "ПОМОЩЬ"}) is None

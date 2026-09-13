@@ -42,6 +42,29 @@ ah-web
 
 Открой http://127.0.0.1:8000 — чат слева, граф справа, кнопка «Скачать JSON» для дампа.
 
+## Потоковый text-to-graph
+
+`ah-ingest` читает UTF-8 текст ограниченными блоками, сохраняет атомарные
+сегменты и staged candidates в SQLite, проверяет coverage до commit и пишет
+возобновляемый JSON-checkpoint графа.
+
+```bash
+# новый job
+ah-ingest --journal data/ingest.sqlite start corpus.txt \
+  --output data/corpus.ah.json \
+  --max-batch-tokens 1800 \
+  --strict-coverage
+
+# состояние и продолжение после остановки
+ah-ingest --journal data/ingest.sqlite status JOB_ID
+ah-ingest --journal data/ingest.sqlite resume JOB_ID
+```
+
+Extraction отделён от commit: после успешного LLM-вызова candidates сначала
+фиксируются в journal. Повторный запуск не вызывает LLM для staged batch и
+безопасно повторяет commit благодаря дедупликации semantic factors. Каждый
+factor содержит provenance с `job_id`, `batch_id` и исходными offsets.
+
 ### Entity Resolution Benchmark
 
 Отдельный benchmark разрешения упоминаний на символы графа

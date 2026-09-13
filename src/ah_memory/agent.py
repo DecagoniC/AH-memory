@@ -9,6 +9,7 @@ from dataclasses import asdict, dataclass, field
 import re
 from typing import Callable, Sequence
 
+from ah_memory.context_ranker import GraphContextRanker
 from ah_memory.dsl import DSLInterpreter
 from ah_memory.gc import collect
 from ah_memory.graph_query import GraphQueryPlanner, QueryPlan
@@ -49,6 +50,7 @@ def _filter_assistant_perception(perc: PerceptionResult) -> PerceptionResult:
                 canonical_relation=c.canonical_relation,
                 statement_type=c.statement_type,
                 source="assistant",
+                metadata=dict(c.metadata),
             )
         )
     seeds = seeds_from_roles(kept)
@@ -105,6 +107,18 @@ class Agent:
             embed=query_embed,
         )
 
+    def perception_context(self, text: str, *, limit: int = 12) -> list[str]:
+        """Build bounded query-ranked WM cards for perception."""
+        ranker = GraphContextRanker(self.store)
+        return [
+            item.prompt_card()
+            for item in ranker.rank_symbols(
+                text,
+                self.ignition.wm.entries(),
+                limit=limit,
+            )
+        ]
+
     def adopt_store(self, store: AHStore) -> None:
         """Swap graph contents in place and rebuild ignition over the new structure."""
         if store is not self.store:
@@ -127,7 +141,7 @@ class Agent:
     ) -> IngestReport:
         """Текст → граф (+ короткий прогон активации по новым seeds)."""
         if perception is None:
-            perc = self.perception.parse(text, list(self.ignition.wm.contents()))
+            perc = self.perception.parse(text, self.perception_context(text))
         else:
             perc = perception
         if source == "assistant":
@@ -167,7 +181,10 @@ class Agent:
     ) -> AgentReply:
         # Зачем: не писать вопрос как факт, а найти UID по seeds → ignition → compose.
         if perception is None:
-            perc = self.perception.parse(question, list(self.ignition.wm.contents()))
+            perc = self.perception.parse(
+                question,
+                self.perception_context(question),
+            )
         else:
             perc = perception
         entry_uids = self._resolve_entry_uids(
@@ -179,13 +196,11 @@ class Agent:
             for uid in entry_uids
         ]
         plan = self.query_planner.plan(question, perc, entry_uids)
-        if plan.factor_scores:
-            self.ignition.set_factor_gates(
-                plan.factor_scores,
-                reset_state=True,
-            )
-        else:
-            self.ignition.set_factor_gates(None)
+        # Keep graph facts, but isolate every query from stale BP/WM state.
+        self.ignition.set_factor_gates(
+            plan.factor_scores or None,
+            reset_state=True,
+        )
         self.ignition.seed(seeds)
         traces = self.ignition.run(ticks)
         trace_uids: list[str] = []
@@ -215,6 +230,7 @@ class Agent:
             "relation_scores": dict(plan.relation_scores),
             "factor_gates": dict(plan.factor_scores),
         }
+        full_trace["question"] = question
         return AgentReply(
             answer=answer,
             trace_uids=trace_uids,
@@ -327,11 +343,11 @@ class Agent:
 
     def step_message(self, text: str, ticks: int = 3) -> AgentReply:
         """Один шаг цикла: вопрос → ask, иначе → ingest."""
-        perc = self.perception.parse(text, list(self.ignition.wm.contents()))
+        perc = self.perception.parse(text, self.perception_context(text))
         if perc.kind == "question":
             return self.ask(text, ticks=ticks, perception=perc)
         report = self.ingest(text)
-        wm = list(self.ignition.wm.contents())
+        wm = self.ignition.wm.ranked_uids()
         return AgentReply(
             answer=f"ingested:{len(report.created_n)} wm:{len(wm)}",
             trace_uids=wm,
@@ -354,9 +370,20 @@ class Agent:
         # Зачем: единый JSON для web/dialogue — узлы, факторы, events, state.
         requested = set(activated_nodes)
         semantic_factor_ids = set(self.store.semantic_factors)
-        actual_nodes = [
-            uid for uid in activated_nodes if uid not in semantic_factor_ids
-        ]
+        activation_scores: dict[str, float] = {}
+        for trace in traces:
+            activation_scores.update(trace.activation_top)
+        actual_nodes = sorted(
+            dict.fromkeys(
+                uid
+                for uid in activated_nodes
+                if uid not in semantic_factor_ids
+            ),
+            key=lambda uid: (
+                -float(activation_scores.get(uid, 0.0)),
+                uid,
+            ),
+        )
         activated_set = set(actual_nodes)
         factor_uids = list(
             dict.fromkeys(

@@ -50,6 +50,7 @@ class FactCandidate:
     canonical_relation: str | None = None
     statement_type: EpistemicStatus = "assertion"
     source: Literal["user", "assistant"] = "user"
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -73,6 +74,7 @@ class PerceptionResult:
                     "confidence": c.confidence,
                     "statement_type": c.statement_type,
                     "source": c.source,
+                    "metadata": dict(c.metadata),
                 }
                 for c in self.candidates
             ],

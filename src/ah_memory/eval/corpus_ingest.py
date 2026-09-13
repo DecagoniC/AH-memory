@@ -39,6 +39,17 @@ class BatchRecord:
     coverage_ratio: float = 1.0
 
 
+@dataclass
+class PreparedBatch:
+    backend: str
+    candidates: list[FactCandidate]
+    segments: list[dict[str, Any]]
+    uncovered_segments: list[dict[str, Any]]
+    repair_attempts: int
+    coverage_ratio: float
+    perception_meta: dict[str, Any] = field(default_factory=dict)
+
+
 @dataclass(frozen=True)
 class AtomicSegment:
     index: int
@@ -215,6 +226,7 @@ def candidate_to_dict(candidate: FactCandidate) -> dict[str, Any]:
         "canonical_relation": candidate.canonical_relation,
         "statement_type": candidate.statement_type,
         "source": candidate.source,
+        "metadata": dict(candidate.metadata),
     }
 
 
@@ -228,6 +240,7 @@ def dict_to_candidate(payload: dict[str, Any]) -> FactCandidate:
         canonical_relation=payload.get("canonical_relation"),
         statement_type=payload.get("statement_type") or "assertion",
         source=payload.get("source") or "user",
+        metadata=dict(payload.get("metadata") or {}),
     )
 
 
@@ -241,62 +254,19 @@ def ingest_text_batches(
     """Parse, audit and repair each batch before writing accepted facts."""
     records: list[BatchRecord] = []
     for index, batch in enumerate(batches):
-        perc = agent.perception.parse(batch, list(agent.ignition.wm.contents()))
-        candidates = list(perc.candidates)
-        candidates.extend(_schema_repair_from_raw(perc, batch))
-        candidates = _deduplicate_candidates(candidates)
-        segments = split_atomic_segments(batch)
-        segment_report, uncovered, _ = coverage_audit(segments, candidates)
-        repair_attempts = 0
-        if repair_uncovered:
-            for segment in uncovered:
-                repair_attempts += 1
-                repair = agent.perception.parse(
-                    segment.context,
-                    list(agent.ignition.wm.contents()),
-                )
-                candidates.extend(repair.candidates)
-                candidates.extend(
-                    _schema_repair_from_raw(repair, segment.context)
-                )
-            candidates = _deduplicate_candidates(candidates)
-            segment_report, uncovered, ratio = coverage_audit(
-                segments,
-                candidates,
-            )
-            if uncovered:
-                candidates.extend(
-                    candidate
-                    for segment in uncovered
-                    if (
-                        candidate := _infer_list_candidate(
-                            segment,
-                            segments,
-                            candidates,
-                        )
-                    )
-                    is not None
-                )
-                candidates = _deduplicate_candidates(candidates)
-                segment_report, uncovered, ratio = coverage_audit(
-                    segments,
-                    candidates,
-                )
-        else:
-            ratio = (
-                sum(bool(item["covered"]) for item in segment_report)
-                / len(segment_report)
-                if segment_report
-                else 1.0
-            )
+        prepared = prepare_text_batch(
+            agent,
+            batch,
+            repair_uncovered=repair_uncovered,
+        )
         combined = PerceptionResult(
             kind="fact",
-            candidates=candidates,
-            seed_tokens=seeds_from_roles(candidates),
+            candidates=prepared.candidates,
+            seed_tokens=seeds_from_roles(prepared.candidates),
             meta={
-                **dict(perc.meta),
-                "coverage_ratio": ratio,
-                "repair_attempts": repair_attempts,
+                **prepared.perception_meta,
+                "coverage_ratio": prepared.coverage_ratio,
+                "repair_attempts": prepared.repair_attempts,
             },
         )
         report = agent.ingest(batch, section=section, perception=combined)
@@ -304,26 +274,108 @@ def ingest_text_batches(
             BatchRecord(
                 index=index,
                 text=batch,
-                backend=str((perc.meta or {}).get("backend") or "unknown"),
-                candidates=[candidate_to_dict(c) for c in candidates],
+                backend=prepared.backend,
+                candidates=[
+                    candidate_to_dict(c)
+                    for c in prepared.candidates
+                ],
                 created_n=list(report.created_n),
                 skipped=list(report.skipped),
-                segments=segment_report,
-                uncovered_segments=[
-                    {
-                        "index": segment.index,
-                        "start": segment.start,
-                        "end": segment.end,
-                        "text": segment.text,
-                        "reason": "no grounded factor after repair",
-                    }
-                    for segment in uncovered
-                ],
-                repair_attempts=repair_attempts,
-                coverage_ratio=ratio,
+                segments=prepared.segments,
+                uncovered_segments=prepared.uncovered_segments,
+                repair_attempts=prepared.repair_attempts,
+                coverage_ratio=prepared.coverage_ratio,
             )
         )
     return records
+
+
+def prepare_text_batch(
+    agent: Agent,
+    batch: str,
+    *,
+    repair_uncovered: bool = True,
+    wm_context: list[str] | None = None,
+) -> PreparedBatch:
+    """Extract and validate one batch without mutating the graph."""
+    context = (
+        list(wm_context)
+        if wm_context is not None
+        else agent.perception_context(batch)
+    )
+    perc = agent.perception.parse(
+        batch,
+        context,
+    )
+    candidates = list(perc.candidates)
+    candidates.extend(_schema_repair_from_raw(perc, batch))
+    candidates = _deduplicate_candidates(candidates)
+    segments = split_atomic_segments(batch)
+    segment_report, uncovered, _ = coverage_audit(
+        segments,
+        candidates,
+    )
+    repair_attempts = 0
+    if repair_uncovered:
+        for segment in uncovered:
+            repair_attempts += 1
+            repair = agent.perception.parse(
+                segment.context,
+                context,
+            )
+            candidates.extend(repair.candidates)
+            candidates.extend(
+                _schema_repair_from_raw(repair, segment.context)
+            )
+        candidates = _deduplicate_candidates(candidates)
+        segment_report, uncovered, ratio = coverage_audit(
+            segments,
+            candidates,
+        )
+        if uncovered:
+            candidates.extend(
+                candidate
+                for segment in uncovered
+                if (
+                    candidate := _infer_list_candidate(
+                        segment,
+                        segments,
+                        candidates,
+                    )
+                )
+                is not None
+            )
+            candidates = _deduplicate_candidates(candidates)
+            segment_report, uncovered, ratio = coverage_audit(
+                segments,
+                candidates,
+            )
+    else:
+        ratio = (
+            sum(bool(item["covered"]) for item in segment_report)
+            / len(segment_report)
+            if segment_report
+            else 1.0
+        )
+    return PreparedBatch(
+        backend=str((perc.meta or {}).get("backend") or "unknown"),
+        candidates=candidates,
+        segments=segment_report,
+        uncovered_segments=[
+            {
+                "index": segment.index,
+                "start": segment.start,
+                "end": segment.end,
+                "text": segment.text,
+                "kind": segment.kind,
+                "reason": "no grounded factor after repair",
+            }
+            for segment in uncovered
+        ],
+        repair_attempts=repair_attempts,
+        coverage_ratio=ratio,
+        perception_meta=dict(perc.meta),
+    )
 
 
 def records_to_payload(records: list[BatchRecord], *, source: str) -> dict[str, Any]:

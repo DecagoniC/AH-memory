@@ -15,6 +15,7 @@ from ah_memory.factor_parameters import (
     RuleBasedParameterGenerator,
 )
 from ah_memory.hyperparams import HyperParams
+from ah_memory.morph import humanize_symbol_text
 from ah_memory.perception import FactCandidate, PerceptionResult, slug_uid
 from ah_memory.relation_normalizer import ExactNormalizer, RelationNormalizer
 from ah_memory.relations import (
@@ -45,8 +46,7 @@ class IngestReport:
 
 
 def _label_from_uid(uid: str) -> str:
-    bare = uid[2:] if uid.startswith("M_") else uid
-    return bare.replace("_", " ").lower()
+    return humanize_symbol_text(uid, uid=uid)
 
 
 class Transform:
@@ -86,7 +86,10 @@ class Transform:
             if self.store.get_relation(uid) is not None:
                 continue
             m_uid = self._m_uid(uid)
-            surface = tok.lower().replace("ё", "е")
+            surface = (
+                humanize_symbol_text(tok, uid=uid).replace("ё", "е")
+                or tok.lower().replace("ё", "е")
+            )
             self.store.ensure_abstract(uid, {surface})
             self.store.ensure_m(m_uid, _label_from_uid(uid))
             if self.identity is not None:
@@ -181,6 +184,7 @@ class Transform:
                 "normalization_confidence": normalized.confidence,
                 "statement_type": candidate.statement_type,
                 "source": candidate.source,
+                "candidate_metadata": dict(candidate.metadata),
                 "added_at": added_at,
                 "created_tau": created_tau,
             },
@@ -219,9 +223,11 @@ class Transform:
             metadata={
                 "event_uid": event_uid,
                 "raw_relation": candidate.raw_relation or candidate.predicate,
+                "raw_span": candidate.raw_span,
                 "canonical_relation": relation.canonical_label,
                 "statement_type": candidate.statement_type,
                 "source": candidate.source,
+                "candidate_metadata": dict(candidate.metadata),
                 "context_uid": context_uid,
                 "source_variable": arguments.get(
                     "SUBJECT",
@@ -371,7 +377,9 @@ class Transform:
         raw = value[2:] if str(value).startswith("M_") else str(value)
         uid = self._resolve_bare(raw, context=context)
         m_uid = self._m_uid(uid)
-        surface = raw.lower().replace("ё", "е")
+        surface = humanize_symbol_text(raw, uid=uid).replace("ё", "е")
+        if not surface:
+            surface = raw.lower().replace("ё", "е").replace("_", " ")
         self.store.ensure_abstract(uid, {surface})
         self.store.ensure_m(m_uid, _label_from_uid(uid))
         if self.identity is not None:

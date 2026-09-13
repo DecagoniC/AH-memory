@@ -9,3 +9,4 @@ build/
 data/*.json
 results/
 !.gitkeep
+docs/

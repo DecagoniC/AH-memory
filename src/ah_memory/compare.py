@@ -1,8 +1,8 @@
-"""Side-by-side: АГ-память vs БЯМ+RAG на живом диалоге/графе (не фиксированный «заяц»)."""
+"""Side-by-side: АГ-память vs БЯМ+RAG на живом диалоге/графе."""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from ah_memory.agent import Agent
 from ah_memory.baselines.rag_embedder import RagEmbedder, resolve_rag_embedder
@@ -16,6 +16,9 @@ from ah_memory.examples.closed_world import (
 )
 from ah_memory.perception import PerceptionResult, content_entity_uids
 from ah_memory.store import AHStore
+
+if TYPE_CHECKING:
+    from ah_memory.dialogue import DialogueAgent
 
 
 COMPARE_GENERATION_SYSTEM = """Ты формируешь ответ только по переданному контексту.
@@ -33,6 +36,10 @@ class CompareTurn:
     rag_scores: list[float] = field(default_factory=list)
     ah_source: str = "graph"
     rag_source: str = "vanilla_rag"
+    ah_prompt: str = ""
+    rag_prompt: str = ""
+    ah_full_trace: dict[str, Any] = field(default_factory=dict)
+    ah_perception: dict[str, Any] = field(default_factory=dict)
     notes: dict[str, Any] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
@@ -84,10 +91,12 @@ class CompareEngine:
         deepseek: DeepSeekConfig | None = None,
         history: list[dict[str, str]] | None = None,
         source_docs: list[str] | None = None,
+        dialogue: "DialogueAgent | None" = None,
     ) -> None:
         self.agent = agent
         self.ticks = ticks
         self.deepseek = deepseek
+        self.dialogue = dialogue
         self.history = history if history is not None else []
         self._extra_docs: list[str] = []
         self.source_docs: list[str] = [
@@ -101,11 +110,12 @@ class CompareEngine:
                 self.source_docs = [rag.corpus]
         else:
             self._embedder = resolve_rag_embedder()
+            corpus = build_rag_corpus(
+                source_docs=self.source_docs,
+                history=self.history,
+            )
             self.rag = VanillaRAG(
-                build_rag_corpus(
-                    source_docs=self.source_docs,
-                    history=self.history,
-                ),
+                corpus,
                 top_k=4,
                 deepseek=ds if ds and ds.configured else None,
                 strict=True,
@@ -128,7 +138,8 @@ class CompareEngine:
             deepseek=ds if ds.configured else None,
             strict=False,
         )
-        return cls(agent, rag, ticks=ticks, deepseek=ds, source_docs=[source])
+        engine = cls(agent, rag, ticks=ticks, deepseek=ds, source_docs=[source])
+        return engine
 
     from_rabbit = from_m4_gold
 
@@ -176,27 +187,66 @@ class CompareEngine:
             raise ValueError(f"unknown comparison mode: {mode}")
         t = ticks if ticks is not None else self.ticks
         text = text.strip()
-        query_perception = PerceptionResult(
-            kind="question",
-            candidates=[],
-            seed_tokens=content_entity_uids(text)[:8],
-            meta={"backend": "compare_query", "interaction": "query"},
-        )
+        prepared = None
+        if self.dialogue is not None:
+            prepared = self.dialogue.answer_read_only(
+                text,
+                ticks=t,
+                generate=mode == "generated",
+            )
+            ah = prepared.ask
+        else:
+            query_perception = PerceptionResult(
+                kind="question",
+                candidates=[],
+                seed_tokens=content_entity_uids(text)[:8],
+                meta={"backend": "compare_query", "interaction": "query"},
+            )
+            ah = self.agent.ask(
+                text,
+                ticks=t,
+                perception=query_perception,
+            )
         self.rebuild_rag()
-        ah = self.agent.ask(
-            text,
-            ticks=t,
-            perception=query_perception,
-        )
         vr = self.rag.ask(text, generate=False)
-        ah_answer, rag_answer, ah_source, rag_source = self._comparison_output(
-            text,
-            ah.answer,
-            vr.answer,
-            vr.chunks,
-            mode,
-            ah_source=ah.source,
-        )
+        ah_prompt = ""
+        rag_prompt = ""
+        if prepared is not None:
+            ah_prompt = prepared.system_prompt
+            if mode == "raw":
+                ah_answer = ah.answer
+                rag_answer = vr.answer
+                ah_source = ah.source
+                rag_source = "extractive_rag"
+            else:
+                ah_answer = prepared.reply
+                rag_context = "\n\n".join(
+                    f"[{index}] {chunk}"
+                    for index, chunk in enumerate(vr.chunks, start=1)
+                )
+                rag_answer, rag_prompt = self.dialogue.generate_from_context(
+                    text,
+                    rag_context,
+                    source="БЯМ+RAG",
+                )
+                generated = self.dialogue.client is not None
+                ah_source = (
+                    f"{ah.source}+llm" if generated else ah.source
+                )
+                rag_source = (
+                    "faiss+llm" if generated else "extractive_rag"
+                )
+        else:
+            ah_answer, rag_answer, ah_source, rag_source = (
+                self._comparison_output(
+                    text,
+                    ah.answer,
+                    vr.answer,
+                    vr.chunks,
+                    mode,
+                    ah_source=ah.source,
+                )
+            )
         return CompareTurn(
             question=text,
             ah_answer=ah_answer,
@@ -206,15 +256,29 @@ class CompareEngine:
             rag_scores=list(vr.scores),
             ah_source=ah_source,
             rag_source=rag_source,
+            ah_prompt=ah_prompt,
+            rag_prompt=rag_prompt,
+            ah_full_trace=dict(ah.full_trace),
+            ah_perception=dict(ah.perception),
             notes={
                 "mode": "question",
                 "comparison_mode": mode,
                 "ah_has_trace": bool(ah.trace_uids),
                 "rag_has_trace": False,
-                "rag_llm": self.rag.client is not None,
+                "rag_llm": (
+                    self.dialogue.client is not None
+                    if self.dialogue is not None
+                    else self.rag.client is not None
+                ),
+                "generation_provider": (
+                    self.dialogue.provider
+                    if self.dialogue is not None
+                    else "deepseek"
+                ),
                 "corpus_chars": len(self.rag.corpus),
                 "corpus_preview": self.rag.corpus[:280],
                 "live": True,
+                "shared_ah_pipeline": prepared is not None,
             },
         )
 

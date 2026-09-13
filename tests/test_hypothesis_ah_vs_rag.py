@@ -230,7 +230,7 @@ def test_unknown_who_tied_against_extractive() -> None:
     assert report.traps.items[0].rag_hallucinated is False
 
 
-def test_sequential_protocol_weakens_h2_via_wm_leak() -> None:
+def test_sequential_protocol_isolates_queries_from_wm_leak() -> None:
     report = evaluate_hypothesis(
         make_agent=_m4_agent,
         make_rag=_m4_extractive,
@@ -243,7 +243,7 @@ def test_sequential_protocol_weakens_h2_via_wm_leak() -> None:
         protocol="sequential",
     )
     assert report.protocol == "sequential"
-    assert report.traps.items[0].ah_hallucinated is True
+    assert report.traps.items[0].ah_hallucinated is False
 
 
 # ── Generic (non-rabbit) fixture: same architecture ──────────────────────────

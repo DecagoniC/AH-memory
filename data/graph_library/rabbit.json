@@ -3,7 +3,7 @@
   "name": "rabbit",
   "kind": "fixture",
   "created_at": "2026-08-22T02:23:20+03:00",
-  "updated_at": "2026-08-22T05:18:06+03:00",
+  "updated_at": "2026-08-24T10:00:51+03:00",
   "stats": {
     "S": 15,
     "C": 15,
@@ -33,7 +33,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "BEAST": {
         "R": {
@@ -44,7 +44,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "SMALL": {
         "R": {
@@ -55,7 +55,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "MEADOW": {
         "R": {
@@ -66,7 +66,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "FOREST": {
         "R": {
@@ -77,29 +77,31 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "HIND_LEG": {
         "R": {
           "TEXT": [
+            "hind leg",
             "hind_leg",
             "задние лапы"
           ]
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "VERY_FAST": {
         "R": {
           "TEXT": [
+            "very fast",
             "very_fast",
             "очень быстро"
           ]
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "EAR": {
         "R": {
@@ -110,7 +112,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "TAIL": {
         "R": {
@@ -121,7 +123,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "FUR": {
         "R": {
@@ -132,7 +134,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "BROWN": {
         "R": {
@@ -143,7 +145,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "WHITE": {
         "R": {
@@ -154,7 +156,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "SUMMER": {
         "R": {
@@ -165,7 +167,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "WINTER": {
         "R": {
@@ -176,7 +178,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "ANIMAL": {
         "R": {
@@ -187,7 +189,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       }
     },
     "C": {
@@ -205,7 +207,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_BEAST": {
         "type": "M",
@@ -221,7 +223,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_SMALL": {
         "type": "M",
@@ -237,7 +239,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_MEADOW": {
         "type": "M",
@@ -253,7 +255,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_FOREST": {
         "type": "M",
@@ -269,7 +271,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_HIND_LEG": {
         "type": "M",
@@ -285,7 +287,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_VERY_FAST": {
         "type": "M",
@@ -301,7 +303,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_EAR": {
         "type": "M",
@@ -317,7 +319,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_TAIL": {
         "type": "M",
@@ -333,7 +335,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_FUR": {
         "type": "M",
@@ -349,7 +351,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_BROWN": {
         "type": "M",
@@ -365,7 +367,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_WHITE": {
         "type": "M",
@@ -381,7 +383,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_SUMMER": {
         "type": "M",
@@ -397,7 +399,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_WINTER": {
         "type": "M",
@@ -413,7 +415,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "M_ANIMAL": {
         "type": "M",
@@ -429,7 +431,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       }
     },
     "P": {},
@@ -455,7 +457,7 @@
         ],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "EP_LESSON_2": {
         "type": "M",
@@ -478,7 +480,7 @@
         ],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       }
     },
     "L": {
@@ -495,7 +497,7 @@
           "target_uid": "M_BEAST"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_BIND_00003": {
         "uid": "L_BIND_00003",
@@ -510,7 +512,7 @@
           "target_uid": "HARE"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00005": {
         "uid": "L_MESH_00005",
@@ -525,7 +527,7 @@
           "target_uid": "M_SMALL"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00007": {
         "uid": "L_MESH_00007",
@@ -540,7 +542,7 @@
           "target_uid": "M_MEADOW"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00009": {
         "uid": "L_MESH_00009",
@@ -555,7 +557,7 @@
           "target_uid": "M_FOREST"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00011": {
         "uid": "L_MESH_00011",
@@ -570,7 +572,7 @@
           "target_uid": "M_HIND_LEG"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00013": {
         "uid": "L_MESH_00013",
@@ -585,7 +587,7 @@
           "target_uid": "M_VERY_FAST"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00015": {
         "uid": "L_MESH_00015",
@@ -600,7 +602,7 @@
           "target_uid": "M_EAR"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00017": {
         "uid": "L_MESH_00017",
@@ -615,7 +617,7 @@
           "target_uid": "M_TAIL"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00019": {
         "uid": "L_MESH_00019",
@@ -630,7 +632,7 @@
           "target_uid": "M_BROWN"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00020": {
         "uid": "L_MESH_00020",
@@ -645,7 +647,7 @@
           "target_uid": "M_SUMMER"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00021": {
         "uid": "L_MESH_00021",
@@ -660,7 +662,7 @@
           "target_uid": "M_SUMMER"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_BIND_00022": {
         "uid": "L_BIND_00022",
@@ -675,7 +677,7 @@
           "target_uid": "FUR"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00024": {
         "uid": "L_MESH_00024",
@@ -690,7 +692,7 @@
           "target_uid": "M_WHITE"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00025": {
         "uid": "L_MESH_00025",
@@ -705,7 +707,7 @@
           "target_uid": "M_WINTER"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_MESH_00026": {
         "uid": "L_MESH_00026",
@@ -720,7 +722,7 @@
           "target_uid": "M_WINTER"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_ISA_00027": {
         "uid": "L_ISA_00027",
@@ -735,7 +737,7 @@
           "target_uid": "M_BEAST"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_ISA_00028": {
         "uid": "L_ISA_00028",
@@ -750,7 +752,7 @@
           "target_uid": "M_ANIMAL"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       },
       "L_FOLLOW_00029": {
         "uid": "L_FOLLOW_00029",
@@ -765,7 +767,7 @@
           "target_uid": "EP_LESSON_2"
         },
         "created_tau": 0,
-        "added_at": "2026-08-22T05:18:06+03:00"
+        "added_at": "2026-08-24T10:00:51+03:00"
       }
     },
     "relations": {
@@ -1156,12 +1158,14 @@
         "metadata": {
           "event_uid": "E_00001",
           "raw_relation": "IS",
+          "raw_span": null,
           "canonical_relation": "IS",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": null,
           "source_variable": "M_HARE",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -1286,12 +1290,14 @@
         "metadata": {
           "event_uid": "E_00004",
           "raw_relation": "IS",
+          "raw_span": null,
           "canonical_relation": "IS",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_BEAST",
           "source_variable": "M_HARE",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -1416,12 +1422,14 @@
         "metadata": {
           "event_uid": "E_00006",
           "raw_relation": "LIVE_IN",
+          "raw_span": null,
           "canonical_relation": "LIVE_IN",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_BEAST",
           "source_variable": "M_HARE",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -1546,12 +1554,14 @@
         "metadata": {
           "event_uid": "E_00008",
           "raw_relation": "LIVE_IN",
+          "raw_span": null,
           "canonical_relation": "LIVE_IN",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_BEAST",
           "source_variable": "M_HARE",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -1676,12 +1686,14 @@
         "metadata": {
           "event_uid": "E_00010",
           "raw_relation": "HAVE",
+          "raw_span": null,
           "canonical_relation": "HAVE",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_BEAST",
           "source_variable": "M_HARE",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -1806,12 +1818,14 @@
         "metadata": {
           "event_uid": "E_00012",
           "raw_relation": "RUN",
+          "raw_span": null,
           "canonical_relation": "RUN",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_BEAST",
           "source_variable": "M_HARE",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -1936,12 +1950,14 @@
         "metadata": {
           "event_uid": "E_00014",
           "raw_relation": "HAVE",
+          "raw_span": null,
           "canonical_relation": "HAVE",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_BEAST",
           "source_variable": "M_HARE",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2066,12 +2082,14 @@
         "metadata": {
           "event_uid": "E_00016",
           "raw_relation": "HAVE",
+          "raw_span": null,
           "canonical_relation": "HAVE",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_BEAST",
           "source_variable": "M_HARE",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2198,12 +2216,14 @@
         "metadata": {
           "event_uid": "E_00018",
           "raw_relation": "BE_COLORED",
+          "raw_span": null,
           "canonical_relation": "BE_COLORED",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_BEAST",
           "source_variable": "M_FUR",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2330,12 +2350,14 @@
         "metadata": {
           "event_uid": "E_00023",
           "raw_relation": "BE_COLORED",
+          "raw_span": null,
           "canonical_relation": "BE_COLORED",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_BEAST",
           "source_variable": "M_FUR",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       }
@@ -2415,7 +2437,8 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2493,7 +2516,8 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2571,7 +2595,8 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2649,7 +2674,8 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2727,7 +2753,8 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2805,7 +2832,8 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2883,7 +2911,8 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -2961,7 +2990,8 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -3043,7 +3073,8 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       },
@@ -3125,7 +3156,8 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-08-22T05:18:06+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-08-24T10:00:51+03:00",
           "created_tau": 0
         }
       }

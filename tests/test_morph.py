@@ -49,6 +49,26 @@ def test_lemma_cases_merge() -> None:
     assert slug_uid("Роман Душкина") == "РОМАН_ДУШКИН"
 
 
+def test_humanize_symbol_text_keeps_short_names_and_heads_of_long_slugs() -> None:
+    from ah_memory.morph import humanize_symbol_text
+
+    assert humanize_symbol_text("M_HEAD_TAIL") == "head tail"
+    assert humanize_symbol_text("readable name") == "readable name"
+    assert (
+        humanize_symbol_text(
+            "alpha beta gamma delta",
+            uid="M_ALPHA_BETA_GAMMA_DELTA",
+            compact=True,
+        )
+        == "gamma delta"
+    )
+    assert humanize_symbol_text("M_ALPHA_BETA_GAMMA_DELTA") == "alpha beta gamma delta"
+    assert (
+        humanize_symbol_text("M_ALPHA_BETA_GAMMA_DELTA", compact=True)
+        == "gamma delta"
+    )
+
+
 def test_reject_verb_and_conj_subjects() -> None:
     assert sanitize_roles({"SUBJECT": "ЗАНИМАЮСЬ", "OBJECT": "ЛЕПКА"}) is None
     assert sanitize_roles({"SUBJECT": "ЕСЛИ", "OBJECT": "ПОМОЩЬ"}) is None

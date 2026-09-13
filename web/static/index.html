@@ -54,7 +54,6 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-left: auto;
     }
     .llm-switch .label {
       font-size: .75rem;
@@ -90,23 +89,75 @@
       opacity: .35;
       cursor: not-allowed;
     }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
     .main {
       display: grid;
       grid-template-columns: 1fr;
       min-height: 0;
       height: 100%;
     }
-    @media (min-width: 960px) {
-      .main { grid-template-columns: minmax(320px, 400px) minmax(220px, 300px) 1fr; }
-    }
     .chat, .trace-wrap, .graph-wrap {
       min-height: 0;
       display: flex;
       flex-direction: column;
       background: rgba(26,34,44,.72);
-      border-right: 1px solid var(--line);
     }
-    .graph-wrap { border-right: none; }
+    .chat {
+      min-width: 0;
+    }
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 10, 14, .45);
+      z-index: 30;
+    }
+    .drawer-backdrop.show { display: block; }
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 31;
+      width: min(720px, 100vw);
+      transform: translateX(100%);
+      transition: transform .2s ease;
+      box-shadow: none;
+    }
+    .drawer.trace-drawer { width: min(420px, 100vw); }
+    .drawer.open {
+      transform: translateX(0);
+      box-shadow: -16px 0 40px rgba(0, 0, 0, .35);
+    }
+    .drawer .trace-wrap,
+    .drawer .graph-wrap {
+      height: 100%;
+      background: var(--panel);
+    }
+    .drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .drawer-head .pane-title {
+      padding: 0;
+      border: none;
+    }
+    .drawer-close {
+      min-height: 36px;
+      padding: 0 12px;
+      background: #334155;
+      color: var(--text);
+    }
     .pane-title {
       padding: 10px 14px;
       font-size: .8rem;
@@ -124,7 +175,7 @@
       gap: 10px;
     }
     .msg {
-      max-width: 95%;
+      max-width: min(920px, 92%);
       padding: 10px 12px;
       border-radius: 12px;
       line-height: 1.4;
@@ -385,11 +436,15 @@
     <header>
       <h1>AH Memory</h1>
       <span class="meta" id="health">загрузка…</span>
-      <div class="llm-switch" title="Провайдер LLM для восприятия и диалога">
-        <span class="label">LLM</span>
-        <div class="seg">
-          <button type="button" id="llmGiga" data-provider="gigachat">GigaChat</button>
-          <button type="button" id="llmDeep" data-provider="deepseek">DeepSeek</button>
+      <div class="header-actions">
+        <button type="button" class="secondary" id="openTrace" title="Трассировка активации">Трасса</button>
+        <button type="button" class="secondary" id="openGraph" title="Граф АГ-памяти">Граф</button>
+        <div class="llm-switch" title="Провайдер LLM для восприятия и диалога">
+          <span class="label">LLM</span>
+          <div class="seg">
+            <button type="button" id="llmGiga" data-provider="gigachat">GigaChat</button>
+            <button type="button" id="llmDeep" data-provider="deepseek">DeepSeek</button>
+          </div>
         </div>
       </div>
     </header>
@@ -404,19 +459,31 @@
             <button class="secondary" id="runM4">M4</button>
             <div class="compare-group" aria-label="Режим сравнения">
               <span class="compare-label">Сравнить</span>
-              <button type="button" class="compare-btn" id="compareRaw" title="Декодер АГ vs extractive FAISS-RAG">Без LLM</button>
+              <button type="button" class="compare-btn" id="compareRaw" title="Без LLM-генерации ответа; perception остаётся общим с чатом">Без LLM-генерации</button>
               <button type="button" class="compare-btn" id="compareGenerated" title="Один LLM-генератор для контекста АГ и RAG">С LLM</button>
             </div>
           </div>
         </div>
       </section>
-      <section class="trace-wrap">
+    </div>
+  </div>
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="drawer trace-drawer" id="traceDrawer" aria-hidden="true">
+    <section class="trace-wrap">
+      <div class="drawer-head">
         <div class="pane-title">Трассировка активации</div>
-        <div class="legend">seed → evidence → BP-тики → WM · клик по UID подсветит граф</div>
-        <div id="traceView"><div class="empty">Пока пусто — отправь сообщение.</div></div>
-      </section>
-      <section class="graph-wrap">
+        <button type="button" class="drawer-close" id="closeTrace">Закрыть</button>
+      </div>
+      <div class="legend">seed → evidence → BP-тики → WM · клик по UID откроет граф</div>
+      <div id="traceView"><div class="empty">Пока пусто — отправь сообщение.</div></div>
+    </section>
+  </aside>
+  <aside class="drawer graph-drawer" id="graphDrawer" aria-hidden="true">
+    <section class="graph-wrap">
+      <div class="drawer-head">
         <div class="pane-title">Дамп графа АГ-памяти</div>
+        <button type="button" class="drawer-close" id="closeGraph">Закрыть</button>
+      </div>
         <div class="graph-tabs">
           <button type="button" class="active" id="tabGraph">Граф</button>
           <button type="button" id="tabTraceGraph">Трассировка (w)</button>
@@ -425,6 +492,7 @@
           <button class="secondary" id="refresh">Обновить</button>
           <button class="secondary" id="modeHyper">Гиперрёбра</button>
           <button class="secondary" id="modeAll">Все связи</button>
+          <button class="secondary" id="expandS" title="Показать все словоформы TEXT у узлов S">Формы S</button>
           <button class="secondary" id="dump">JSON</button>
           <button class="secondary" id="reset">Сброс</button>
           <select id="graphSelect" title="Сохранённые графы">
@@ -454,7 +522,7 @@
             <span class="legend-item"><span class="swatch" style="background:#f4a261"></span>CAUSE</span>
             <span class="legend-item"><span class="swatch" style="background:#c5d0de"></span>L — бинарные связи</span>
           </div>
-          <div class="legend-note">Гиперребро N — n-арный факт: жёлтый хаб + цветные роли + пунктирный mesh между всеми актантами одной микротемы. ASSOC-mesh также пишется в L.</div>
+          <div class="legend-note">Гиперребро N — n-арный факт: жёлтый хаб + цветные роли + пунктирный mesh между всеми актантами одной микротемы. ASSOC-mesh также пишется в L. Кнопка «Формы S» разворачивает все словоформы TEXT; клик по синему узлу — только этот S.</div>
         </div>
         <div class="legend" id="traceGraphLegend" style="display:none">
           Подграф активации: рёбра подписаны типом и силой <code>w</code>. Источник — seeds / WM / цепочки последнего хода.
@@ -462,9 +530,8 @@
         <div id="network"></div>
         <div id="networkTrace"></div>
         <div id="traceGraphEmpty">Нет данных активации — отправь сообщение, затем открой эту вкладку.</div>
-      </section>
-    </div>
-  </div>
+    </section>
+  </aside>
   <script>
     const log = document.getElementById("log");
     const input = document.getElementById("input");
@@ -473,6 +540,11 @@
     const compareGeneratedBtn = document.getElementById("compareGenerated");
     const m4Btn = document.getElementById("runM4");
     const traceView = document.getElementById("traceView");
+    const traceDrawer = document.getElementById("traceDrawer");
+    const graphDrawer = document.getElementById("graphDrawer");
+    const drawerBackdrop = document.getElementById("drawerBackdrop");
+    let graphOpen = false;
+    let graphLoaded = false;
     let network = null;
     let networkTrace = null;
     let highlight = new Set();
@@ -483,12 +555,58 @@
     let lastActivation = null;
     let lastGraphData = null;
     let lastQuestion = "";
+    let graphNodes = null;
+    let expandAllS = false;
+    let expandedS = new Set();
+    let collapsedS = new Set();
 
     function setBusy(busy) {
       if (sendBtn) sendBtn.disabled = busy;
       if (compareRawBtn) compareRawBtn.disabled = busy;
       if (compareGeneratedBtn) compareGeneratedBtn.disabled = busy;
       if (m4Btn) m4Btn.disabled = busy;
+    }
+
+    function syncBackdrop() {
+      const any = graphDrawer.classList.contains("open") || traceDrawer.classList.contains("open");
+      drawerBackdrop.classList.toggle("show", any);
+      drawerBackdrop.hidden = !any;
+    }
+
+    function openTraceDrawer() {
+      traceDrawer.classList.add("open");
+      traceDrawer.setAttribute("aria-hidden", "false");
+      document.getElementById("openTrace").classList.add("active");
+      syncBackdrop();
+    }
+
+    function closeTraceDrawer() {
+      traceDrawer.classList.remove("open");
+      traceDrawer.setAttribute("aria-hidden", "true");
+      document.getElementById("openTrace").classList.remove("active");
+      syncBackdrop();
+    }
+
+    async function openGraphDrawer() {
+      graphDrawer.classList.add("open");
+      graphDrawer.setAttribute("aria-hidden", "false");
+      document.getElementById("openGraph").classList.add("active");
+      graphOpen = true;
+      syncBackdrop();
+      if (!graphLoaded) {
+        await loadGraph();
+        graphLoaded = true;
+      } else if (network) {
+        try { network.fit({ animation: false }); } catch (_) {}
+      }
+    }
+
+    function closeGraphDrawer() {
+      graphDrawer.classList.remove("open");
+      graphDrawer.setAttribute("aria-hidden", "true");
+      document.getElementById("openGraph").classList.remove("active");
+      graphOpen = false;
+      syncBackdrop();
     }
 
     function resolveQuestion() {
@@ -602,10 +720,13 @@
           const id = el.getAttribute("data-uid");
           if (!id) return;
           highlight = new Set([id, ...highlight]);
-          loadGraph();
-          if (network) {
-            try { network.selectNodes([id]); network.focus(id, { scale: 1.2, animation: true }); } catch (_) {}
-          }
+          openGraphDrawer().then(() => {
+            loadGraph().then(() => {
+              if (network) {
+                try { network.selectNodes([id]); network.focus(id, { scale: 1.2, animation: true }); } catch (_) {}
+              }
+            });
+          });
         });
       });
     }
@@ -624,7 +745,7 @@
       body.className = "body";
       body.textContent = text;
       el.appendChild(body);
-      if (role === "bot" && (extras.systemPrompt || extras.activation || extras.graphBuildJson)) {
+      if (role === "bot" && (extras.systemPrompt || extras.prompts || extras.activation || extras.graphBuildJson)) {
         const actions = document.createElement("div");
         actions.className = "msg-actions";
         el.appendChild(actions);
@@ -642,6 +763,24 @@
           });
           actions.appendChild(btn);
           el.appendChild(panel);
+        }
+        for (const prompt of (extras.prompts || [])) {
+          if (!prompt || !prompt.text) continue;
+          const btnP = document.createElement("button");
+          btnP.type = "button";
+          btnP.textContent = prompt.label || "промпт";
+          const panelP = document.createElement("pre");
+          panelP.className = "prompt-panel";
+          panelP.textContent = prompt.text;
+          btnP.addEventListener("click", () => {
+            const open = panelP.classList.toggle("show");
+            btnP.classList.toggle("open", open);
+            btnP.textContent = open
+              ? `скрыть ${prompt.label || "промпт"}`
+              : (prompt.label || "промпт");
+          });
+          actions.appendChild(btnP);
+          el.appendChild(panelP);
         }
         if (extras.graphBuildJson) {
           const btnG = document.createElement("button");
@@ -665,6 +804,7 @@
           btnT.addEventListener("click", () => {
             lastActivation = extras.activation;
             renderActivation(lastActivation);
+            openTraceDrawer();
             traceView.scrollTop = 0;
           });
           actions.appendChild(btnT);
@@ -716,7 +856,67 @@
       };
     }
 
-    function nodeStyle(n) {
+    function sForms(n) {
+      const raw = Array.isArray(n.forms) ? n.forms : [];
+      const forms = [...new Set(raw.map((item) => String(item)).filter(Boolean))];
+      if (!forms.length && n.label) forms.push(n.label);
+      return forms;
+    }
+
+    function isSExpanded(id) {
+      if (expandAllS) return !collapsedS.has(id);
+      return expandedS.has(id);
+    }
+
+    function sDisplayLabel(n) {
+      if (n.group !== "S" || !isSExpanded(n.id)) return n.label;
+      const forms = sForms(n);
+      const extra = forms.filter((form) => form !== n.id);
+      return [n.id, ...extra].join("\n");
+    }
+
+    function toggleSExpand(id) {
+      if (!id) return;
+      if (expandAllS) {
+        if (collapsedS.has(id)) collapsedS.delete(id);
+        else collapsedS.add(id);
+      } else if (expandedS.has(id)) {
+        expandedS.delete(id);
+      } else {
+        expandedS.add(id);
+      }
+      restyleVisibleNodes();
+    }
+
+    function setExpandAllS(on) {
+      expandAllS = on;
+      collapsedS = new Set();
+      if (on) expandedS = new Set();
+      const btn = document.getElementById("expandS");
+      if (btn) btn.classList.toggle("active", expandAllS);
+      restyleVisibleNodes();
+    }
+
+    function restyleVisibleNodes() {
+      if (graphNodes && lastGraphData) {
+        graphNodes.update(
+          lastGraphData.nodes.map((n) => nodeStyle(n, { keepPosition: true }))
+        );
+      }
+      if (graphPane === "trace" && networkTrace) renderTraceGraph();
+    }
+
+    function bindSExpandClicks(net) {
+      if (!net) return;
+      net.on("click", (params) => {
+        const id = (params.nodes || [])[0];
+        if (!id || !lastGraphData) return;
+        const raw = lastGraphData.nodes.find((n) => n.id === id);
+        if (raw && raw.group === "S") toggleSExpand(id);
+      });
+    }
+
+    function nodeStyle(n, { keepPosition = false } = {}) {
       const act = n.activation || 0;
       const hi = highlight.has(n.id);
       if (n.kind === "hyperedge") {
@@ -724,8 +924,7 @@
           id: n.id,
           label: n.label,
           title: n.title,
-          x: n.x,
-          y: n.y,
+          ...(keepPosition ? {} : { x: n.x, y: n.y }),
           shape: "box",
           size: 28 + Math.min(10, act * 12),
           font: {
@@ -750,7 +949,8 @@
       }
       if (n.kind === "template") {
         return {
-          id: n.id, label: n.label, title: n.title, x: n.x, y: n.y,
+          id: n.id, label: n.label, title: n.title,
+          ...(keepPosition ? {} : { x: n.x, y: n.y }),
           shape: "box", size: 18,
           color: { background: "#7b5cff", border: "#ffffff" },
           font: labelFont("#ffffff", 11),
@@ -772,17 +972,22 @@
         H_k: { background: "#3aa0ff", border: "#d6ecff" },
       };
       const c = colors[n.group] || { background: "#6b7c93", border: "#e8eef6" };
+      const sOpen = n.group === "S" && isSExpanded(n.id);
       return {
         id: n.id,
-        label: n.label,
+        label: sDisplayLabel(n),
         title: n.title,
-        x: n.x,
-        y: n.y,
-        shape: n.group === "S" ? "dot" : "ellipse",
+        ...(keepPosition ? {} : { x: n.x, y: n.y }),
+        shape: sOpen ? "box" : (n.group === "S" ? "dot" : "ellipse"),
         size: (n.group === "S" ? 14 : 18) + Math.min(10, act * 14),
         color: hi ? { background: "#ff5c5c", border: "#ffffff" } : c,
         borderWidth: hi ? 3 : 2,
-        font: labelFont("#ffffff", 12),
+        font: {
+          ...labelFont("#ffffff", sOpen ? 11 : 12),
+          align: sOpen ? "left" : "center",
+        },
+        margin: sOpen ? 8 : 2,
+        widthConstraint: sOpen ? { maximum: 240 } : false,
         shadow: { enabled: true, color: "rgba(0,0,0,0.45)", size: 6, x: 0, y: 2 },
       };
     }
@@ -1001,6 +1206,7 @@
     function wipeNetwork() {
       lastHyperedges = [];
       lastComponents = [];
+      graphNodes = null;
       if (network) {
         try { network.destroy(); } catch (_) { /* ignore */ }
         network = null;
@@ -1167,6 +1373,7 @@
           interaction: { hover: true, tooltipDelay: 60 },
         }
       );
+      bindSExpandClicks(networkTrace);
       networkTrace.once("stabilizationIterationsDone", () => {
         networkTrace.setOptions({ physics: { enabled: false } });
         networkTrace.fit({ animation: false });
@@ -1214,6 +1421,7 @@
       }
 
       const nodes = new vis.DataSet(data.nodes.map(nodeStyle));
+      graphNodes = nodes;
       const edges = new vis.DataSet(data.edges.map(edgeStyle));
       const options = {
         layout: { improvedLayout: false, randomSeed: 42 },
@@ -1243,6 +1451,7 @@
         interaction: { hover: true, tooltipDelay: 60, multiselect: true },
       };
       network = new vis.Network(container, { nodes, edges }, options);
+      bindSExpandClicks(network);
       network.on("afterDrawing", (ctx) => {
         drawComponentFrames(ctx);
         drawHyperHulls(ctx);
@@ -1278,8 +1487,14 @@
         renderActivation(lastActivation);
         highlight = new Set(j.trace_uids || []);
         await loadHealth();
-        await loadGraph();
-        if (graphPane === "trace") renderTraceGraph();
+        if (graphOpen) {
+          graphLoaded = false;
+          await loadGraph();
+          graphLoaded = true;
+          if (graphPane === "trace") renderTraceGraph();
+        } else {
+          graphLoaded = false;
+        }
       } catch (e) {
         addMsg("bot", String(e), "error");
       } finally {
@@ -1316,11 +1531,28 @@
           "bot",
           `АГ-память:\n${j.ah_answer}\n\nБЯМ+RAG:\n${j.rag_answer}`,
           `compare · ${j.notes?.comparison_mode || mode} · ${j.notes?.mode || "?"} · ah=${j.ah_source} · rag=${j.rag_source} · corpus=${j.notes?.corpus_chars ?? "?"}`,
-          { systemPrompt: (preview ? `corpus:\n${preview}\n\n` : "") + (ragBits ? `chunks:\n${ragBits}` : "chunks: (пусто)") }
+          {
+            prompts: [
+              {
+                label: "промпт АГ",
+                text: j.ah_prompt || "Промпт АГ не подготовлен."
+              },
+              {
+                label: mode === "generated" ? "промпт RAG" : "контекст RAG",
+                text: j.rag_prompt || ((preview ? `corpus:\n${preview}\n\n` : "") + (ragBits ? `chunks:\n${ragBits}` : "chunks: (пусто)"))
+              }
+            ]
+          }
         );
         highlight = new Set(j.ah_trace_uids || []);
         await loadHealth();
-        await loadGraph();
+        if (graphOpen) {
+          graphLoaded = false;
+          await loadGraph();
+          graphLoaded = true;
+        } else {
+          graphLoaded = false;
+        }
       } catch (e) {
         addMsg("bot", String(e), "error");
       } finally {
@@ -1362,6 +1594,7 @@
     document.getElementById("refresh").addEventListener("click", loadGraph);
     document.getElementById("modeHyper").addEventListener("click", () => { graphMode = "hyper"; loadGraph(); });
     document.getElementById("modeAll").addEventListener("click", () => { graphMode = "all"; loadGraph(); });
+    document.getElementById("expandS").addEventListener("click", () => setExpandAllS(!expandAllS));
     document.getElementById("tabGraph").addEventListener("click", () => setGraphPane("graph"));
     document.getElementById("tabTraceGraph").addEventListener("click", () => setGraphPane("trace"));
     document.getElementById("dump").addEventListener("click", async () => {
@@ -1427,8 +1660,12 @@
         lastQuestion = "";
         addMsg("bot", `Загружен граф «${j.name}» · graph_size=${j.stats?.graph_size ?? "?"}`, "system");
         await loadHealth();
-        await loadGraph();
-        if (graphPane === "trace") renderTraceGraph();
+        graphLoaded = false;
+        if (graphOpen) {
+          await loadGraph();
+          graphLoaded = true;
+          if (graphPane === "trace") renderTraceGraph();
+        }
       } catch (e) {
         addMsg("bot", String(e), "error");
       }
@@ -1452,8 +1689,12 @@
         lastQuestion = "";
         addMsg("bot", "Граф и RAG очищены. Пиши факты/вопросы → Сравнить.", "system");
         await loadHealth();
-        await loadGraph();
-        if (graphPane === "trace") renderTraceGraph();
+        graphLoaded = false;
+        if (graphOpen) {
+          await loadGraph();
+          graphLoaded = true;
+          if (graphPane === "trace") renderTraceGraph();
+        }
       } catch (e) {
         addMsg("bot", String(e), "error");
       }
@@ -1468,10 +1709,30 @@
       catch (e) { addMsg("bot", String(e), "error"); }
     });
 
+    document.getElementById("openTrace").addEventListener("click", () => {
+      if (traceDrawer.classList.contains("open")) closeTraceDrawer();
+      else openTraceDrawer();
+    });
+    document.getElementById("openGraph").addEventListener("click", () => {
+      if (graphDrawer.classList.contains("open")) closeGraphDrawer();
+      else openGraphDrawer();
+    });
+    document.getElementById("closeTrace").addEventListener("click", closeTraceDrawer);
+    document.getElementById("closeGraph").addEventListener("click", closeGraphDrawer);
+    drawerBackdrop.addEventListener("click", () => {
+      closeTraceDrawer();
+      closeGraphDrawer();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeTraceDrawer();
+        closeGraphDrawer();
+      }
+    });
+
     (async () => {
       addMsg("bot", "Готов к диалогу. Каждая твоя реплика и ответ модели пишутся в АГ-память.", "system");
       await loadHealth();
-      await loadGraph();
       await refreshGraphLibrary();
     })();
   </script>

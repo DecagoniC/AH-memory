@@ -157,7 +157,7 @@ def _build_dialogue(core: Agent) -> DialogueAgent:
 
 def _apply_llm_provider(provider: LlmProvider) -> None:
     """Swap perception + dialogue client; keep current AH store/graph."""
-    global agent, dialogue, llm_provider
+    global agent, dialogue, comparer, llm_provider
     llm_provider = provider
     agent.perception = _make_perception(provider)
     hist = list(dialogue.history)
@@ -170,17 +170,23 @@ def _apply_llm_provider(provider: LlmProvider) -> None:
     dialogue._turn = turn
     dialogue.last_activation = last_act
     dialogue.last_graph_build_json = last_gb
+    comparer.dialogue = dialogue
 
 
-def _build_compare(core: Agent) -> CompareEngine:
+def _build_compare(core: Agent, responder: DialogueAgent) -> CompareEngine:
     """Сравнение на том же живом агенте, что и чат (корпус = диалог + факты)."""
     ds = cfg.deepseek if (cfg.agent.use_llm and cfg.deepseek.configured) else None
-    return CompareEngine(core, ticks=cfg.agent.ticks, deepseek=ds)
+    return CompareEngine(
+        core,
+        ticks=cfg.agent.ticks,
+        deepseek=ds,
+        dialogue=responder,
+    )
 
 
 agent = _build_core()
 dialogue = _build_dialogue(agent)
-comparer = _build_compare(agent)
+comparer = _build_compare(agent, dialogue)
 
 _synthetic_world: SyntheticWorld | None = None
 _synthetic_ingest: IngestResult | None = None
@@ -507,7 +513,7 @@ def reset(preload: str = "empty") -> dict[str, Any]:
     agent = _build_core()
     dialogue = _build_dialogue(agent)
     dialogue.reset_history()
-    comparer = _build_compare(agent)
+    comparer = _build_compare(agent, dialogue)
     comparer.clear()
     _synthetic_world = None
     _synthetic_ingest = None
@@ -562,7 +568,7 @@ def synthetic_generate(body: SyntheticGenerateIn) -> dict[str, Any]:
     dialogue = _build_dialogue(agent)
     dialogue.reset_history()
     ingest = ingest_world(world, agent.store)
-    comparer = _build_compare(agent)
+    comparer = _build_compare(agent, dialogue)
     docs = "\n\n".join(
         str(getattr(doc, "text", "") or "").strip()
         for doc in world.documents

@@ -4,24 +4,13 @@ from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass
 
+from ah_memory.context_ranker import symbol_label
 from ah_memory.factor_graph import Factor, FactorGraph, FactorKind
 from ah_memory.store import AHStore
 
 
 def node_label(store: AHStore, uid: str) -> str:
-    bare = uid[2:] if uid.startswith("M_") else uid
-    try:
-        e = store._find_anywhere(uid)  # noqa: SLF001
-        for p in getattr(e, "Pr", []) or []:
-            if p.name == "label" and p.value:
-                return str(p.value)
-    except Exception:
-        pass
-    if uid in store.ah.S:
-        forms = store.ah.S[uid].R.get("TEXT") or set()
-        if forms:
-            return next(iter(forms))
-    return bare.replace("_", " ").lower()
+    return symbol_label(store, uid)
 
 
 def _factor_via(store: AHStore, f: Factor) -> str:

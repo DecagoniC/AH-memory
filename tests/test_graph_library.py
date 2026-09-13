@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from ah_memory.agent import Agent
+from ah_memory.graph_export import dump_graph
 from ah_memory.graph_library import GraphLibrary, make_graph_id
+from ah_memory.store import AHStore
 from ah_memory.store_codec import restore_store, snapshot_store
 from tests._mini_graph import build_mini_open_store
 
@@ -60,3 +62,12 @@ def test_agent_adopt_store_restores_askable_graph() -> None:
     assert agent.store.graph_size() > 0
     assert agent.store is agent.ignition.store
     assert agent.store is agent.dsl.store
+
+
+def test_dump_graph_exports_all_s_forms() -> None:
+    store = AHStore()
+    store.ensure_abstract("TOKEN", {"alpha", "beta", "gamma"})
+    node = next(item for item in dump_graph(store)["nodes"] if item["id"] == "TOKEN")
+    assert node["forms"] == ["alpha", "beta", "gamma"]
+    assert node["label"] in node["forms"]
+    assert all(form in node["title"] for form in node["forms"])

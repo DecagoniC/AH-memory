@@ -26,6 +26,7 @@ experiment = ["matplotlib>=3.8"]
 
 [project.scripts]
 ah-web = "web.app:main"
+ah-ingest = "ah_memory.stream_ingest_cli:main"
 ah-entity-resolution = "ah_memory.benchmarks.entity_resolution.runner:main"
 ah-challenge = "ah_memory.benchmarks.challenge.runner:main"
 

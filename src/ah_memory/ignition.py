@@ -86,10 +86,13 @@ class WorkingMemory:
         return tuple(
             sorted(
                 self._entries.values(),
-                key=lambda entry: entry.activation,
-                reverse=True,
+                key=lambda entry: (-entry.activation, entry.uid),
             )
         )
+
+    def ranked_uids(self, limit: int | None = None) -> list[str]:
+        ranked = [entry.uid for entry in self.entries()]
+        return ranked if limit is None else ranked[: max(0, limit)]
 
     def snapshot(self) -> list[dict]:
         return [
@@ -282,7 +285,7 @@ class IgnitionEngine:
             threshold=hp.threshold_t,
             support=support,
         )
-        activated = sorted(self.wm.contents())
+        activated = self.wm.ranked_uids()
         weight_updates = self._hebb_update() if hp.fg_hebb_enabled else 0
 
         if self.store is not None:
@@ -420,7 +423,7 @@ class IgnitionEngine:
             and self.hp.pacemaker_period > 0
             and self.store.ah.tau % self.hp.pacemaker_period == 0
         ):
-            targets = list(self.wm.contents())[:5] or list(self.store.ah.S)[:3]
+            targets = self.wm.ranked_uids(5)
             for uid in targets:
                 if uid in self.graph.var_factors:
                     self._evidence[uid] = self._evidence.get(uid, 0.0) + 0.4

@@ -27,6 +27,8 @@ STOP = {
 
 # max tokens in a role UID (mega-subjects from whole-clause match)
 MAX_UID_PARTS = 4
+# Overlong UID phrases are head-final; prompt/UI keep the last two parts.
+MAX_DISPLAY_PARTS = 2
 
 _NON_ENTITY_POS = frozenset({
     "VERB", "INFN", "GRND", "PRTF", "PRTS", "ADVB", "CONJ", "PREP", "PRCL",
@@ -192,6 +194,38 @@ def slug_uid(token: str) -> str:
         lemmas = (nouns or lemmas)[-MAX_UID_PARTS:]
     uid = "_".join(lemmas).upper()
     return uid[:48] if uid else "UNK"
+
+
+def humanize_symbol_text(
+    text: str,
+    *,
+    uid: str | None = None,
+    compact: bool = False,
+) -> str:
+    """Turn M_/UPPER_SNAKE (or an expanded slug label) into a readable phrase."""
+    raw = str(text or "").strip()
+    source = uid or raw
+    if raw.startswith("M_"):
+        raw = raw[2:]
+    from_slug = bool(raw) and (
+        "_" in raw or (raw.isupper() and " " not in raw)
+    )
+    if from_slug:
+        parts = [part.lower() if part.isupper() else part for part in raw.split("_") if part]
+    else:
+        parts = [part for part in raw.split() if part]
+        bare = str(source)
+        if bare.startswith("M_"):
+            bare = bare[2:]
+        uid_phrase = " ".join(piece.lower() for piece in bare.split("_") if piece)
+        if raw.lower() == uid_phrase:
+            from_slug = True
+            parts = uid_phrase.split()
+    if compact and from_slug and len(parts) > MAX_UID_PARTS - 1:
+        parts = parts[-MAX_DISPLAY_PARTS:]
+    elif from_slug:
+        parts = [part.lower() if part.isupper() else part for part in parts]
+    return " ".join(parts)
 
 
 def uid_too_wide(uid: str) -> bool:

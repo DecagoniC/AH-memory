@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
+from ah_memory.context_ranker import symbol_label
 from ah_memory.store import AHStore
 from ah_memory.types import SecondOrderSymbol
 
@@ -62,16 +63,20 @@ def dump_graph(
         if store.get_relation(uid) is not None:
             continue
         px, py = _place("S")
+        forms = _s_forms(s.R.get("TEXT"), uid)
         nodes.append(
             {
                 "id": uid,
-                "label": next(iter(s.R.get("TEXT", (uid,))), uid),
+                "label": forms[0],
+                "forms": forms,
                 "group": "S",
                 "kind": "vertex",
                 "activation": round(_act(uid, s.x), 4),
                 "x": px,
                 "y": py,
-                "title": f"S {uid}\nR={{{_fmt_R(s.R)}}}\nact={_act(uid, s.x):.3f}",
+                "title": (
+                    f"S {uid}\nформы: {', '.join(forms)}\nact={_act(uid, s.x):.3f}"
+                ),
             }
         )
 
@@ -80,10 +85,12 @@ def dump_graph(
             if not isinstance(e, SecondOrderSymbol):
                 continue
             act = _act(uid, float(getattr(e, "x", 0.0)))
-            label = uid
-            for p in e.Pr:
-                if p.name == "label":
-                    label = p.value
+            label = symbol_label(store, uid, compact=True)
+            if not label:
+                label = uid
+                for p in e.Pr:
+                    if p.name == "label":
+                        label = p.value
             kind_meta = next((p.value for p in e.Mt if p.name == "kind"), "")
             layer = "episode" if kind_meta == "Episode" or section_name == "H" else "vertex"
             group = f"{section_name}_k" if kind_meta == "Episode" else f"{section_name}_m"
@@ -110,7 +117,9 @@ def dump_graph(
             relation.canonical_label if relation is not None else "RELATED_TO"
         )
         raw_relation = str(factor.metadata.get("raw_relation") or pred)
-        role_lines = "\n".join(f"{r} → {_short(v)}" for r, v in roles.items())
+        role_lines = "\n".join(
+            f"{r} → {symbol_label(store, v, compact=True)}" for r, v in roles.items()
+        )
         label = f"⟦{pred}⟧\n{role_lines}" if roles else f"⟦{pred}⟧"
         px, py = _place("hyperedge")
         n_activation = _act(
@@ -278,18 +287,6 @@ def dump_ah_json(store: AHStore) -> dict[str, Any]:
     return payload
 
 
-def _short(uid: str) -> str:
-    if uid.startswith("M_"):
-        return uid[2:]
-    if uid.startswith("G_"):
-        return uid[2:]
-    if uid.startswith("K_"):
-        return uid[2:]
-    return uid
-
-
-def _fmt_R(R: dict[str, set[str]]) -> str:
-    parts = []
-    for m, forms in R.items():
-        parts.append(f"{m}:{'|'.join(sorted(forms)[:5])}")
-    return ", ".join(parts)
+def _s_forms(text: set[str] | None, uid: str) -> list[str]:
+    forms = sorted({str(item).strip() for item in (text or set()) if str(item).strip()})
+    return forms or [uid]

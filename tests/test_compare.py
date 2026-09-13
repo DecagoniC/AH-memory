@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from ah_memory.compare import CompareEngine
 from ah_memory.config import DeepSeekConfig
+from ah_memory.dialogue import AH_CONTEXT_PREAMBLE, DIALOGUE_SYSTEM, DialogueAgent
 
 
 def test_compare_turn_offline() -> None:
@@ -95,6 +96,47 @@ def test_compare_modes_separate_raw_and_shared_generation() -> None:
     )
 
 
+def test_live_compare_reuses_dialogue_ah_prompt_pipeline() -> None:
+    class RecordingClient:
+        def __init__(self) -> None:
+            self.calls: list[list[dict[str, str]]] = []
+
+        def chat(self, messages, *, json_mode=False) -> str:
+            self.calls.append(messages)
+            return "единый ответ"
+
+    eng = CompareEngine.from_m4_gold(
+        DeepSeekConfig(api_key=""),
+        ticks=4,
+    )
+    client = RecordingClient()
+    dialogue = DialogueAgent(
+        eng.agent,
+        chat_client=client,
+        provider="recording",
+    )
+    eng.dialogue = dialogue
+    question = "Какие ресурсы есть на Тиманском кряже?"
+
+    chat_preview = dialogue.answer_read_only(
+        question,
+        ticks=4,
+        generate=True,
+    )
+    compared = eng.ask(question, ticks=4, mode="generated")
+
+    assert compared.notes["shared_ah_pipeline"] is True
+    assert compared.ah_prompt == chat_preview.system_prompt
+    assert compared.ah_prompt.startswith(DIALOGUE_SYSTEM)
+    assert compared.rag_prompt.startswith(DIALOGUE_SYSTEM)
+    assert AH_CONTEXT_PREAMBLE in compared.ah_prompt
+    assert "единственный источник фактов" in compared.rag_prompt
+    assert compared.ah_full_trace["question"] == question
+    assert compared.ah_perception["kind"] == "question"
+    assert compared.ah_answer == "единый ответ"
+    assert compared.rag_answer == "единый ответ"
+
+
 def test_live_rag_summarizes_multi_fact() -> None:
     from ah_memory.config import load_config
 
@@ -108,3 +150,12 @@ def test_live_rag_summarizes_multi_fact() -> None:
     )
     rag = turn.rag_answer.lower().replace("ё", "е")
     assert "боксит" in rag or "нефт" in rag or "ресурс" in rag
+
+
+def test_dialogue_system_forbids_world_knowledge_when_context_present() -> None:
+    text = DIALOGUE_SYSTEM.lower()
+    assert "опирайся только на него" in text
+    assert "не восполняй пробелы общими знаниями" in text
+    assert "неизвестн" in text
+    assert "не отмалчивайся" not in DIALOGUE_SYSTEM
+    assert "единственный источник фактов" in AH_CONTEXT_PREAMBLE.lower()

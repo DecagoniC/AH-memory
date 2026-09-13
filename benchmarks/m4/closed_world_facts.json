@@ -1,7 +1,7 @@
 {
   "source": "D:/Go-prog/AH-memory/benchmarks/m4/closed_world.txt",
   "n_batches": 3,
-  "n_candidates": 43,
+  "n_candidates": 39,
   "candidates": [
     {
       "predicate": "LOCATED_IN",
@@ -14,7 +14,8 @@
       "raw_relation": "расположена на северо-востоке Восточно-Европейской равнины",
       "canonical_relation": "LOCATED_IN",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "EXTENDS_FROM_TO",
@@ -27,23 +28,26 @@
       "raw_relation": "тянется на 900 километров от Чёшской губы Баренцева моря на юго-восток до истоков реки Вычегды",
       "canonical_relation": "EXTENDS_FROM_TO",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "CREATED_MAP",
+      "predicate": "COMPOSED_MAP",
       "roles": {
         "SUBJECT": "КЕЙЗЕРЛИНГ",
-        "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ"
+        "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ",
+        "TIME": "1847"
       },
       "raw_span": "составили в 1847 году первую карту Тиманского кряжа",
       "confidence": 1.0,
       "raw_relation": "составили в 1847 году первую карту Тиманского кряжа",
-      "canonical_relation": "CREATED_MAP",
+      "canonical_relation": "COMPOSED_MAP",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "NAMED",
+      "predicate": "NAMED_FIRST",
       "roles": {
         "SUBJECT": "КЕЙЗЕРЛИНГ",
         "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
@@ -51,48 +55,54 @@
       "raw_span": "Кейзерлинг первым назвал кряж Тиманским",
       "confidence": 1.0,
       "raw_relation": "первым назвал кряж Тиманским",
-      "canonical_relation": "NAMED",
+      "canonical_relation": "NAMED_FIRST",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HYPOTHESIZED_AS",
+      "predicate": "SUPPOSED_INDEPENDENT",
       "roles": {
         "SUBJECT": "КЕЙЗЕРЛИНГ",
-        "OBJECT": "САМОСТОЯТЕЛЬНЫЙ_ГОРНЫЙ_СООРУЖЕНИЕ"
+        "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
       },
       "raw_span": "предположив, что это не ответвление Урала, а самостоятельное горное сооружение",
       "confidence": 1.0,
       "raw_relation": "предположив, что это не ответвление Урала, а самостоятельное горное сооружение",
-      "canonical_relation": "HYPOTHESIZED_AS",
+      "canonical_relation": "SUPPOSED_INDEPENDENT",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "CREATED_MAP",
+      "predicate": "COMPOSED_MAP",
       "roles": {
         "SUBJECT": "КРУЗЕНШТЕРН",
-        "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ"
+        "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ",
+        "TIME": "1847"
       },
       "raw_span": "составили в 1847 году первую карту Тиманского кряжа",
       "confidence": 1.0,
       "raw_relation": "составили в 1847 году первую карту Тиманского кряжа",
-      "canonical_relation": "CREATED_MAP",
+      "canonical_relation": "COMPOSED_MAP",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "DESCRIBED",
+      "predicate": "DESCRIBED_FIRST",
       "roles": {
         "SUBJECT": "ФОМИН",
-        "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
+        "OBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "TIME": "1797"
       },
-      "raw_span": "первым описал Тиманский кряж",
+      "raw_span": "первым описал Тиманский кряж (называя его камнем)",
       "confidence": 1.0,
-      "raw_relation": "первым описал Тиманский кряж",
-      "canonical_relation": "DESCRIBED",
+      "raw_relation": "первым описал Тиманский кряж (называя его камнем)",
+      "canonical_relation": "DESCRIBED_FIRST",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "HAS_LENGTH",
@@ -102,10 +112,11 @@
       },
       "raw_span": "Длина кряжа составляет около 950 км",
       "confidence": 1.0,
-      "raw_relation": "составляет",
+      "raw_relation": "составляет около 950 км",
       "canonical_relation": "HAS_LENGTH",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "SEPARATES",
@@ -115,10 +126,11 @@
       },
       "raw_span": "Разделяет Двинско-Печорский бассейн на две части",
       "confidence": 1.0,
-      "raw_relation": "разделяет",
+      "raw_relation": "разделяет на две части",
       "canonical_relation": "SEPARATES",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "HAS_PART",
@@ -126,12 +138,13 @@
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
         "OBJECT": "СЕВЕРНЫЙ_ЧАСТЬ"
       },
-      "raw_span": "В Тиманском кряже выделяют три части: Северная часть",
+      "raw_span": "выделяют три части: Северная часть",
       "confidence": 1.0,
-      "raw_relation": "выделяют",
+      "raw_relation": "выделяют три части",
       "canonical_relation": "HAS_PART",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "HAS_PART",
@@ -139,12 +152,13 @@
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
         "OBJECT": "СРЕДНИЙ_ЧАСТЬ"
       },
-      "raw_span": "В Тиманском кряже выделяют три части: Средняя часть",
+      "raw_span": "выделяют три части: Средняя часть",
       "confidence": 1.0,
-      "raw_relation": "выделяют",
+      "raw_relation": "выделяют три части",
       "canonical_relation": "HAS_PART",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "HAS_PART",
@@ -152,12 +166,13 @@
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
         "OBJECT": "ЮЖНЫЙ_ЧАСТЬ"
       },
-      "raw_span": "В Тиманском кряже выделяют три части: Южная часть",
+      "raw_span": "выделяют три части: Южная часть",
       "confidence": 1.0,
-      "raw_relation": "выделяют",
+      "raw_relation": "выделяют три части",
       "canonical_relation": "HAS_PART",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "BOUNDED_BY",
@@ -167,49 +182,53 @@
       },
       "raw_span": "Северная часть — ограничена долиной реки Пижма Мезенская",
       "confidence": 1.0,
-      "raw_relation": "ограничена",
+      "raw_relation": "ограничена долиной реки Пижма Мезенская",
       "canonical_relation": "BOUNDED_BY",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_PART",
+      "predicate": "CONSISTS_OF",
       "roles": {
         "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
         "OBJECT": "КОСМИНСКИЙ_КАМЕНЬ"
       },
-      "raw_span": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+      "raw_span": "состоит из невысоких гряд Косминский Камень",
       "confidence": 1.0,
-      "raw_relation": "состоит из",
-      "canonical_relation": "HAS_PART",
+      "raw_relation": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+      "canonical_relation": "CONSISTS_OF",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_PART",
+      "predicate": "CONSISTS_OF",
       "roles": {
         "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
         "OBJECT": "ТИМАНСКИЙ_КАМЕНЬ"
       },
-      "raw_span": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+      "raw_span": "состоит из невысоких гряд Тиманский Камень",
       "confidence": 1.0,
-      "raw_relation": "состоит из",
-      "canonical_relation": "HAS_PART",
+      "raw_relation": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+      "canonical_relation": "CONSISTS_OF",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_HEIGHT",
+      "predicate": "HAS_MAX_HEIGHT",
       "roles": {
         "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
         "OBJECT": "303"
       },
       "raw_span": "высота достигает 303 м",
       "confidence": 1.0,
-      "raw_relation": "достигает",
-      "canonical_relation": "HAS_HEIGHT",
+      "raw_relation": "высота достигает 303 м",
+      "canonical_relation": "HAS_MAX_HEIGHT",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "LOCATED_IN",
@@ -217,12 +236,13 @@
         "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
         "OBJECT": "ТУНДРА"
       },
-      "raw_span": "Северная часть расположена в пределах тундры и лесотундры",
+      "raw_span": "расположена в пределах тундры",
       "confidence": 1.0,
-      "raw_relation": "расположена в пределах",
+      "raw_relation": "расположена в пределах тундры и лесотундры",
       "canonical_relation": "LOCATED_IN",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "LOCATED_IN",
@@ -230,12 +250,13 @@
         "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
         "OBJECT": "ЛЕСОТУНДРА"
       },
-      "raw_span": "Северная часть расположена в пределах тундры и лесотундры",
+      "raw_span": "расположена в пределах лесотундры",
       "confidence": 1.0,
-      "raw_relation": "расположена в пределах",
+      "raw_relation": "расположена в пределах тундры и лесотундры",
       "canonical_relation": "LOCATED_IN",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "BOUNDED_BY",
@@ -243,12 +264,13 @@
         "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
         "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_МЕЗЕНСКИЙ"
       },
-      "raw_span": "Средняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская",
+      "raw_span": "ограничена долинами рек Пижма Мезенская",
       "confidence": 1.0,
-      "raw_relation": "ограничена",
+      "raw_relation": "ограничена долинами рек Пижма Мезенская и Пижма Печорская",
       "canonical_relation": "BOUNDED_BY",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "BOUNDED_BY",
@@ -256,25 +278,27 @@
         "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
         "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_ПЕЧОРСКИЙ"
       },
-      "raw_span": "Средняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская",
+      "raw_span": "ограничена долинами рек Пижма Печорская",
       "confidence": 1.0,
-      "raw_relation": "ограничена",
+      "raw_relation": "ограничена долинами рек Пижма Мезенская и Пижма Печорская",
       "canonical_relation": "BOUNDED_BY",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "IS",
+      "predicate": "IS_HIGHEST_PART_OF",
       "roles": {
         "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
-        "OBJECT": "НАИБОЛЕЕ_ВЫСОКИЙ_ЧАСТЬ_КРЯЖ"
+        "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
       },
       "raw_span": "является наиболее высокой частью кряжа",
       "confidence": 1.0,
-      "raw_relation": "является",
-      "canonical_relation": "IS",
+      "raw_relation": "является наиболее высокой частью кряжа",
+      "canonical_relation": "IS_HIGHEST_PART_OF",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "HAS_HIGHEST_POINT",
@@ -282,25 +306,27 @@
         "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
         "OBJECT": "ЧЕТЛАССКИЙ_КАМЕНЬ"
       },
-      "raw_span": "высшая точка — Четласский Камень (471 м)",
+      "raw_span": "высшая точка — Четласский Камень",
       "confidence": 1.0,
-      "raw_relation": "высшая точка",
+      "raw_relation": "высшая точка — Четласский Камень (471 м)",
       "canonical_relation": "HAS_HIGHEST_POINT",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "IS",
+      "predicate": "IS_A",
       "roles": {
         "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
         "OBJECT": "ПЛАТО"
       },
       "raw_span": "Южная часть — представляет собой плато",
       "confidence": 1.0,
-      "raw_relation": "представляет собой",
-      "canonical_relation": "IS",
+      "raw_relation": "представляет собой плато",
+      "canonical_relation": "IS_A",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "DISSECTED_BY",
@@ -310,10 +336,25 @@
       },
       "raw_span": "расчленённое долинами рек",
       "confidence": 1.0,
-      "raw_relation": "расчленено",
+      "raw_relation": "расчленённое долинами рек на несколько отдельных возвышенностей",
       "canonical_relation": "DISSECTED_BY",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
+    },
+    {
+      "predicate": "HAS_HEIGHT",
+      "roles": {
+        "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
+        "OBJECT": "300_350"
+      },
+      "raw_span": "высота до 300—350 м",
+      "confidence": 1.0,
+      "raw_relation": "высота до 300—350 м",
+      "canonical_relation": "HAS_HEIGHT",
+      "statement_type": "assertion",
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "LOCATED_IN",
@@ -321,210 +362,163 @@
         "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
         "OBJECT": "ТАЙГА"
       },
-      "raw_span": "Южная часть располагается в пределах тайги",
+      "raw_span": "располагается в пределах тайги",
       "confidence": 1.0,
-      "raw_relation": "располагается в пределах",
+      "raw_relation": "располагается в пределах тайги",
       "canonical_relation": "LOCATED_IN",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
       "predicate": "FORMED_IN",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-        "OBJECT": "БАЙКАЛЬСКИЙ_ЭПОХА_ТЕКТОГЕНЕЗ"
+        "TIME": "БАЙКАЛЬСКИЙ_ЭПОХА_ТЕКТОГЕНЕЗ"
       },
       "raw_span": "Тиманский кряж был сформирован в Байкальскую эпоху тектогенеза",
       "confidence": 1.0,
       "raw_relation": "был сформирован в",
       "canonical_relation": "FORMED_IN",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-        "OBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ"
-      },
-      "raw_span": "россыпи титановых минералов",
-      "confidence": 1.0,
-      "raw_relation": "полезные ископаемые: россыпи титановых минералов",
-      "canonical_relation": "HAS_MINERAL",
-      "statement_type": "assertion",
-      "source": "user"
-    },
-    {
-      "predicate": "LOCATED_AT",
-      "roles": {
-        "SUBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ",
-        "OBJECT": "ЯРЕГ"
+        "OBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ",
+        "LOCATION": "ЯРЕГ"
       },
       "raw_span": "россыпи титановых минералов (Ярега)",
       "confidence": 1.0,
-      "raw_relation": "россыпи титановых минералов (Ярега)",
-      "canonical_relation": "LOCATED_AT",
+      "raw_relation": "россыпи титановых минералов",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-        "OBJECT": "БОКСИТ"
-      },
-      "raw_span": "бокситы",
-      "confidence": 1.0,
-      "raw_relation": "полезные ископаемые: бокситы",
-      "canonical_relation": "HAS_MINERAL",
-      "statement_type": "assertion",
-      "source": "user"
-    },
-    {
-      "predicate": "LOCATED_AT",
-      "roles": {
-        "SUBJECT": "БОКСИТ",
-        "OBJECT": "ЧЕТЛАССКИЙ_КАМЕНЬ"
+        "OBJECT": "БОКСИТ",
+        "LOCATION": "ЧЕТЛАССКИЙ_КАМЕНЬ"
       },
       "raw_span": "бокситы (Четласский Камень)",
       "confidence": 1.0,
-      "raw_relation": "бокситы (Четласский Камень)",
-      "canonical_relation": "LOCATED_AT",
+      "raw_relation": "бокситы",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-        "OBJECT": "АГАТЫ"
-      },
-      "raw_span": "агаты",
-      "confidence": 1.0,
-      "raw_relation": "полезные ископаемые: агаты",
-      "canonical_relation": "HAS_MINERAL",
-      "statement_type": "assertion",
-      "source": "user"
-    },
-    {
-      "predicate": "ASSOCIATED_WITH",
-      "roles": {
-        "SUBJECT": "АГАТЫ",
-        "OBJECT": "ДЕВОНСКИЙ_БАЗАЛЬТ"
+        "OBJECT": "АГАТЫ",
+        "CAUSE": "ДЕВОНСКИЙ_БАЗАЛЬТ"
       },
       "raw_span": "агаты, связанные с девонскими базальтами",
       "confidence": 1.0,
       "raw_relation": "агаты, связанные с девонскими базальтами",
-      "canonical_relation": "ASSOCIATED_WITH",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-        "OBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ"
+        "OBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
+        "LOCATION": "ЯРЕГ_ПОД_УХТА"
       },
-      "raw_span": "месторождения нефти",
+      "raw_span": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
       "confidence": 1.0,
-      "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
-      "canonical_relation": "HAS_MINERAL",
+      "raw_relation": "месторождения нефти",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "LOCATED_AT",
-      "roles": {
-        "SUBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
-        "OBJECT": "ЯРЕГ_ПОД_УХТА"
-      },
-      "raw_span": "Ярега под Ухтой",
-      "confidence": 1.0,
-      "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
-      "canonical_relation": "LOCATED_AT",
-      "statement_type": "assertion",
-      "source": "user"
-    },
-    {
-      "predicate": "LOCATED_AT",
-      "roles": {
-        "SUBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
-        "OBJECT": "ЛАЯВОЖИЙ"
-      },
-      "raw_span": "Лаявож",
-      "confidence": 1.0,
-      "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
-      "canonical_relation": "LOCATED_AT",
-      "statement_type": "assertion",
-      "source": "user"
-    },
-    {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-        "OBJECT": "КОНДЕНСАТ"
+        "OBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
+        "LOCATION": "ЛАЯВОЖИЙ"
       },
-      "raw_span": "конденсата",
+      "raw_span": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
       "confidence": 1.0,
-      "raw_relation": "газа и конденсата (Войвож и Омра)",
-      "canonical_relation": "HAS_MINERAL",
+      "raw_relation": "месторождения нефти",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "LOCATED_AT",
+      "predicate": "HAS_RESOURCE",
       "roles": {
-        "SUBJECT": "КОНДЕНСАТ",
-        "OBJECT": "ВОЙВОЖИЙ"
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "КОНДЕНСАТ",
+        "LOCATION": "ВОЙВОЖИЙ"
       },
-      "raw_span": "Войвож",
+      "raw_span": "газа и конденсата (Войвож и Омра)",
       "confidence": 1.0,
-      "raw_relation": "газа и конденсата (Войвож и Омра)",
-      "canonical_relation": "LOCATED_AT",
+      "raw_relation": "газа и конденсата",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "LOCATED_AT",
+      "predicate": "HAS_RESOURCE",
       "roles": {
-        "SUBJECT": "КОНДЕНСАТ",
-        "OBJECT": "ОМР"
+        "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "OBJECT": "КОНДЕНСАТ",
+        "LOCATION": "ОМР"
       },
-      "raw_span": "Омра",
+      "raw_span": "газа и конденсата (Войвож и Омра)",
       "confidence": 1.0,
-      "raw_relation": "газа и конденсата (Войвож и Омра)",
-      "canonical_relation": "LOCATED_AT",
+      "raw_relation": "газа и конденсата",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
         "OBJECT": "БИТУМ"
       },
-      "raw_span": "битумы",
+      "raw_span": "битумы и горючие сланцы",
       "confidence": 1.0,
       "raw_relation": "битумы и горючие сланцы",
-      "canonical_relation": "HAS_MINERAL",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
         "OBJECT": "ГОРЮЧИЙ_СЛАНЦЫ"
       },
-      "raw_span": "горючие сланцы",
+      "raw_span": "битумы и горючие сланцы",
       "confidence": 1.0,
       "raw_relation": "битумы и горючие сланцы",
-      "canonical_relation": "HAS_MINERAL",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
         "OBJECT": "ТОРФ"
@@ -532,12 +526,13 @@
       "raw_span": "торф",
       "confidence": 1.0,
       "raw_relation": "торф",
-      "canonical_relation": "HAS_MINERAL",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
         "OBJECT": "СТРОИТЕЛЬНЫЙ_КАМНИ"
@@ -545,22 +540,25 @@
       "raw_span": "строительные камни",
       "confidence": 1.0,
       "raw_relation": "строительные камни",
-      "canonical_relation": "HAS_MINERAL",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     },
     {
-      "predicate": "HAS_MINERAL",
+      "predicate": "HAS_RESOURCE",
       "roles": {
         "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+        "CAUSE": "ДЕВОНСКИЙ_БАЗАЛЬТ",
         "OBJECT": "ГАЗА"
       },
       "raw_span": "газа",
       "confidence": 0.8,
-      "raw_relation": "полезные ископаемые: россыпи титановых минералов",
-      "canonical_relation": "HAS_MINERAL",
+      "raw_relation": "россыпи титановых минералов",
+      "canonical_relation": "HAS_RESOURCE",
       "statement_type": "assertion",
-      "source": "user"
+      "source": "user",
+      "metadata": {}
     }
   ],
   "batches": [
@@ -580,7 +578,8 @@
           "raw_relation": "расположена на северо-востоке Восточно-Европейской равнины",
           "canonical_relation": "LOCATED_IN",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "EXTENDS_FROM_TO",
@@ -593,23 +592,26 @@
           "raw_relation": "тянется на 900 километров от Чёшской губы Баренцева моря на юго-восток до истоков реки Вычегды",
           "canonical_relation": "EXTENDS_FROM_TO",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "CREATED_MAP",
+          "predicate": "COMPOSED_MAP",
           "roles": {
             "SUBJECT": "КЕЙЗЕРЛИНГ",
-            "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ"
+            "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ",
+            "TIME": "1847"
           },
           "raw_span": "составили в 1847 году первую карту Тиманского кряжа",
           "confidence": 1.0,
           "raw_relation": "составили в 1847 году первую карту Тиманского кряжа",
-          "canonical_relation": "CREATED_MAP",
+          "canonical_relation": "COMPOSED_MAP",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "NAMED",
+          "predicate": "NAMED_FIRST",
           "roles": {
             "SUBJECT": "КЕЙЗЕРЛИНГ",
             "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
@@ -617,58 +619,64 @@
           "raw_span": "Кейзерлинг первым назвал кряж Тиманским",
           "confidence": 1.0,
           "raw_relation": "первым назвал кряж Тиманским",
-          "canonical_relation": "NAMED",
+          "canonical_relation": "NAMED_FIRST",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HYPOTHESIZED_AS",
+          "predicate": "SUPPOSED_INDEPENDENT",
           "roles": {
             "SUBJECT": "КЕЙЗЕРЛИНГ",
-            "OBJECT": "САМОСТОЯТЕЛЬНЫЙ_ГОРНЫЙ_СООРУЖЕНИЕ"
+            "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
           },
           "raw_span": "предположив, что это не ответвление Урала, а самостоятельное горное сооружение",
           "confidence": 1.0,
           "raw_relation": "предположив, что это не ответвление Урала, а самостоятельное горное сооружение",
-          "canonical_relation": "HYPOTHESIZED_AS",
+          "canonical_relation": "SUPPOSED_INDEPENDENT",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "CREATED_MAP",
+          "predicate": "COMPOSED_MAP",
           "roles": {
             "SUBJECT": "КРУЗЕНШТЕРН",
-            "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ"
+            "OBJECT": "ПЕРВЫЙ_КАРТА_ТИМАНСКИЙ_КРЯЖ",
+            "TIME": "1847"
           },
           "raw_span": "составили в 1847 году первую карту Тиманского кряжа",
           "confidence": 1.0,
           "raw_relation": "составили в 1847 году первую карту Тиманского кряжа",
-          "canonical_relation": "CREATED_MAP",
+          "canonical_relation": "COMPOSED_MAP",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "DESCRIBED",
+          "predicate": "DESCRIBED_FIRST",
           "roles": {
             "SUBJECT": "ФОМИН",
-            "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
+            "OBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "TIME": "1797"
           },
-          "raw_span": "первым описал Тиманский кряж",
+          "raw_span": "первым описал Тиманский кряж (называя его камнем)",
           "confidence": 1.0,
-          "raw_relation": "первым описал Тиманский кряж",
-          "canonical_relation": "DESCRIBED",
+          "raw_relation": "первым описал Тиманский кряж (называя его камнем)",
+          "canonical_relation": "DESCRIBED_FIRST",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         }
       ],
       "created_n": [
         "SF::E_00001",
         "SF::E_00004",
         "SF::E_00006",
-        "SF::E_00009",
         "SF::E_00011",
         "SF::E_00013",
-        "SF::E_00016"
+        "SF::E_00014",
+        "SF::E_00018"
       ],
       "skipped": [],
       "segments": [
@@ -684,6 +692,7 @@
             1,
             2,
             3,
+            4,
             5,
             6
           ]
@@ -746,6 +755,7 @@
             1,
             2,
             3,
+            4,
             5,
             6
           ]
@@ -768,10 +778,11 @@
           },
           "raw_span": "Длина кряжа составляет около 950 км",
           "confidence": 1.0,
-          "raw_relation": "составляет",
+          "raw_relation": "составляет около 950 км",
           "canonical_relation": "HAS_LENGTH",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "SEPARATES",
@@ -781,10 +792,11 @@
           },
           "raw_span": "Разделяет Двинско-Печорский бассейн на две части",
           "confidence": 1.0,
-          "raw_relation": "разделяет",
+          "raw_relation": "разделяет на две части",
           "canonical_relation": "SEPARATES",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "HAS_PART",
@@ -792,12 +804,13 @@
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
             "OBJECT": "СЕВЕРНЫЙ_ЧАСТЬ"
           },
-          "raw_span": "В Тиманском кряже выделяют три части: Северная часть",
+          "raw_span": "выделяют три части: Северная часть",
           "confidence": 1.0,
-          "raw_relation": "выделяют",
+          "raw_relation": "выделяют три части",
           "canonical_relation": "HAS_PART",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "HAS_PART",
@@ -805,12 +818,13 @@
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
             "OBJECT": "СРЕДНИЙ_ЧАСТЬ"
           },
-          "raw_span": "В Тиманском кряже выделяют три части: Средняя часть",
+          "raw_span": "выделяют три части: Средняя часть",
           "confidence": 1.0,
-          "raw_relation": "выделяют",
+          "raw_relation": "выделяют три части",
           "canonical_relation": "HAS_PART",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "HAS_PART",
@@ -818,12 +832,13 @@
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
             "OBJECT": "ЮЖНЫЙ_ЧАСТЬ"
           },
-          "raw_span": "В Тиманском кряже выделяют три части: Южная часть",
+          "raw_span": "выделяют три части: Южная часть",
           "confidence": 1.0,
-          "raw_relation": "выделяют",
+          "raw_relation": "выделяют три части",
           "canonical_relation": "HAS_PART",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "BOUNDED_BY",
@@ -833,49 +848,53 @@
           },
           "raw_span": "Северная часть — ограничена долиной реки Пижма Мезенская",
           "confidence": 1.0,
-          "raw_relation": "ограничена",
+          "raw_relation": "ограничена долиной реки Пижма Мезенская",
           "canonical_relation": "BOUNDED_BY",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_PART",
+          "predicate": "CONSISTS_OF",
           "roles": {
             "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
             "OBJECT": "КОСМИНСКИЙ_КАМЕНЬ"
           },
-          "raw_span": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+          "raw_span": "состоит из невысоких гряд Косминский Камень",
           "confidence": 1.0,
-          "raw_relation": "состоит из",
-          "canonical_relation": "HAS_PART",
+          "raw_relation": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+          "canonical_relation": "CONSISTS_OF",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_PART",
+          "predicate": "CONSISTS_OF",
           "roles": {
             "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
             "OBJECT": "ТИМАНСКИЙ_КАМЕНЬ"
           },
-          "raw_span": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+          "raw_span": "состоит из невысоких гряд Тиманский Камень",
           "confidence": 1.0,
-          "raw_relation": "состоит из",
-          "canonical_relation": "HAS_PART",
+          "raw_relation": "состоит из невысоких гряд Косминский Камень, Тиманский Камень и других",
+          "canonical_relation": "CONSISTS_OF",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_HEIGHT",
+          "predicate": "HAS_MAX_HEIGHT",
           "roles": {
             "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
             "OBJECT": "303"
           },
           "raw_span": "высота достигает 303 м",
           "confidence": 1.0,
-          "raw_relation": "достигает",
-          "canonical_relation": "HAS_HEIGHT",
+          "raw_relation": "высота достигает 303 м",
+          "canonical_relation": "HAS_MAX_HEIGHT",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "LOCATED_IN",
@@ -883,12 +902,13 @@
             "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
             "OBJECT": "ТУНДРА"
           },
-          "raw_span": "Северная часть расположена в пределах тундры и лесотундры",
+          "raw_span": "расположена в пределах тундры",
           "confidence": 1.0,
-          "raw_relation": "расположена в пределах",
+          "raw_relation": "расположена в пределах тундры и лесотундры",
           "canonical_relation": "LOCATED_IN",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "LOCATED_IN",
@@ -896,12 +916,13 @@
             "SUBJECT": "СЕВЕРНЫЙ_ЧАСТЬ",
             "OBJECT": "ЛЕСОТУНДРА"
           },
-          "raw_span": "Северная часть расположена в пределах тундры и лесотундры",
+          "raw_span": "расположена в пределах лесотундры",
           "confidence": 1.0,
-          "raw_relation": "расположена в пределах",
+          "raw_relation": "расположена в пределах тундры и лесотундры",
           "canonical_relation": "LOCATED_IN",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "BOUNDED_BY",
@@ -909,12 +930,13 @@
             "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
             "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_МЕЗЕНСКИЙ"
           },
-          "raw_span": "Средняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская",
+          "raw_span": "ограничена долинами рек Пижма Мезенская",
           "confidence": 1.0,
-          "raw_relation": "ограничена",
+          "raw_relation": "ограничена долинами рек Пижма Мезенская и Пижма Печорская",
           "canonical_relation": "BOUNDED_BY",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "BOUNDED_BY",
@@ -922,25 +944,27 @@
             "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
             "OBJECT": "ДОЛИНА_РЕКА_ПИЖМА_ПЕЧОРСКИЙ"
           },
-          "raw_span": "Средняя часть — ограничена долинами рек Пижма Мезенская и Пижма Печорская",
+          "raw_span": "ограничена долинами рек Пижма Печорская",
           "confidence": 1.0,
-          "raw_relation": "ограничена",
+          "raw_relation": "ограничена долинами рек Пижма Мезенская и Пижма Печорская",
           "canonical_relation": "BOUNDED_BY",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "IS",
+          "predicate": "IS_HIGHEST_PART_OF",
           "roles": {
             "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
-            "OBJECT": "НАИБОЛЕЕ_ВЫСОКИЙ_ЧАСТЬ_КРЯЖ"
+            "OBJECT": "ТИМАНСКИЙ_КРЯЖ"
           },
           "raw_span": "является наиболее высокой частью кряжа",
           "confidence": 1.0,
-          "raw_relation": "является",
-          "canonical_relation": "IS",
+          "raw_relation": "является наиболее высокой частью кряжа",
+          "canonical_relation": "IS_HIGHEST_PART_OF",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "HAS_HIGHEST_POINT",
@@ -948,25 +972,27 @@
             "SUBJECT": "СРЕДНИЙ_ЧАСТЬ",
             "OBJECT": "ЧЕТЛАССКИЙ_КАМЕНЬ"
           },
-          "raw_span": "высшая точка — Четласский Камень (471 м)",
+          "raw_span": "высшая точка — Четласский Камень",
           "confidence": 1.0,
-          "raw_relation": "высшая точка",
+          "raw_relation": "высшая точка — Четласский Камень (471 м)",
           "canonical_relation": "HAS_HIGHEST_POINT",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "IS",
+          "predicate": "IS_A",
           "roles": {
             "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
             "OBJECT": "ПЛАТО"
           },
           "raw_span": "Южная часть — представляет собой плато",
           "confidence": 1.0,
-          "raw_relation": "представляет собой",
-          "canonical_relation": "IS",
+          "raw_relation": "представляет собой плато",
+          "canonical_relation": "IS_A",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "DISSECTED_BY",
@@ -976,10 +1002,25 @@
           },
           "raw_span": "расчленённое долинами рек",
           "confidence": 1.0,
-          "raw_relation": "расчленено",
+          "raw_relation": "расчленённое долинами рек на несколько отдельных возвышенностей",
           "canonical_relation": "DISSECTED_BY",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
+        },
+        {
+          "predicate": "HAS_HEIGHT",
+          "roles": {
+            "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
+            "OBJECT": "300_350"
+          },
+          "raw_span": "высота до 300—350 м",
+          "confidence": 1.0,
+          "raw_relation": "высота до 300—350 м",
+          "canonical_relation": "HAS_HEIGHT",
+          "statement_type": "assertion",
+          "source": "user",
+          "metadata": {}
         },
         {
           "predicate": "LOCATED_IN",
@@ -987,33 +1028,35 @@
             "SUBJECT": "ЮЖНЫЙ_ЧАСТЬ",
             "OBJECT": "ТАЙГА"
           },
-          "raw_span": "Южная часть располагается в пределах тайги",
+          "raw_span": "располагается в пределах тайги",
           "confidence": 1.0,
-          "raw_relation": "располагается в пределах",
+          "raw_relation": "располагается в пределах тайги",
           "canonical_relation": "LOCATED_IN",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         }
       ],
       "created_n": [
-        "SF::E_00019",
-        "SF::E_00021",
         "SF::E_00023",
         "SF::E_00025",
         "SF::E_00027",
         "SF::E_00029",
-        "SF::E_00032",
-        "SF::E_00034",
+        "SF::E_00031",
+        "SF::E_00033",
         "SF::E_00036",
         "SF::E_00038",
         "SF::E_00040",
         "SF::E_00042",
-        "SF::E_00045",
-        "SF::E_00047",
+        "SF::E_00044",
+        "SF::E_00046",
         "SF::E_00049",
         "SF::E_00051",
+        "SF::E_00052",
         "SF::E_00054",
-        "SF::E_00056"
+        "SF::E_00057",
+        "SF::E_00059",
+        "SF::E_00061"
       ],
       "skipped": [],
       "segments": [
@@ -1078,7 +1121,8 @@
             14,
             15,
             16,
-            17
+            17,
+            18
           ]
         },
         {
@@ -1106,7 +1150,8 @@
             14,
             15,
             16,
-            17
+            17,
+            18
           ]
         },
         {
@@ -1132,7 +1177,8 @@
             14,
             15,
             16,
-            17
+            17,
+            18
           ]
         },
         {
@@ -1158,7 +1204,8 @@
             14,
             15,
             16,
-            17
+            17,
+            18
           ]
         }
       ],
@@ -1175,199 +1222,151 @@
           "predicate": "FORMED_IN",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-            "OBJECT": "БАЙКАЛЬСКИЙ_ЭПОХА_ТЕКТОГЕНЕЗ"
+            "TIME": "БАЙКАЛЬСКИЙ_ЭПОХА_ТЕКТОГЕНЕЗ"
           },
           "raw_span": "Тиманский кряж был сформирован в Байкальскую эпоху тектогенеза",
           "confidence": 1.0,
           "raw_relation": "был сформирован в",
           "canonical_relation": "FORMED_IN",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-            "OBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ"
-          },
-          "raw_span": "россыпи титановых минералов",
-          "confidence": 1.0,
-          "raw_relation": "полезные ископаемые: россыпи титановых минералов",
-          "canonical_relation": "HAS_MINERAL",
-          "statement_type": "assertion",
-          "source": "user"
-        },
-        {
-          "predicate": "LOCATED_AT",
-          "roles": {
-            "SUBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ",
-            "OBJECT": "ЯРЕГ"
+            "OBJECT": "РОССЫПЬ_ТИТАНОВЫЙ_МИНЕРАЛ",
+            "LOCATION": "ЯРЕГ"
           },
           "raw_span": "россыпи титановых минералов (Ярега)",
           "confidence": 1.0,
-          "raw_relation": "россыпи титановых минералов (Ярега)",
-          "canonical_relation": "LOCATED_AT",
+          "raw_relation": "россыпи титановых минералов",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-            "OBJECT": "БОКСИТ"
-          },
-          "raw_span": "бокситы",
-          "confidence": 1.0,
-          "raw_relation": "полезные ископаемые: бокситы",
-          "canonical_relation": "HAS_MINERAL",
-          "statement_type": "assertion",
-          "source": "user"
-        },
-        {
-          "predicate": "LOCATED_AT",
-          "roles": {
-            "SUBJECT": "БОКСИТ",
-            "OBJECT": "ЧЕТЛАССКИЙ_КАМЕНЬ"
+            "OBJECT": "БОКСИТ",
+            "LOCATION": "ЧЕТЛАССКИЙ_КАМЕНЬ"
           },
           "raw_span": "бокситы (Четласский Камень)",
           "confidence": 1.0,
-          "raw_relation": "бокситы (Четласский Камень)",
-          "canonical_relation": "LOCATED_AT",
+          "raw_relation": "бокситы",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-            "OBJECT": "АГАТЫ"
-          },
-          "raw_span": "агаты",
-          "confidence": 1.0,
-          "raw_relation": "полезные ископаемые: агаты",
-          "canonical_relation": "HAS_MINERAL",
-          "statement_type": "assertion",
-          "source": "user"
-        },
-        {
-          "predicate": "ASSOCIATED_WITH",
-          "roles": {
-            "SUBJECT": "АГАТЫ",
-            "OBJECT": "ДЕВОНСКИЙ_БАЗАЛЬТ"
+            "OBJECT": "АГАТЫ",
+            "CAUSE": "ДЕВОНСКИЙ_БАЗАЛЬТ"
           },
           "raw_span": "агаты, связанные с девонскими базальтами",
           "confidence": 1.0,
           "raw_relation": "агаты, связанные с девонскими базальтами",
-          "canonical_relation": "ASSOCIATED_WITH",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-            "OBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ"
+            "OBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
+            "LOCATION": "ЯРЕГ_ПОД_УХТА"
           },
-          "raw_span": "месторождения нефти",
+          "raw_span": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
           "confidence": 1.0,
-          "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
-          "canonical_relation": "HAS_MINERAL",
+          "raw_relation": "месторождения нефти",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "LOCATED_AT",
-          "roles": {
-            "SUBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
-            "OBJECT": "ЯРЕГ_ПОД_УХТА"
-          },
-          "raw_span": "Ярега под Ухтой",
-          "confidence": 1.0,
-          "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
-          "canonical_relation": "LOCATED_AT",
-          "statement_type": "assertion",
-          "source": "user"
-        },
-        {
-          "predicate": "LOCATED_AT",
-          "roles": {
-            "SUBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
-            "OBJECT": "ЛАЯВОЖИЙ"
-          },
-          "raw_span": "Лаявож",
-          "confidence": 1.0,
-          "raw_relation": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
-          "canonical_relation": "LOCATED_AT",
-          "statement_type": "assertion",
-          "source": "user"
-        },
-        {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
-            "OBJECT": "КОНДЕНСАТ"
+            "OBJECT": "МЕСТОРОЖДЕНИЕ_НЕФТИ",
+            "LOCATION": "ЛАЯВОЖИЙ"
           },
-          "raw_span": "конденсата",
+          "raw_span": "месторождения нефти (Нижнечутинское и Ярега под Ухтой, Лаявож)",
           "confidence": 1.0,
-          "raw_relation": "газа и конденсата (Войвож и Омра)",
-          "canonical_relation": "HAS_MINERAL",
+          "raw_relation": "месторождения нефти",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "LOCATED_AT",
+          "predicate": "HAS_RESOURCE",
           "roles": {
-            "SUBJECT": "КОНДЕНСАТ",
-            "OBJECT": "ВОЙВОЖИЙ"
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "КОНДЕНСАТ",
+            "LOCATION": "ВОЙВОЖИЙ"
           },
-          "raw_span": "Войвож",
+          "raw_span": "газа и конденсата (Войвож и Омра)",
           "confidence": 1.0,
-          "raw_relation": "газа и конденсата (Войвож и Омра)",
-          "canonical_relation": "LOCATED_AT",
+          "raw_relation": "газа и конденсата",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "LOCATED_AT",
+          "predicate": "HAS_RESOURCE",
           "roles": {
-            "SUBJECT": "КОНДЕНСАТ",
-            "OBJECT": "ОМР"
+            "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "OBJECT": "КОНДЕНСАТ",
+            "LOCATION": "ОМР"
           },
-          "raw_span": "Омра",
+          "raw_span": "газа и конденсата (Войвож и Омра)",
           "confidence": 1.0,
-          "raw_relation": "газа и конденсата (Войвож и Омра)",
-          "canonical_relation": "LOCATED_AT",
+          "raw_relation": "газа и конденсата",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
             "OBJECT": "БИТУМ"
           },
-          "raw_span": "битумы",
+          "raw_span": "битумы и горючие сланцы",
           "confidence": 1.0,
           "raw_relation": "битумы и горючие сланцы",
-          "canonical_relation": "HAS_MINERAL",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
             "OBJECT": "ГОРЮЧИЙ_СЛАНЦЫ"
           },
-          "raw_span": "горючие сланцы",
+          "raw_span": "битумы и горючие сланцы",
           "confidence": 1.0,
           "raw_relation": "битумы и горючие сланцы",
-          "canonical_relation": "HAS_MINERAL",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
             "OBJECT": "ТОРФ"
@@ -1375,12 +1374,13 @@
           "raw_span": "торф",
           "confidence": 1.0,
           "raw_relation": "торф",
-          "canonical_relation": "HAS_MINERAL",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
             "OBJECT": "СТРОИТЕЛЬНЫЙ_КАМНИ"
@@ -1388,43 +1388,41 @@
           "raw_span": "строительные камни",
           "confidence": 1.0,
           "raw_relation": "строительные камни",
-          "canonical_relation": "HAS_MINERAL",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         },
         {
-          "predicate": "HAS_MINERAL",
+          "predicate": "HAS_RESOURCE",
           "roles": {
             "SUBJECT": "ТИМАНСКИЙ_КРЯЖ",
+            "CAUSE": "ДЕВОНСКИЙ_БАЗАЛЬТ",
             "OBJECT": "ГАЗА"
           },
           "raw_span": "газа",
           "confidence": 0.8,
-          "raw_relation": "полезные ископаемые: россыпи титановых минералов",
-          "canonical_relation": "HAS_MINERAL",
+          "raw_relation": "россыпи титановых минералов",
+          "canonical_relation": "HAS_RESOURCE",
           "statement_type": "assertion",
-          "source": "user"
+          "source": "user",
+          "metadata": {}
         }
       ],
       "created_n": [
-        "SF::E_00058",
-        "SF::E_00060",
-        "SF::E_00062",
+        "SF::E_00063",
         "SF::E_00065",
-        "SF::E_00067",
-        "SF::E_00070",
-        "SF::E_00072",
-        "SF::E_00075",
+        "SF::E_00069",
+        "SF::E_00073",
         "SF::E_00077",
-        "SF::E_00080",
-        "SF::E_00082",
+        "SF::E_00081",
         "SF::E_00084",
-        "SF::E_00087",
-        "SF::E_00089",
+        "SF::E_00088",
         "SF::E_00091",
         "SF::E_00093",
         "SF::E_00095",
-        "SF::E_00097"
+        "SF::E_00097",
+        "SF::E_00099"
       ],
       "skipped": [],
       "segments": [
@@ -1438,15 +1436,17 @@
           "candidate_indexes": [
             0,
             1,
+            2,
             3,
+            4,
             5,
+            6,
             7,
+            8,
+            9,
             10,
-            13,
-            14,
-            15,
-            16,
-            17
+            11,
+            12
           ]
         },
         {
@@ -1458,11 +1458,9 @@
           "covered": true,
           "candidate_indexes": [
             1,
-            2,
-            7,
-            8,
-            9,
-            17
+            4,
+            5,
+            12
           ]
         },
         {
@@ -1473,8 +1471,7 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            3,
-            4
+            2
           ]
         },
         {
@@ -1485,8 +1482,7 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            5,
-            6
+            3
           ]
         },
         {
@@ -1497,7 +1493,8 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            6
+            3,
+            12
           ]
         },
         {
@@ -1508,10 +1505,9 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            2,
-            7,
-            8,
-            9
+            1,
+            4,
+            5
           ]
         },
         {
@@ -1522,10 +1518,9 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            10,
-            11,
-            12,
-            17
+            6,
+            7,
+            12
           ]
         },
         {
@@ -1536,9 +1531,8 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            10,
-            11,
-            12
+            6,
+            7
           ]
         },
         {
@@ -1549,8 +1543,8 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            13,
-            14
+            8,
+            9
           ]
         },
         {
@@ -1561,8 +1555,8 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            13,
-            14
+            8,
+            9
           ]
         },
         {
@@ -1573,7 +1567,7 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            15
+            10
           ]
         },
         {
@@ -1584,7 +1578,7 @@
           "kind": "list_item",
           "covered": true,
           "candidate_indexes": [
-            16
+            11
           ]
         }
       ],
@@ -1600,9 +1594,9 @@
     "uncovered": []
   },
   "graph": {
-    "semantic_factors": 43,
-    "events": 43,
-    "S": 42,
-    "graph_size": 140
+    "semantic_factors": 39,
+    "events": 39,
+    "S": 43,
+    "graph_size": 144
   }
 }

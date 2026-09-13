@@ -8,6 +8,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from ah_memory.baselines.rag_embedder import RagEmbedder, resolve_rag_embedder
 from ah_memory.baselines.vector_store import FaissVectorStore
@@ -47,6 +48,7 @@ class VanillaRAG:
         chunk_overlap: int = 40,
         top_k: int = 8,
         deepseek: DeepSeekConfig | None = None,
+        chat_client: Any | None = None,
         strict: bool = False,
         generator: RagGenerator | None = None,
         embedder: RagEmbedder | None = None,
@@ -61,11 +63,12 @@ class VanillaRAG:
             vectors = self.embedder.embed_many(self.chunks)
             self.store.replace(self.chunks, vectors)
         self.generator = generator
-        self.client = (
-            None
-            if generator is not None
-            else (DeepSeekClient(deepseek) if deepseek and deepseek.configured else None)
-        )
+        if generator is not None:
+            self.client = None
+        elif chat_client is not None:
+            self.client = chat_client
+        else:
+            self.client = DeepSeekClient(deepseek) if deepseek and deepseek.configured else None
         answerer = (
             "scripted" if generator is not None else ("llm" if self.client is not None else "extractive")
         )

@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CONFIG = ROOT / "config.yaml"
 LOCAL_CONFIG = ROOT / "config.local.yaml"
 
-LlmProvider = Literal["gigachat", "deepseek"]
+LlmProvider = Literal["gigachat", "deepseek", "ollama"]
 
 
 @dataclass(frozen=True)
@@ -62,10 +62,11 @@ class OllamaConfig:
     """Connection settings for a local Ollama HTTP server."""
 
     base_url: str = "http://127.0.0.1:11434"
-    model: str = "llama3.2"
+    model: str = "qwen3:30b-a3b"
     embedding_model: str = "nomic-embed-text"
-    timeout_sec: float = 60.0
+    timeout_sec: float = 300.0
     temperature: float = 0.1
+    num_ctx: int | None = 2048
 
     @property
     def configured(self) -> bool:
@@ -151,10 +152,19 @@ def _load_dotenv() -> None:
             os.environ[k] = v
 
 
+def _optional_positive_int(raw: Any, default: int | None) -> int | None:
+    if raw is None or raw == "":
+        return default
+    value = int(raw)
+    return value if value > 0 else None
+
+
 def _norm_provider(raw: str | None) -> LlmProvider:
     p = (raw or "gigachat").strip().lower()
     if p in {"deepseek", "ds"}:
         return "deepseek"
+    if p in {"ollama", "local"}:
+        return "ollama"
     return "gigachat"
 
 
@@ -220,7 +230,7 @@ def load_config(path: Path | None = None) -> AppConfig:
             model=str(
                 os.environ.get("OLLAMA_CHAT_MODEL")
                 or os.environ.get("OLLAMA_MODEL")
-                or ollama.get("model", "llama3.2")
+                or ollama.get("model", "qwen3:30b-a3b")
             ),
             embedding_model=str(
                 os.environ.get("OLLAMA_EMBEDDING_MODEL")
@@ -228,11 +238,15 @@ def load_config(path: Path | None = None) -> AppConfig:
             ),
             timeout_sec=float(
                 os.environ.get("OLLAMA_TIMEOUT_SEC")
-                or ollama.get("timeout_sec", 60)
+                or ollama.get("timeout_sec", 300)
             ),
             temperature=float(
                 os.environ.get("OLLAMA_TEMPERATURE")
                 or ollama.get("temperature", 0.1)
+            ),
+            num_ctx=_optional_positive_int(
+                os.environ.get("OLLAMA_NUM_CTX") or ollama.get("num_ctx", 2048),
+                2048,
             ),
         ),
         web=WebConfig(

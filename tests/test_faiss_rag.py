@@ -44,3 +44,21 @@ def test_vanilla_rag_uses_faiss_backend() -> None:
     assert reply.trace_uids == []
     assert reply.chunks
     assert reply.scores[0] > 0
+
+
+def test_vanilla_rag_uses_injected_chat_client() -> None:
+    class RecordingClient:
+        def chat(self, messages, *, json_mode=True) -> str:
+            assert json_mode is False
+            return "ответ из клиента"
+
+    rag = VanillaRAG(
+        "Тиманский кряж тянется на 900 километров.\n\nВысшая точка — Четласский Камень.",
+        top_k=2,
+        chat_client=RecordingClient(),
+        embedder=DeterministicRagEmbedder(),
+    )
+    assert rag.backend.startswith("llm+faiss:")
+    reply = rag.ask("Какая высшая точка?", generate=True)
+    assert reply.answer == "ответ из клиента"
+    assert reply.source == "llm_rag"

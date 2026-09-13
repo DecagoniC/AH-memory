@@ -99,8 +99,11 @@ def _offline_rag() -> VanillaRAG:
     )
 
 
-def _run_offline() -> tuple[dict[str, Any], dict[str, Any]]:
-    qa = load_qa_corpus()
+def _run_offline(
+    *,
+    qa_path: Path | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    qa = load_qa_corpus(qa_path)
     m2 = run_m2_benchmark(
         [to_inference_item(item) for item in qa],
         lambda item: run_graph_qa(next(case for case in qa if case.item_id == item.item_id)),
@@ -111,6 +114,7 @@ def _run_offline() -> tuple[dict[str, Any], dict[str, Any]]:
     m3 = _measure_m3()
     return {
         "mode": "offline",
+        "qa_corpus": str(qa_path) if qa_path is not None else "benchmarks/challenge/m2_m4_qa.jsonl",
         "m2": {
             "explain_score": m2.explain_score,
             "d_max": m2.d_max,
@@ -171,7 +175,10 @@ def _chat_fn(client: Any):
     return chat
 
 
-def _run_live() -> tuple[dict[str, Any], dict[str, Any]]:
+def _run_live(
+    *,
+    roles_path: Path | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     from ah_memory.gigachat_llm import GigaChatClient, GigaChatPerception
     from ah_memory.ollama import OllamaClient, OllamaPerception, is_ollama_available
 
@@ -181,7 +188,7 @@ def _run_live() -> tuple[dict[str, Any], dict[str, Any]]:
     if not is_ollama_available(cfg.ollama):
         raise RuntimeError("Ollama is not available")
 
-    roles = role_benchmark_items(load_role_corpus())
+    roles = role_benchmark_items(load_role_corpus(roles_path))
     giga_client = GigaChatClient(cfg.gigachat)
     ollama_client = OllamaClient(cfg.ollama)
     ah_llm = GigaChatPerception(cfg.gigachat)
@@ -226,11 +233,36 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the open AH-memory challenge stand")
     parser.add_argument("--live", action="store_true", help="also run GigaChat and Ollama")
     parser.add_argument("--root", default="results/challenge")
+    parser.add_argument(
+        "--qa",
+        type=Path,
+        default=None,
+        help="optional M2/M4 JSONL (default: benchmarks/challenge/m2_m4_qa.jsonl)",
+    )
+    parser.add_argument(
+        "--roles",
+        type=Path,
+        default=None,
+        help="optional M1 JSONL for --live (default: benchmarks/challenge/m1_roles.jsonl)",
+    )
+    parser.add_argument(
+        "--fresh-openai-hf",
+        action="store_true",
+        help="use benchmarks/fresh/openai_hf_2026 corpora (Aug 2026 OpenAI post)",
+    )
     args = parser.parse_args(argv)
+    qa_path = args.qa
+    roles_path = args.roles
+    if args.fresh_openai_hf:
+        pack = Path("benchmarks/fresh/openai_hf_2026")
+        qa_path = qa_path or (pack / "m2_m4_qa.jsonl")
+        roles_path = roles_path or (pack / "m1_roles.jsonl")
+        if args.root == "results/challenge":
+            args.root = "results/challenge/openai_hf_2026"
     started = time.perf_counter()
-    summary, logs = _run_offline()
+    summary, logs = _run_offline(qa_path=qa_path)
     if args.live:
-        live_summary, live_logs = _run_live()
+        live_summary, live_logs = _run_live(roles_path=roles_path)
         summary.update(live_summary)
         logs.update(live_logs)
     summary["elapsed_sec"] = round(time.perf_counter() - started, 3)

@@ -1,7 +1,7 @@
 # AH Memory — локальный конфиг
 # Ключи: .env (GIGACHAT_* / DEEPSEEK_API_KEY) или поля ниже
 
-llm_provider: deepseek  # gigachat | deepseek
+llm_provider: ollama  # gigachat | deepseek | ollama
 
 gigachat:
   credentials: ""
@@ -22,10 +22,11 @@ deepseek:
 
 ollama:
   base_url: "http://127.0.0.1:11434"
-  model: "llama3.2"
+  model: "qwen3:30b-a3b"  # MoE ~30B/3B active; ~19GB, partial RAM offload on 12GB VRAM
   embedding_model: "nomic-embed-text"
-  timeout_sec: 60
+  timeout_sec: 300
   temperature: 0.1
+  num_ctx: 2048
 
 web:
   host: "127.0.0.1"
@@ -36,7 +37,7 @@ agent:
   fallback_rules: true
   ticks: 6
   preload: "empty"
-  llm_provider: deepseek
+  llm_provider: ollama
 
 open_semantics:
   enabled: true
@@ -48,8 +49,8 @@ open_semantics:
 # Pluggable embedding backend for entity resolution (and future semantic match).
 # GigaChat models use GIGACHAT_CREDENTIALS (same key as chat).
 embedding:
-  model: EmbeddingsGigaR  # EmbeddingsGigaR | Embeddings-2 | Embeddings | deterministic_ngram
-  dimensions: 64  # ignored for GigaChat (taken from API response)
+  model: nomic-embed-text  # nomic-embed-text | ollama | EmbeddingsGigaR | Embeddings-2 | Embeddings | deterministic_ngram
+  dimensions: 64  # used by deterministic_ngram; remote models report their own size
 
 # Resolve mentions to existing symbols before creating duplicates.
 identity:

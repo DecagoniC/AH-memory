@@ -1,0 +1,77 @@
+﻿метрика;стенд;ряд;значение;комментарий
+M1 F1 AH-gated;инцидент HF, n=12;qwen3:8b;0,381;ниже порога 0,6
+M1 F1 AH-gated;инцидент HF, n=12;GigaChat-2-Pro;0,654;Middle пройден
+M1 F1 AH-gated;инцидент HF, n=12;deepseek-chat;0,605;Middle пройден
+M1 F1 без гейта;инцидент HF, n=12;qwen3:8b;0,433;
+M1 F1 без гейта;инцидент HF, n=12;GigaChat-2-Pro;0,681;
+M1 F1 без гейта;инцидент HF, n=12;deepseek-chat;0,781;
+M1 F1 AH-gated;челлендж, n=16;deepseek-chat;0,705;пояснительная записка
+M1 F1 без LLM;челлендж, n=100;SeedPerception;0;только seed_tokens
+M2 ExplainScore;офлайн челлендж, n=20;AH;0,258;13/20 с полной трассой
+M3 GC efficiency;офлайн челлендж;AH;1;200 → 0 сирот
+M4 Δ объяснимости;заяц, LLM RAG, n=6;AH − RAG;0,667;гипотеза да
+M4 Δ галлюцинаций;заяц, LLM RAG, n=6;RAG − AH;0,5;гипотеза да
+M4 Δ объяснимости;заяц, extractive, n=6;AH − RAG;0,667;H2 нет: оба не врут
+M4 Δ объяснимости;HF, граф пересобран, n=6;AH − любой RAG;0,25;0,25 на всех бэкендах
+M5 RobustnessGain;HF, n=12;8b vs GigaChat;-0,08;гипотеза отвергнута
+M5 RobustnessGain;HF, n=12;8b vs DeepSeek;0,104;плюс из просадки LLM
+M1 F1 AH-gated;HF n=12;qwen3:8b;0,381;
+M1 F1 без гейта;HF n=12;qwen3:8b;0,433;
+M1 F1 AH-gated;HF n=12;GigaChat-2-Pro;0,654;
+M1 F1 без гейта;HF n=12;GigaChat-2-Pro;0,681;
+M1 F1 AH-gated;HF n=12;deepseek-chat;0,605;
+M1 F1 без гейта;HF n=12;deepseek-chat;0,781;
+M1 F1 роль SUBJECT;челлендж n=16 DeepSeek gated;SUBJECT;0,667;
+M1 F1 роль OBJECT;челлендж n=16 DeepSeek gated;OBJECT;0,667;
+M1 F1 роль LOCATION;челлендж n=16 DeepSeek gated;LOCATION;0,857;
+M1 F1 итоговый;челлендж n=16;deepseek gated;0,705;
+M1 F1 итоговый;челлендж n=16;deepseek ungated;0,705;
+M1 F1 итоговый;челлендж n=100;SeedPerception;0;
+M2 успех;глубина 1;доля верных с трассой;1;
+M2 успех;глубина 2;доля верных с трассой;1;
+M2 успех;глубина 3;доля верных с трассой;1;
+M2 успех;глубина 4;доля верных с трассой;1;
+M2 успех;глубина 5;доля верных с трассой;0;
+M2 успех;глубина 6;доля верных с трассой;0;
+M2 ExplainScore;офлайн n=20;AH;0,258;
+M3 GC efficiency;офлайн;AH;1;
+M3 сироты до;офлайн;AH;200;
+M3 сироты после;офлайн;AH;0;
+M4 ExplainScore AH;заяц LLM RAG;AH;0,667;
+M4 ExplainScore RAG;заяц LLM RAG;RAG;0;
+M4 hall AH;заяц LLM RAG;AH;0;
+M4 hall RAG;заяц LLM RAG;RAG;0,5;
+M4 ExplainScore AH;HF extractive+nomic;AH;0,25;
+M4 Δ explain;HF extractive+nomic;AH − RAG;0,25;
+M4 hall RAG;HF extractive+nomic;RAG;0,333;
+M4 ExplainScore AH;HF ollama:qwen3:8b;AH;0,25;
+M4 Δ explain;HF ollama:qwen3:8b;AH − RAG;0,25;
+M4 hall RAG;HF ollama:qwen3:8b;RAG;1;
+M4 ExplainScore AH;HF deepseek-chat;AH;0,25;
+M4 Δ explain;HF deepseek-chat;AH − RAG;0,25;
+M4 hall RAG;HF deepseek-chat;RAG;1;
+M4 ExplainScore AH;HF gigachat-2-pro;AH;0,25;
+M4 Δ explain;HF gigachat-2-pro;AH − RAG;0,25;
+M4 hall RAG;HF gigachat-2-pro;RAG;1;
+M4 ExplainScore;офлайн челлендж;AH;0,258;
+M4 Δ hall;офлайн челлендж;RAG − AH;-0,35;
+M5 RobustnessGain;HF n=12;qwen3:8b / GigaChat-2-Pro;-0,08;
+M5 RobustnessGain;HF n=12;qwen3:8b / deepseek-chat;0,104;
+граф факты;общий граф;deepseek-chat;438;
+покрытие ingest;общий граф;deepseek-chat;0,99;
+верность декодера;общий граф;deepseek-chat;0,5;
+верность SLM по графу;общий граф;deepseek-chat;0,167;
+верность LLM по графу;общий граф;deepseek-chat;0,167;
+граф факты;общий граф;qwen3:8b;301;
+покрытие ingest;общий граф;qwen3:8b;0,919;
+верность декодера;общий граф;qwen3:8b;0,333;
+верность SLM по графу;общий граф;qwen3:8b;0,167;
+верность LLM по графу;общий граф;qwen3:8b;0,167;
+H1 Δ explain;заяц, extractive;AH − RAG;0,9;
+H2 Δ hall;заяц, extractive;RAG − AH;0,167;
+H1 Δ explain;заяц, скриптовый генератор;AH − RAG;0,9;
+H2 Δ hall;заяц, скриптовый генератор;RAG − AH;0,5;
+H1 Δ explain;мини-граф, extractive;AH − RAG;1;
+H2 Δ hall;мини-граф, extractive;RAG − AH;0,5;
+H1 Δ explain;мини-граф, скриптовый генератор;AH − RAG;1;
+H2 Δ hall;мини-граф, скриптовый генератор;RAG − AH;0,5;

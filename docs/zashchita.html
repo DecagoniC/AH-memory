@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Защита проекта — АГ-память</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --color-primary: #1d1d1f;
+      --color-accent: #0071e3;
+      --color-background: #f5f5f7;
+      --color-card: #ffffff;
+      --color-muted-fg: #6e6e73;
+      --color-border: #d2d2d7;
+      --color-danger: #ff3b30;
+      --color-ok: #248a3d;
+      --color-warn: #c93400;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: #000;
+      color: var(--color-primary);
+      font-family: Inter, system-ui, sans-serif;
+    }
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: var(--color-accent); z-index: 20; width: 0;
+    }
+    .slide-deck {
+      position: relative; width: 100vw; height: 100vh; overflow: hidden;
+    }
+    @media (min-width: 769px) {
+      .slide-deck {
+        max-width: calc(100vh * 16 / 9);
+        max-height: calc(100vw * 9 / 16);
+        margin: auto; position: absolute; inset: 0;
+        background: var(--color-background);
+      }
+    }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      padding: 40px 48px 64px;
+      opacity: 0; visibility: hidden;
+      background: var(--color-background);
+    }
+    .slide.active { opacity: 1; visibility: visible; }
+    .slide-content {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; gap: 12px;
+      overflow: hidden;
+    }
+    h1 { font-size: clamp(24px, 3.6vw, 40px); letter-spacing: -0.03em; line-height: 1.12; }
+    h2 { font-size: clamp(20px, 2.6vw, 28px); letter-spacing: -0.03em; }
+    .kicker {
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--color-accent);
+    }
+    .lead { font-size: 16px; line-height: 1.45; color: var(--color-muted-fg); max-width: 54rem; }
+    .muted { color: var(--color-muted-fg); font-size: 13.5px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .card {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      padding: 12px 14px;
+    }
+    .card h3 { font-size: 14px; margin-bottom: 6px; }
+    .card p, .card li { font-size: 13px; line-height: 1.4; color: var(--color-muted-fg); }
+    .stat .v { font-size: 28px; font-weight: 700; letter-spacing: -0.03em; }
+    .stat .l { font-size: 12px; color: var(--color-muted-fg); margin-top: 4px; }
+    .ok { color: var(--color-ok); }
+    .bad { color: var(--color-danger); }
+    .warn { color: var(--color-warn); }
+    ul { padding-left: 1.1em; }
+    li { margin: 3px 0; }
+    ol.steps { padding-left: 1.3em; }
+    ol.steps li { margin: 6px 0; font-size: 14px; line-height: 1.4; color: var(--color-muted-fg); }
+    ol.steps li strong { color: var(--color-primary); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+    th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-muted-fg); }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .mono { font-family: ui-monospace, Consolas, monospace; font-size: 0.92em; }
+    .flow {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 13px; line-height: 1.6;
+      background: var(--color-card); border: 1px solid var(--color-border);
+      padding: 14px 16px; white-space: pre-wrap;
+    }
+    .prompt-box {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 12.5px; line-height: 1.5;
+      background: var(--color-card); border: 1px solid var(--color-border);
+      padding: 12px 14px; color: #333;
+    }
+    .chart-box { flex: 1; min-height: 180px; position: relative; }
+    .chart-legend {
+      font-size: 12.5px; line-height: 1.45; color: var(--color-muted-fg);
+      background: var(--color-card); border: 1px solid var(--color-border);
+      padding: 10px 12px;
+    }
+    .chart-legend strong { color: var(--color-primary); }
+    .sw { display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; }
+    .notes {
+      display: none; margin-top: auto; padding-top: 8px;
+      border-top: 1px dashed var(--color-border);
+      font-size: 12px; color: var(--color-muted-fg);
+    }
+    body.show-notes .notes { display: block; }
+    .nav-controls {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 12px; z-index: 20;
+    }
+    .nav-btn {
+      width: 36px; height: 36px; border: 1px solid var(--color-border);
+      background: var(--color-card); cursor: pointer; font-size: 16px;
+    }
+    .slide-counter { color: var(--color-muted-fg); font-size: 13px; }
+    .title-slide { justify-content: flex-end; }
+    .title-slide .slide-content { justify-content: flex-end; gap: 12px; padding-bottom: 20px; }
+    @page { size: 338.67mm 190.5mm; margin: 0; }
+    @media print {
+      html, body { background: #fff; height: auto; overflow: visible; }
+      .nav-controls, .progress-bar { display: none !important; }
+      .slide-deck { position: static; max-width: none; max-height: none; width: auto; height: auto; }
+      .slide {
+        position: relative; opacity: 1 !important; visibility: visible !important;
+        page-break-after: always; break-after: page;
+        width: 338.67mm; height: 190.5mm; overflow: hidden;
+      }
+      .slide:last-of-type { page-break-after: auto; }
+      .notes { display: none !important; }
+    }
+    @media (max-width: 768px) {
+      .slide { padding: 24px 18px 60px; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="slide-deck">
+
+    <section class="slide active title-slide">
+      <div class="slide-content">
+        <p class="kicker">Защита проекта</p>
+        <h1>Как текст становится графом,<br>а граф — контекстом модели</h1>
+        <p class="lead">Ассоциативно-гетерархическая память: построение, воспламенение, точки входа, закрытый контекст и метрики M1–M5.</p>
+        <p class="muted">AH-memory · сентябрь 2026 · клавиши ← →, N — заметки</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Повестка</p>
+        <h2>Сначала контур, потом измерения</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Контур</h3>
+            <ol class="steps">
+              <li>Как из текста строится граф.</li>
+              <li>Как выбираются точки входа.</li>
+              <li>Как работает воспламенение.</li>
+              <li>Что в итоге попадает в контекст модели.</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>Проверки</h3>
+            <ol class="steps" start="5">
+              <li>Суть тестов M1–M5.</li>
+              <li>График каждой метрики с полной легендой.</li>
+              <li>Итоговый F1 и вывод.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <p class="notes">Не начинайте с зайца. Сначала покажите, что модель не пишет ответ из головы, а получает сжатый список фактов из памяти.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Построение графа · 1</p>
+        <h2>Текст сначала разбирается, в граф ещё не пишется</h2>
+        <ol class="steps">
+          <li><strong>Perception.</strong> Модель (DeepSeek, GigaChat или Ollama) возвращает JSON: предикат, роли актантов, цитату <span class="mono">raw_span</span>, уверенность. Это кандидаты, не факты памяти.</li>
+          <li><strong>Роли протокола.</strong> Допускаются только SUBJECT, OBJECT, LOCATION, TIME, CAUSE, TOOL, MATERIAL, PURPOSE, HOW-TO, WITH. Прочие поля отбрасываются схемой, а не «догадкой про зайца».</li>
+          <li><strong>Семена.</strong> Даже без полного факта слой отмечает, о каких сущностях речь: <span class="mono">seed_tokens</span>. Они понадобятся как точки входа при вопросе.</li>
+        </ol>
+        <div class="prompt-box">Фраза: «Заяц обитает на лугу»
+Кандидат: LIVE_IN · SUBJECT=заяц · LOCATION=луг · raw_span=«Заяц обитает на лугу»</div>
+      </div>
+      <p class="notes">Подчеркните: Perception не вызывает Store. Если JSON кривой — ремонт по схеме, не семантическое угадывание.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Построение графа · 2</p>
+        <h2>Гейт пускает только то, что есть в исходном тексте</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Проходит</h3>
+            <ul>
+              <li>Роль заземлена в фразе (лемма / вхождение).</li>
+              <li>Уверенность не ниже порога (0,5).</li>
+              <li>UID роли не слишком широкий («всё», «они»).</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Не проходит</h3>
+            <ul>
+              <li>Сущность, которой в тексте нет: модель додумала.</li>
+              <li>Роль вне протокола.</li>
+              <li>Кандидат без двух актантов: фактор не из чего собрать.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="lead">Гейт — сито, не вторая модель. Он не добавляет знаний и не уравнивает 8b с DeepSeek.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Построение графа · 3</p>
+        <h2>Transform записывает событие и n-арный фактор</h2>
+        <ol class="steps">
+          <li><strong>Символы.</strong> Для каждой роли: абстрактный символ в S и карточка второго порядка (ярлык «заяц», «луг»).</li>
+          <li><strong>Отношение.</strong> Сырое имя нормализуется в каноническую метку реестра. Неизвестный предикат регистрируется, код под него не пишется.</li>
+          <li><strong>Event + Factor.</strong> Появляется событие с ролями-ссылками и семантический фактор N. Это гиперребро, не чанк текста.</li>
+          <li><strong>Связки.</strong> Между актантами одного факта ставится ASSOC — микротема для последующего воспламенения.</li>
+        </ol>
+        <p class="muted">Мутации идут только через Store / DSL. Perception в граф не пишет. Дубликаты того же предиката и тех же ролей не плодятся.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Построение графа · 4</p>
+        <h2>После записи в памяти лежит структура, а не абзац</h2>
+        <div class="flow">AH = ⟨S, C, P, H, L⟩ + факторы N
+S     символы и словоформы          «заяц», «луг»
+C/P/H общее / частное / эпизоды     карточка на одной полке
+L     бинарные связи                IS-A, FOLLOW, ASSOC
+N     n-арный факт                  LIVE_IN(SUBJECT=заяц, LOCATION=луг)
+UID   стабильный адрес узла         по нему потом строится трасса</div>
+        <p class="lead">Корпус RAG при этом существует отдельно: те же документы режутся на чанки для контроля. У чанка нет UID и нет ролей.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Точки входа</p>
+        <h2>Вопрос не записывается. Он ищет якоря в уже построенном графе</h2>
+        <ol class="steps">
+          <li><strong>Сброс.</strong> Сообщения belief propagation и рабочая память прошлого вопроса гасятся. Сам граф не трогается.</li>
+          <li><strong>Сначала упоминания.</strong> В формулировке ищутся самые длинные точные имена сущностей из S. «Заяц» бьёт в UID зайца, а не в случайный токен.</li>
+          <li><strong>Затем семена Perception.</strong> Если точного упоминания нет, берутся <span class="mono">seed_tokens</span> и словоформы. Не больше 16 якорей.</li>
+          <li><strong>План запроса.</strong> Среди соседних фактов якоря выбирается одна связь и один слот ответа (кто / что / где). Победившие факторы получают маску 1, остальные — 0.</li>
+        </ol>
+        <p class="muted">Писать вопрос как факт нельзя: иначе память засоряется своей же формулировкой.</p>
+      </div>
+      <p class="notes">Это one-hop: соседи якоря, не цепочка A→B→C в планировщике. Длинные hop идут уже через такты воспламенения.</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Воспламенение</p>
+        <h2>Якоря получают evidence, такт несёт активацию по факторам</h2>
+        <ol class="steps">
+          <li><strong>Семена.</strong> Каждому якорю кладётся evidence δ = 0,8. Это старт фокуса, не новый факт.</li>
+          <li><strong>Такты BP.</strong> Сообщения переменная → фактор и фактор → переменная. Потенциал фактора смотрит на роли и маску плана.</li>
+          <li><strong>Активация.</strong> Скаляр x узла обновляется из вклада факторов, затухает с λ = 0,15. Полураспад ≈ 4,6 такта.</li>
+          <li><strong>Рабочая память.</strong> WM = { узлы с x &gt; t }, t = 0,55. Ниже порога — шум, в ответ не идёт.</li>
+          <li><strong>Трасса.</strong> UID, которые вспыхнули по тактам, плюс факторы с вкладом выше ε. Это доказательство, не похожесть чанка.</li>
+        </ol>
+        <p class="muted">Структура Store здесь не меняется. Ignition не вызывает языковую модель.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Контекст модели</p>
+        <h2>В промпт идёт сжатый список фактов, а не UID и не весь граф</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Как отбирается</h3>
+            <p>Ранжировщик считает релевантность фактора к вопросу: лексика формулировки, активация узлов, маска плана, поддержка соседей. В промпт — до 12 фактов с ненулевым счётом. Сырые UID в текст не попадают, только человекочитаемые ярлыки и цитаты.</p>
+          </div>
+          <div class="card">
+            <h3>Закрытый мир</h3>
+            <p>Системный блок говорит: опирайся только на этот список; не добавляй места, даты, числа и связи, которых нет; если факта нет — ответь ровно «неизвестно». Общие знания запрещены. Если компактный список пуст, запасной путь — строка декодера «Активировано: …».</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Пример</p>
+        <h2>От фразы до того, что видит модель</h2>
+        <div class="prompt-box">Запись: «Заяц обитает на лугу»
+  → LIVE_IN(SUBJECT=заяц, LOCATION=луг) в графе
+
+Вопрос: «Где обитает заяц?»
+  → якорь: заяц
+  → воспламенение: заяц, луг, фактор LIVE_IN
+  → декодер читает слот LOCATION → «луг»
+
+Контекст модели:
+  [Контекст из АГ-памяти — единственный источник фактов]
+  • обитает: субъект заяц, место луг
+
+Пользовательская реплика модели: «Где обитает заяц?»
+Ответ модели должен перефразировать только этот список.</div>
+      </div>
+      <p class="notes">Если спросить про массу короля зайцев на Луне, якорь может вспыхнуть, но нужного фактора нет — корректный контекст пуст по сути, ответ «неизвестно».</p>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Тесты после контура</p>
+        <h2>Пять метрик проверяют разные звенья одной цепи</h2>
+        <table>
+          <thead><tr><th>Метрика</th><th>Что именно проверяет</th><th>Где в контуре</th></tr></thead>
+          <tbody>
+            <tr><td>M1</td><td>Верно ли Perception ставит роли SUBJECT / OBJECT / LOCATION</td><td>разбор текста, до записи</td></tr>
+            <tr><td>M2</td><td>Доходит ли активация до ответа и полна ли трасса UID</td><td>воспламенение</td></tr>
+            <tr><td>M3</td><td>Удаляет ли GC сирот, не трогая живые узлы</td><td>память после тактов</td></tr>
+            <tr><td>M4</td><td>Есть ли объяснимость и меньше ли галлюцинаций, чем у RAG</td><td>контекст + ответ vs чанки</td></tr>
+            <tr><td>M5</td><td>Даёт ли типизация ролей фору маленькой модели</td><td>M1 на SLM против LLM</td></tr>
+          </tbody>
+        </table>
+        <p class="muted">F1 — это M1. Остальные метрики не F1: ExplainScore, доля собранных сирот, две дельты относительно RAG.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">M1 · суть теста</p>
+        <h2>Одни и те же короткие фразы, две разборки ролей</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Протокол</h3>
+            <p>12 шаблонных предложений стенда инцидента Hugging Face. Эталон — тройки SUBJECT / OBJECT / LOCATION. Вес субъекта и объекта = 2, локации = 1. Считается нормированный взвешенный F1. Порог Middle из постановки: ≥ 0,6.</p>
+          </div>
+          <div class="card">
+            <h3>Два режима</h3>
+            <p><strong>AH-gated</strong> — после гейта: в счёт идут только роли, заземлённые в тексте. <strong>Без гейта</strong> — сырой JSON модели. Здесь нет общего графа и нет ответа на вопрос: измеряется только парсер на границе.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">M1 · график</p>
+        <h2>Класс модели важнее гейта</h2>
+        <div class="chart-box"><canvas id="chartM1"></canvas></div>
+        <div class="chart-legend">
+          <p><span class="sw" style="background:#0071e3"></span><strong>Синие столбцы — AH-gated F1.</strong> Модель предложила роли, гейт оставил только те, что встречаются в исходной фразе. Это тот разбор, который реально идёт в Transform.</p>
+          <p><span class="sw" style="background:#6e6e73"></span><strong>Серые столбцы — F1 без гейта.</strong> Та же модель, тот же текст, без сита. На коротких шаблонах серый столбец чуть выше: гейт отбрасывает лишнее, эталону это не помогает.</p>
+          <p><strong>Вертикаль 0…1</strong> — нормированный взвешенный F1. Линия 0,6 на шкале — порог Middle. n = 12.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">M2 · суть теста</p>
+        <h2>Верный ответ считается только вместе с полной трассой</h2>
+        <p class="lead">Офлайн-стенд: 20 вопросов с эталонной цепочкой UID длины 1…6. Модель чата не вызывается. Срабатывает только воспламенение и декодер.</p>
+        <div class="prompt-box">ExplainScore = (1/N) Σ  1_верный · (глубина / 6) · 1_трасса_полная</div>
+        <p class="muted">Если ответ угадан, но в трассе нет эталонной подпоследовательности UID — вклад нулевой. Это проверка точек входа и тактов, не беглости текста.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">M2 · график</p>
+        <h2>На глубине 1–4 трасса доходит, на 5–6 — нет</h2>
+        <div class="chart-box"><canvas id="chartM2"></canvas></div>
+        <div class="chart-legend">
+          <p><span class="sw" style="background:#0071e3"></span><strong>Синие — доля вопросов этой глубины, где ответ верен и трасса UID полная.</strong> На d = 1…4 это все кейсы (4, 3, 3 и 3 вопроса).</p>
+          <p><span class="sw" style="background:#d2d2d7"></span><strong>Серые — кейсы, где активация не дошла до эталонного UID.</strong> Все 3 вопроса глубины 5 и все 4 вопросы глубины 6.</p
+          <p>Итоговый ExplainScore = 0,26: 13 из 20 с полной трассой, вклад взвешен глубиной. Провал d = 5–6 — затухание и порог WM, не отсутствие механизма.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">M3 · суть и график</p>
+        <h2>Сборка мусора снимает сирот и не трогает живое</h2>
+        <div class="chart-box"><canvas id="chartM3"></canvas></div>
+        <div class="chart-legend">
+          <p><span class="sw" style="background:#6e6e73"></span><strong>Серый столбец — 200 сирот до GC.</strong> Узлы без связи, TTL = 50 тактов.</p>
+          <p><span class="sw" style="background:#248a3d"></span><strong>Зелёный столбец — сироты после GC.</strong> Ноль. Живые LIVE / M_LIVE и их связь сохранены, ложных удалений нет.</p>
+          <p>Метрика постановки: доля собранных сирот = 1 − N_после / N_до = <strong>1,00</strong>. Это санитарный инвариант памяти, не качество парсера.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">M4 · суть теста</p>
+        <h2>Тот же корпус: граф с трассой против чанков без UID</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>АГ-память</h3>
+            <p>Вопрос → якоря → воспламенение → ответ из WM. ExplainScore ненулевой, только если ответ верен и трасса содержит эталонные UID.</p>
+          </div>
+          <div class="card">
+            <h3>Vanilla RAG</h3>
+            <p>Те же документы режутся на фрагменты. Поиск TF-IDF или FAISS, затем извлечение или пересказ моделью. Поля трассы UID нет, поэтому ExplainScore RAG по постановке всегда 0.</p>
+          </div>
+        </div>
+        <p class="muted">Δ объяснимости = E_AH − E_RAG. Δ галлюцинаций = H_RAG − H_AH. Два независимых золота: заяц (n = 6) и инцидент Hugging Face (n = 6, граф пересобирается на каждый бэкенд).</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">M4 · график, эталон «заяц»</p>
+        <h2>На монографии гипотеза закрыта целиком</h2>
+        <div class="chart-box"><canvas id="chartM4rabbit"></canvas></div>
+        <div class="chart-legend">
+          <p><span class="sw" style="background:#0071e3"></span><strong>Синие — АГ-память.</strong> ExplainScore 0,67: ответы с трассой. Галлюцинации 0: на лунном короле зайцев система сказала «неизвестно».</p>
+          <p><span class="sw" style="background:#ff3b30"></span><strong>Красные — Vanilla RAG с DeepSeek.</strong> ExplainScore 0: нет UID. Галлюцинации 0,50: генератор дописывает массу и энциклопедию сверх фрагмента.</p>
+          <p>Ось 0…1. Левая пара — объяснимость (больше лучше). Правая — доля галлюцинаций (меньше лучше).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">M4 · график, инцидент Hugging Face</p>
+        <h2>После пересборки графа Δ объяснимости = 0,25 против любого RAG</h2>
+        <div class="chart-box"><canvas id="chartM4hf"></canvas></div>
+        <div class="chart-legend">
+          <p><span class="sw" style="background:#248a3d"></span><strong>Зелёные — Δ объяснимости.</strong> 0,25 на всех четырёх бэкендах, потому что граф и агент собираются заново: след активации прошлого RAG больше не портит AH.</p>
+          <p><span class="sw" style="background:#ff3b30"></span><strong>Красные — доля галлюцинаций RAG.</strong> Extractive цитирует чанк (0,33). Чат-модели на закрытом промпте всё равно дописывают (1,0). Галлюцинации AH на этом стенде 0,17 — ловушка с секретным кодом, где отказ не случился.</p>
+          <p>Ось 0…1. n = 6 вопросов. ExplainScore RAG = 0 по контракту метрики.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">M5 · суть и график</p>
+        <h2>Типизация ролей не компенсирует слабость 8b</h2>
+        <div class="chart-box"><canvas id="chartM5"></canvas></div>
+        <div class="chart-legend">
+          <p>Формула: RobustnessGain = (F1_AH_SLM / F1_без_гейта_SLM) − (F1_AH_LLM / F1_без_гейта_LLM). Ожидание постановки: плюс, если гейт сильнее помогает маленькой модели.</p>
+          <p><span class="sw" style="background:#ff3b30"></span><strong>Против GigaChat: −0,080.</strong> Отвергаем гипотезу: 8b выигрывает от гейта меньше, чем коммерческая модель.</p>
+          <p><span class="sw" style="background:#c93400"></span><strong>Против DeepSeek: +0,104.</strong> Плюс из-за просадки gated F1 у DeepSeek (0,605 против 0,781 без гейта), а не потому что 8b вырос. Честный reject по GigaChat — валидный исход.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Итоговый F1</p>
+        <h2>Нормированный взвешенный F1 ролей после контура Perception</h2>
+        <div class="grid-3">
+          <div class="card stat"><div class="v bad">0,381</div><div class="l">qwen3:8b · AH-gated · ниже порога 0,6</div></div>
+          <div class="card stat"><div class="v ok">0,654</div><div class="l">GigaChat-2-Pro · AH-gated · Middle пройден</div></div>
+          <div class="card stat"><div class="v ok">0,605</div><div class="l">deepseek-chat · AH-gated · Middle пройден</div></div>
+        </div>
+        <table>
+          <thead><tr><th>Модель</th><th class="num">F1 с гейтом</th><th class="num">F1 без гейта</th><th>Вердикт</th></tr></thead>
+          <tbody>
+            <tr><td>qwen3:8b</td><td class="num">0,381</td><td class="num">0,433</td><td class="bad">не проходит Middle</td></tr>
+            <tr><td>GigaChat-2-Pro</td><td class="num">0,654</td><td class="num">0,681</td><td class="ok">проходит</td></tr>
+            <tr><td>deepseek-chat</td><td class="num">0,605</td><td class="num">0,781</td><td class="ok">проходит gated</td></tr>
+          </tbody>
+        </table>
+        <p class="muted">Контроль на 16 репликах DeepSeek в пояснительной записке: F1 = 0,705 (LOCATION 0,86 · OBJECT 0,67 · SUBJECT 0,67). F1 измеряет парсер, не воспламенение.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-content">
+        <p class="kicker">Вывод</p>
+        <h2>Что следует из контура и из чисел</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Контур работает как заявлено</h3>
+            <ul>
+              <li>Текст становится гиперрёбрами с ролями, не мешком чанков.</li>
+              <li>Точки входа — якоря в вопросе, не запись вопроса в память.</li>
+              <li>Воспламенение зажигает WM; в модель идёт сжатый закрытый список фактов.</li>
+              <li>M3 = 1,0. M4: Δ объяснимости &gt; 0, потому что у RAG нет трассы UID.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Где предел</h3>
+            <ul>
+              <li>Итоговый F1 следует за классом парсера: 8b не дотягивает до 0,6, коммерческие модели дотягивают.</li>
+              <li>Гейт не лечит слабый JSON. M5 отвергнут.</li>
+              <li>Длинные цепи d = 5–6 гаснут. На ловушках отказ не всегда срабатывает.</li>
+              <li>Когда обе модели видят один граф, ответы уравниваются: разрыв был во входе, не в «уме».</li>
+            </ul>
+          </div>
+        </div>
+        <p class="lead">Память хранит доказательство. Модель только разбирает текст на входе и пересказывает выданный контекст.</p>
+      </div>
+    </section>
+
+    <section class="slide title-slide">
+      <div class="slide-content">
+        <p class="kicker">Конец</p>
+        <h1>Вопросы</h1>
+        <p class="lead">Граф ← текст. Контекст ← воспламенённые факты. F1 ← качество парсера на границе.</p>
+        <p class="muted">docs/zashchita.html · docs/zashchita.pdf · N — заметки докладчика</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="nav-controls">
+    <button class="nav-btn" type="button" onclick="prevSlide()">←</button>
+    <span class="slide-counter"><span id="current">1</span> / <span id="total">0</span></span>
+    <button class="nav-btn" type="button" onclick="nextSlide()">→</button>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll(".slide");
+    let current = 1;
+    const total = slides.length;
+    document.getElementById("total").textContent = total;
+    const ticks = { color: "#6e6e73", font: { family: "Inter", size: 11 } };
+    const grid = { color: "#e8e8ed" };
+    const legend = {
+      position: "top",
+      labels: {
+        color: "#1d1d1f",
+        font: { family: "Inter", size: 12 },
+        boxWidth: 12,
+        padding: 10
+      }
+    };
+
+    function showSlide(n) {
+      if (n < 1) n = 1;
+      if (n > total) n = total;
+      current = n;
+      slides.forEach((s, i) => s.classList.toggle("active", i === n - 1));
+      document.getElementById("current").textContent = n;
+      document.getElementById("progressBar").style.width = (n / total) * 100 + "%";
+    }
+    function nextSlide() { showSlide(current + 1); }
+    function prevSlide() { showSlide(current - 1); }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextSlide(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); prevSlide(); }
+      if (e.key === "Home") { e.preventDefault(); showSlide(1); }
+      if (e.key === "End") { e.preventDefault(); showSlide(total); }
+      if (e.key === "n" || e.key === "N" || e.key === "р" || e.key === "Р") {
+        document.body.classList.toggle("show-notes");
+      }
+    });
+
+    new Chart(document.getElementById("chartM1"), {
+      type: "bar",
+      data: {
+        labels: ["qwen3:8b", "GigaChat-2-Pro", "deepseek-chat"],
+        datasets: [
+          {
+            label: "AH-gated F1 — роли после гейта, идут в граф",
+            data: [0.381, 0.654, 0.605],
+            backgroundColor: "#0071e3"
+          },
+          {
+            label: "F1 без гейта — сырой JSON той же модели",
+            data: [0.433, 0.681, 0.781],
+            backgroundColor: "#6e6e73"
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend, tooltip: { callbacks: {
+          label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(3)}`
+        } } },
+        scales: {
+          x: { ticks, grid },
+          y: {
+            min: 0, max: 1, ticks: { ...ticks, callback: (v) => v === 0.6 ? "0,6 порог" : String(v) },
+            grid,
+            title: { display: true, text: "нормированный взвешенный F1", color: "#6e6e73", font: { family: "Inter", size: 11 } }
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("chartM2"), {
+      type: "bar",
+      data: {
+        labels: ["глубина 1", "глубина 2", "глубина 3", "глубина 4", "глубина 5", "глубина 6"],
+        datasets: [
+          {
+            label: "Верный ответ и полная трасса UID",
+            data: [1, 1, 1, 1, 0, 0],
+            backgroundColor: "#0071e3"
+          },
+          {
+            label: "Нет полной трассы до цели",
+            data: [0, 0, 0, 0, 1, 1],
+            backgroundColor: "#d2d2d7"
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend },
+        scales: {
+          x: { stacked: true, ticks, grid },
+          y: {
+            stacked: true, min: 0, max: 1, ticks,
+            title: { display: true, text: "доля кейсов этой глубины", color: "#6e6e73", font: { family: "Inter", size: 11 } }
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("chartM3"), {
+      type: "bar",
+      data: {
+        labels: ["Сироты в памяти"],
+        datasets: [
+          { label: "До сборки мусора", data: [200], backgroundColor: "#6e6e73" },
+          { label: "После сборки мусора", data: [0], backgroundColor: "#248a3d" }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend },
+        scales: {
+          x: { ticks, grid },
+          y: {
+            beginAtZero: true, ticks,
+            title: { display: true, text: "число узлов-сирот", color: "#6e6e73", font: { family: "Inter", size: 11 } }
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("chartM4rabbit"), {
+      type: "bar",
+      data: {
+        labels: ["ExplainScore (больше лучше)", "Галлюцинации (меньше лучше)"],
+        datasets: [
+          { label: "АГ-память: ответ из WM и трасса UID", data: [0.667, 0], backgroundColor: "#0071e3" },
+          { label: "Vanilla RAG: чанки + DeepSeek, трассы нет", data: [0, 0.5], backgroundColor: "#ff3b30" }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend },
+        scales: {
+          x: { ticks, grid },
+          y: { min: 0, max: 1, ticks, title: { display: true, text: "доля по 6 вопросам эталона «заяц»", color: "#6e6e73", font: { family: "Inter", size: 11 } } }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("chartM4hf"), {
+      type: "bar",
+      data: {
+        labels: ["extractive", "qwen3:8b", "deepseek-chat", "GigaChat-2-Pro"],
+        datasets: [
+          { label: "Δ объяснимости = E_AH − E_RAG (E_RAG всегда 0)", data: [0.25, 0.25, 0.25, 0.25], backgroundColor: "#248a3d" },
+          { label: "Доля галлюцинаций RAG на 6 вопросах", data: [0.333, 1, 1, 1], backgroundColor: "#ff3b30" }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend },
+        scales: {
+          x: { ticks, grid },
+          y: { min: 0, max: 1, ticks, title: { display: true, text: "значение метрики (0…1)", color: "#6e6e73", font: { family: "Inter", size: 11 } } }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("chartM5"), {
+      type: "bar",
+      data: {
+        labels: ["8b относительно GigaChat", "8b относительно DeepSeek"],
+        datasets: [
+          {
+            label: "RobustnessGain: плюс = гейт помогает SLM сильнее, чем LLM",
+            data: [-0.080, 0.104],
+            backgroundColor: ["#ff3b30", "#c93400"]
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend },
+        scales: {
+          x: { ticks, grid },
+          y: {
+            min: -0.15, max: 0.15, ticks,
+            title: { display: true, text: "RobustnessGain", color: "#6e6e73", font: { family: "Inter", size: 11 } }
+          }
+        }
+      }
+    });
+
+    showSlide(1);
+  </script>
+</body>
+</html>

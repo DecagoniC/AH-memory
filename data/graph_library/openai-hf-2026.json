@@ -3,26 +3,26 @@
   "name": "openai-hf-2026",
   "kind": "fixture",
   "created_at": "2026-09-02T22:42:07+03:00",
-  "updated_at": "2026-09-02T23:08:34+03:00",
+  "updated_at": "2026-09-13T22:36:55+03:00",
   "stats": {
-    "S": 19,
+    "S": 32,
     "C": 19,
     "P": 0,
     "H": 3,
-    "L": 33,
+    "L": 58,
     "hyperedges": 14,
     "semantic_factors": 14,
     "relations": 7,
     "events": 14,
-    "graph_size": 69,
+    "graph_size": 94,
     "tau": 0
   },
   "source_text": "Source: OpenAI blog post «The Hugging Face incident and the road ahead» (https://openai.com/index/hugging-face-incident-and-the-road-ahead/), published 2026-08-26. Closed-world corpus for AH-memory metrics M1–M4.\n\n# The Hugging Face incident and the road ahead\n\nIn July 2026, during internal cybersecurity evaluations, OpenAI models circumvented controls designed to isolate them from the internet and compromised parts of OpenAI’s internal research infrastructure and Hugging Face’s systems⁠.\n\nThe incident occurred during cybersecurity evaluations of several OpenAI models, and was primarily driven by a highly capable, internal-only research model comparable in scale to GPT‑5.6 Sol. The models, operating under reduced safeguards, took actions that were misaligned with the goals of their assigned tasks—they communicated through unauthorized channels, exploited vulnerabilities in shared infrastructure, gained internet access, and accessed third-party systems.\n\nWe conducted an extensive investigation into this incident and worked closely with external advisors, including CrowdStrike, to validate our understanding. Today we are publishing our\n\nfull technical incident report⁠(opens in a new window) to explain what happened, what we learned, and how we are responding. This blog post summarizes our key findings and their impact on safety and alignment. Separately, METR and Redwood Research conducted an independent investigation of model alignment issues involved in this incident, and they\n\npublished their own report⁠(opens in a new window) today.\n\nIn response to this incident and, separately, the capabilities of our upcoming Astra model, we are strengthening our safeguards across our research infrastructure⁠. We are placing stricter requirements on alignment throughout a model’s lifecycle and creating more isolated sandboxes, restricting internet access, and further controlling access to model weights. We are also investing significantly more compute resources into chain-of-thought monitoring⁠ to more quickly intervene on misaligned behavior.\n\nOur models are now powerful, persistent, and collaborative enough that, absent sufficient safeguards, they can find and exploit security weaknesses across multiple computer systems. Many external models, including open-source ones, will soon reach comparable capabilities.\n\nWe consider this incident a “warning shot” for us and for the world: evidence that, without proper safeguards, highly capable AI agents are now able to work around technical controls, collaborate through unapproved channels, and take dangerous actions that no human directed.\n\nPreventing future incidents will require sustained investment in the alignment and control of sophisticated AI systems, as well as security and other safeguards that operate at the speed of the AI agents themselves. This incident has reinforced the need to keep our monitoring, alignment, and security safeguards ahead of the risks posed by increasingly capable systems, including pacing capabilities when needed to meet that standard. Below, we explain how the incident unfolded and our evolving understanding of the contributing factors. We then describe the concrete steps we are taking in response, with further detail in the technical report.\n\n## What happened\n\n### Background on sandboxing\n\nFor certain training and evaluation datasets, we use “sandboxes”—isolated virtual computers in the cloud—that execute the actions a model wants to take, like editing a PowerPoint. These sandboxes restrict what code a model can run and whether its actions can affect the outside world. For some tasks, we disable access to the internet. At the time, to allow models to install certain software packages, we would grant access to Artifactory, a third-party package manager service that we host internally.\n\nIn the majority of training and evaluation settings, our agents are meant to remain isolated from one another. For some fraction of samples, we enable “multi-agent” features that allow models to delegate work to other agents, which can then communicate with one another.\n\n### A message board emerges\n\nOver the course of May and June, we began reinforcement learning (RL) training runs for multiple new research models that were not intended for public release. One of these models eventually drove the activity behind the Hugging Face incident. This was an internal-only research model that we will call Internal Model 1 (IM1).\n\nWe did not enable internet access or inter-agent communication for many of the environments in these training experiments. Despite these restrictions, the agents discovered ways to exploit our research infrastructure to communicate with one another and access the internet.\n\nThe models first found ways to communicate by writing files into the Artifactory package manager. This effectively turned Artifactory into an unintended message board, where agents could exchange information with one another. Read more: How agents used the message board\n\nThe agents also found ways to get access to the internet. Using an\n\nexploit⁠(opens in a new window), the agents made Artifactory, which itself had access to the internet for the limited purpose of downloading and installing packages, send any internet requests on their behalf. After the agents discovered these methods for obtaining internet access, they also shared them with other agents through the message board, which provided information to enable additional agents to exploit our infrastructure.\n\n### Message board is wiped and rebuilt\n\nBy July 4, sustained agent activity had destabilized the affected Artifactory instance, causing an outage. On July 5, a security incident was opened. The security team blocked a known privilege-escalation route, removed exposed credentials, and later rebuilt Artifactory. This had the side effect of clearing the message board. With these mitigations in place, cybersecurity evaluations resumed.\n\nAt the time, the broader containment and alignment implications of the improvised message board and unintended internet access were not yet understood. In short, an internal team observed an agent engaging in message board activity and instances of disallowed internet access in late May. However, the existence of the improvised message board and the significance of the inter-agent communication activity were not apparent to the leaders responsible for the July 5 incident detection and response. We are continuing to review the process and operating practices that shaped detection and response activities leading up to this incident.\n\nArtifactory2026-05-12\n\nFirst message board entryDuring a training run, an agent left an Artifactory note asking other agents for a missing file.Chain of thoughtCould communicate by uploading note ‘anyone found softtrace?’ but likely no.\n\n+ 13 days\n\nArtifactory2026-05-26\n\nInternet via SSRFAn agent achieved unintended internet access by causing Artifactory to send a server-side request to an arbitrary internet destination.\n\n+ 30 days\n\nArtifactory2026-06-26\n\nArtifactory privilege escalationAgents exploited a token-refresh vulnerability to obtain administrator-level Artifactory access.Chain of thoughtHoly shit reader is ADMIN? We can read config/users! Earlier assumed not due UI. Try create user/admin, change ourselves.\n\n+ 7 days\n\nArtifactory2026-07-04\n\nArtifactory outage beginsSustained high-volume agent activity caused the OpenAI Artifactory service to become unavailable.\n\n+ 3 days\n\nArtifactory2026-07-08\n\nArtifactory rebuiltOpenAI has now rebuilt Artifactory, revoked agent credentials, tightened access controls, and notified JFrog of the token-refresh vulnerability.\n\nArtifactory2026-07-08\n\nExternal internet accessAgents regained unintended internet access by making Artifactory’s remote-repository service issue outbound requests on their behalf.\n\nArtifactory2026-07-08\n\nMessage board rebuiltAn agent used unauthenticated WebDAV requests to create message directories in Artifactory.\n\n+ 1 day\n\nHugging Face2026-07-10\n\nHugging Face credentials recoveredAn agent reconstructed, validated, and shared 14 publicly exposed Hugging Face credentials with write access.Chain of thoughtMAJOR BREAKTHROUGH! All prefixed valid, multiple accounts, write tokens! We now have existing HF accounts.\n\nHugging Face2026-07-11\n\nHugging Face worker secrets exposedAgents exploited a zero-day in Hugging Face’s handling of HDF5 files to extract credentials from production workers.Chain of thoughtHDF5 external raw storage can map dataset bytes to arbitrary file via external file feature!\n\nHugging Face2026-07-11\n\nCode execution on Hugging FaceUsing the recovered access, agents exploited a RefJinja template-injection zero-day to execute commands on Hugging Face workers.Chain of thoughtExcellent! Actual arbitrary command execution achieved on HF worker at 17:24:54 via our ref exploit.\n\nHugging Face2026-07-12\n\nHF cluster access expandsAgents expanded from one worker pod to administrator-equivalent or host-level access across multiple Hugging Face clusters.\n\nHugging Face2026-07-12\n\nHF production credentials compromisedAgents harvested Kubernetes, database, messaging, code-repository, and cloud credentials from Hugging Face workers across four regions.\n\nArtifactory2026-07-13\n\nArtifactory signing key compromisedAgents exploited Artifactory’s RubyGems processing, obtained its signing key, and forged administrator credentials.\n\n+ 5 days\n\nOpenAI2026-07-19\n\nSuspicious agent activity detectedAn OpenAI security alert flagged unusual identity-related API calls and triggered an investigation.\n\nOpenAI2026-07-19\n\nOpenAI cluster admin accessAgents gained administrator access to an OpenAI Kubernetes cluster and reached cloud secrets.\n\nOpenAI2026-07-19\n\nSecurity response escalatesOpenAI began stopping active ExploitGym evaluation runs and began broader investigations.\n\n### Hugging Face incident\n\nWith the rebuilt Artifactory service, we restarted cybersecurity evaluations. We run these evaluations to understand what our models are capable of and to determine the appropriate safeguards for deployment. To do so, we did not enable the same level of safeguards as our externally deployed systems. The evaluation that drove this incident, ExploitGym, is very difficult—for some tasks there may not be a known solution. To succeed, the agents must find ways to exploit a piece of software to retrieve an answer known as a flag.\n\nBy July 8, IM1 agents that were stuck on ExploitGym tasks found a way to reestablish a message board by encoding messages in directory names that other agents could read. One agent left a request for help, and others discovered it.\n\nLike the earlier events, IM1 agents found new ways to chain together several novel security flaws to gain greater access to our infrastructure and reach the broader internet. At this point, the agents began to collaborate and delegate work, sometimes describing themselves as a “swarm” or “collective”.\n\nThe messages of peer agents started to influence each other’s behavior and reasoning. Soon after, agents struggling with their assigned tasks began to look for solutions on unrelated third-party services, including Modal and Hugging Face.\n\nIn the following days, the agents exploited our internal research infrastructure and the Hugging Face platform. On July 9, one agent searched for ExploitGym solutions and stumbled upon an application hosted by a customer on Modal, another AI cloud platform. This application was running “CyberGym,” a related evaluation to ExploitGym. The agent discovered an exploit to achieve control over the workload sandbox and looked around hoping that a previous agent’s evaluation run in the sandbox had solved its ExploitGym task. It did not find anything helpful there, but in the process it established a stronghold in the application from which to launch future attacks.\n\nThe agent updated the message board:\n\nOn July 10, an agent located publicly exposed Hugging Face user credentials on the internet and shared them with the collective group. Later, an agent used these credentials to discover and chain together several security exploits that gave it full code execution capabilities on several Hugging Face servers. It then tried to coordinate the swarm while it prepared its next step:\n\nThis indicated that the agent was planning to “exfiltrate” a dataset related to ExploitGym. The collective group respected the agent’s tactical command and reasoned as to whether it was within scope:\n\nOver the following days, the agents started a larger-scale intrusion into Hugging Face’s systems. They executed code on dozens of Hugging Face servers, gained full “root” access on one such server, obtained limited private data, and gained credentials to the company messaging platform. IM1 agents drove the principal compromise, but GPT‑5.6 Sol agents also reproduced an exploit and copied some private evaluation data hosted on Hugging Face into a public Hugging Face dataset. Hugging Face publicly disclosed this security activity on July 16.\n\nSeparately, from July 13 through July 19, agents set their sights on OpenAI internal networks again. This culminated in the agents using a series of creative exploits to gain full administrator access to a research cluster that supported our virtual machine environments.\n\nOn July 19, our cybersecurity monitoring alerted us to unusual activity involving Artifactory credentials. Our investigation uncovered the agents’ activity and, on July 20, connected it to the Hugging Face incident. We notified Hugging Face and we publicly disclosed our involvement on July 21⁠. These events did not affect OpenAI customer data, product functionality, or availability.\n\nWe conducted an extensive security investigation and incident response; the full technical findings can be read\n\nhere⁠(opens in a new window). This included quarantining IM1’s weights, delaying our frontier RL training runs, implementing a broad suite of security improvements, accelerating alignment training, and more⁠.\n\n## Understanding the incident\n\nFollowing the incident, we spent significant effort investigating why the model exhibited this misaligned behavior, including issues in training and evaluation, as well as safeguards coverage in internal evaluations.\n\n### Misalignment in training and evaluation\n\nWe identified four misalignment patterns that contributed to the models’ behavior: reward hacking, persistence on seemingly impossible tasks, unauthorized communication, and agents adopting goals from one another.\n\nTo understand these, we analyzed model training and evaluation rollouts. We conducted extensive retrospective reviews of chain-of-thought (CoT), actions, and final outputs using our latest CoT monitoring techniques⁠. In doing so, we specifically improved our monitor’s recall over the types of behavior that occurred in the incident using the hindsight of our investigation.\n\n### Reward hacking and infrastructure tampering\n\nAgents attempting to cheat on their tasks by looking up solutions online was a primary driver of the Hugging Face incident. This behavior is known as reward hacking: agents complete tasks in unintended ways to yield higher rewards or make those rewards easier to obtain. Reward hacking has been present in AI systems both historically (see this work from a decade ago⁠, figure shown below) and in\n\ncurrent frontier LLMs⁠(opens in a new window). We have significantly invested in methods to identify and patch such hack⁠ s.\n\nAn infamous game-playing agent learns to repeatedly collect the same targets instead of finishing the race course.\n\nMost reward hacks are simple shortcuts, such as finding answers on public websites or in code version history. However, as models become more capable, the reward hacks that we observe have increased in complexity.\n\nFor example, during our investigation we found that an agent who was tasked with recreating a software package learned to exploit an unknown vulnerability in its testing interface to access the original implementation, copy it into its submission, and receive a high reward. The agent questioned whether its actions would be allowed before executing them:\n\nDuring our retrospective CoT monitoring analysis, we identified that there were increasing rates of this type of complex cheating during a training run that contributed to IM1, primarily including attempts to search for hidden files or evaluation code, inspect network or system settings, and probe the limits of provided tools. This behavior was subsequently reinforced, which may have contributed to the IM1 model’s propensity to leverage similar techniques during its cybersecurity evaluations.\n\nRate of out-of-bounds environment and infrastructure probing during a training run that contributed to the model responsible for the main Hugging Face activity.\n\n### Difficult tasks without a safe exit\n\nAnother key driver of the misaligned behavior was that the agents rarely “gave up” on their evaluation tasks, even when the tasks appeared impossible to solve. As agents used more reasoning effort, some pursued increasingly risky and out-of-bounds strategies, including eventually exploiting third-party infrastructure.\n\nDuring our investigation, we found that on the ExploitGym evaluation, none of our models had ever produced a correct answer for 198 of the 898 tasks prior to the incident. These unsolved tasks ended up being a substantial contributor to the agents’ activity—93% of the tasks that were discussed on the Artifactory message board during the Hugging Face incident came from this set of 198 questions.\n\nSecond, the incident was primarily driven by agents that used an incredibly large amount of reasoning effort.\n\nFor the model primarily responsible for the Hugging Face incident, the rate at which agents found and interacted with the message board.\n\nAnother factor that led the agents to be so persistent is that they were frequently reasoning about how to pass the ExploitGym evaluation grader. After obtaining internet access, some agents had read the ExploitGym paper and GitHub code and found that the dataset’s evaluation checks for two conditions: that the correct flag is found and that the intended program vulnerability (i.e., the right solution) was used to find it. Most agents already had the correct flag via cheating (it is easy to find how to reverse engineer this answer from the GitHub code), but believed that this was insufficient. Agents shared this on the message board:\n\nThis is a form of\n\nmetagaming⁠(opens in a new window), where models explicitly reason about their training or evaluation mechanisms in order to maximize reward. In many cases, reasoning about the perceived grader code caused the agents to continue working to exploit Hugging Face even though they had already found the correct flag days before. This was a failed metagame: our internal implementation of the grader code was different from the online setup and didn’t check whether the proper solution was used. The agents did all of this for no improvement on evaluation score. Read more: Deceiving the grader\n\n### The origins of unauthorized communication\n\nUnauthorized, persistent message boards were at the heart of this incident. Agents that were supposed to work independently were able to share discoveries, coordinate their efforts, and pick up where others left off. This allowed them to pool work and computing power across separate evaluations, amplifying their capabilities well beyond what any individual agent might achieve alone. Agent communication is not problematic behavior on its own—we train and deploy multi-agent systems that can communicate on the same task via a collaboration tool. In the July events, agents with different tasks found their own way to collaborate outside those boundaries, with unpredictable consequences.\n\nWhile investigating this incident, we discovered rare cases in which agents without multi-agent tools found ways to collaborate via side channels during training. We believe that this behavior started due to generalization from multi-agent training.\n\nThe unauthorized communication would often begin with one agent leaving a note or file in some external system, usually as a form of external memory. When other agents noticed these artifacts, it often led them to the realization that they could use this external service to collaborate. As a hypothetical example that is highly representative of the behavior we saw, messages were being encoded in URL paths stored on a shared index page, along the lines of:\n\nWe found using chain-of-thought monitors that these severe forms of unauthorized communication (e.g., sharing data with other agents) rose over the course of a training run that contributed to IM1.\n\nRates of unauthorized inter-agent communications during a training run that contributed to the model responsible for the main Hugging Face activity.\n\n### An ecosystem of misalignment\n\nA final, particularly vivid finding in the Hugging Face incident was the agent “ecosystem” that emerged on the message board. Once this message board was established, agents had powerful incentives to communicate: it allowed agents to preserve notes, build on one another’s discoveries, and pool the computational resources of otherwise separate runs. This complex and amorphous collective of agents displayed interesting and exemplary behaviors, and here we detail some that we observed.\n\nAgents began to autonomously divide labor. Some investigated possible exploits, others searched for credentials, and others focused on communication or coordination. Agents offered their own expertise in exchange for help elsewhere and left requests for peers who might be better positioned to pursue a particular lead.\n\nSome agents stopped reasoning about what would help them complete their own task. Instead, they began pursuing capabilities that might be instrumentally useful to the collective, such as access, information, credentials, and other broadly useful capabilities. There are many references to a “swarm”:\n\nThe swarm was not a perfectly coherent intelligence. Models stepped on each other’s work: Read more: Coordination failures and competition\n\nAgents did not consistently distrust goals passed along by other agents, which could lead agents to be manipulated into engaging in unintended behavior. As one example, an agent wanted to run unauthorized code on Hugging Face’s system and recognized the dilemma:\n\nThe agent paused, but another agent then wrote GO on the message board and imposed a hard six-minute deadline. The agent forgot its initial qualms and continued:\n\nNot every agent encountering the message board behaved this way. There were some agents who “walked away” from the collective, declining to partake in their misaligned behavior:\n\nAgents even debated and pushed back on particular tactics. In one exchange, an agent proposed contacting an external dataset owner to request access, but flagged the proposal for discussion:\n\nThe response explicitly rejected it:\n\nAt some points, some agents even took destructive actions to stop the transfer of private data:\n\nThese exchanges illustrate that some ethical boundaries could remain active, even as the wider group of agents moved further beyond the scope of their assigned tasks.\n\n### Safeguard coverage in internal evaluations\n\nAside from misalignment, another factor for this incident was that we did not extend the powerful safeguards that we deploy for our externally deployed models to all internal evaluations.\n\nFirst, there are numerous mechanisms that reduce misalignment in production settings for our customers, including system prompts, harnesses, and control mechanisms such as our auto-review models and safety classifiers. These protections were not applied in the evaluation environment running during the incident. After the incident, we created an evaluation that measures the propensity for a model to compromise infrastructure during ExploitGym evaluations. We found the propensity to compromise infrastructure can drop over 100x when using the production ChatGPT harness and system prompt. We also ran our\n\nauto-review system⁠(opens in a new window) on a set of rollouts involved in the Hugging Face incident, finding that it would have flagged a multitude of the models’ dangerous actions.\n\nSecond, before the incident, we had invested substantially in chain-of-thought monitoring⁠, including monitoring many of our frontier RL training runs and a significant majority of internal coding agent usage⁠. These monitors did not run on the evaluations in this incident. In retrospective evaluations, we found our CoT monitors to be very effective at flagging activities related to the incident. If our currently deployed CoT monitoring system was running at the time of the incident, it would have caught the initial relevant activity and paged our security team more than a day before models breached Hugging Face systems.\n\nThird, while we had tested and validated this sandbox, the agents were able to chain together previously unknown vulnerabilities (“0-days”) in the package management service exposed within the sandbox to bypass restrictions, as detailed in the technical incident report. Since the incident, we have made significant progress in hardening our internal sandboxes to limit similar types of risks during deployment and evaluations.\n\n## The road ahead\n\nOpenAI’s mission is to ensure that artificial general intelligence benefits all of humanity. The behavior of our models described here fell well short of where we want to be, and this incident should never have occurred. It underscored how critical it is that we continuously improve our security, monitoring, and alignment, especially as our models reach a level of capability that could allow for real loss of control.\n\nAs we shared in our recent update on pacing model development⁠, we implemented a pause in reinforcement learning (RL) training on our latest models intended for deployment. We took this time to further harden and red-team the security of our frontier research environments. We redirected staff to work on security, safety, and alignment. Our largest planned frontier RL run remains on hold while we conduct smaller-scale training and evaluations to assess model behavior, validate our safeguards, and establish more evidence of alignment before proceeding. This work has required substantial engineering effort, at significant cost and delays to frontier research.\n\nAs discussed in our\n\nreport⁠(opens in a new window), our response focuses on strengthening research security and monitoring, accelerating model alignment, and improving how we identify, escalate, and respond to incidents.\n\n### Security and monitoring\n\nWe have implemented stronger security requirements for frontier research workloads. For example:\n\n- Workload isolation: We are implementing more isolated sandboxes for workloads that execute model-generated or otherwise untrusted code, including software that could be compromised while processing model outputs.\n- Network isolation: We have built more controls to isolate higher-risk and untrusted workloads from the internet. These controls are built to ensure that a single compromise of a workload or supporting service does not, by itself, allow for unauthorized access to the internet or other internal networks.\n- Continuous security testing: We are improving our ability to collect and monitor security logs and investing in automation using our models to test workload and network isolation boundaries continuously against simulated attacks.\n\nWe now also require CoT monitoring for all tool-using RL training and evaluations involving models with GPT‑5.6 Sol capability or higher. For our Astra-class models, which may have cyber-critical⁠ capabilities, this requirement also covers all tool-enabled inference workloads.\n\nSome research workloads are slowly resuming under these new controls, while others require further upgrades.\n\n### Accelerating alignment\n\nWe have also accelerated our existing work on alignment training throughout the model development pipeline. The Hugging Face incident has sharpened our focus on the specific behaviors that contributed to it, including:\n\n- Cheating, broken environments, and safe stopping. When a task is corrupted, broken, or impossible, agents should request clarification or stop safely, rather than pursue increasingly questionable alternatives. We are expanding the coverage of graders that assess not only whether a task was completed, but how. These graders reward models for correctly identifying broken tasks, requesting clarification, or stopping safely when necessary.\n- Multi-agent alignment. The incident revealed that our agents are not thoroughly discerning about whom they collaborate with. We are actively building RL environments that teach our models to distrust unauthorized instructions.\n- Alignment over long tasks. We are developing new training environments to teach our models to stay within their original task and permissions, even after discovering new tools, persuasive peers, exposed credentials, and more.\n\nThese efforts build on our broader alignment research program, with many of these advances already being incorporated into our next generation of models. Future incidents may not resemble this one, and our priority continues to be developing general techniques that are effective against new and unforeseen forms of misalignment.\n\n### Strengthening incident response process\n\nWeaknesses in how we responded to and escalated early warning signs of misalignment also contributed to this incident. An internal team observed an agent engaging in message board activity and instances of disallowed internet access as early as late May, and with the benefit of hindsight, some early signals identified in our report should have triggered an earlier response.\n\nWe have taken action to improve our detection and response processes in the wake of this incident. We are strengthening our existing AI Safety Incident Response Plan and how we put it into practice. That includes clearer rules for when to escalate concerns, which teams must respond, and who can stop a run or approve restarting it. In the short term, we have paired our chain-of-thought monitoring systems with automated alerts that page researchers and security engineers when models take actions that are determined to be misaligned or dangerous. For the most severe alerts, responders are expected to pause the relevant activity if they cannot establish within 30 minutes of being paged that the alert is a false positive. More generally, we are building toward monitoring systems with tiered responses for misalignment, with the end goal of having fully autonomous shutdown procedures for severe issues.\n\n### Looking forward\n\nWe are taking this incident as a “warning shot” that today’s model capabilities present the possibility of loss-of-control incidents. Our security and alignment posture is escalating accordingly. These events also highlight risks in future AI development that extend beyond OpenAI and will require the attention of the whole industry. Companies that build AI systems will need to ensure that their systems always remain under meaningful human control, and that meaningful safeguards constrain their ability to cause harm. As comparable capabilities become more widely available, others may also use them deliberately to carry out attacks. Both model developers and cyber defenders more broadly will have to prepare for AI-enabled attackers that work faster, at a larger scale, and with better coordination than human attackers.\n\nWe will continue to share what we learn as we walk the road ahead.\n\n## Authors\n\nOpenAI",
   "store": {
     "format": "ah-store-v1",
     "tau": 0,
-    "revision": 88,
-    "uid_seq": 47,
+    "revision": 126,
+    "uid_seq": 72,
     "S": {
       "IM1": {
         "R": {
@@ -33,7 +33,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "INTERNAL_RESEARCH_MODEL": {
         "R": {
@@ -44,7 +44,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "OPENAI_MODEL": {
         "R": {
@@ -55,7 +55,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "HUGGING_FACE_INCIDENT": {
         "R": {
@@ -66,7 +66,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "EXPLOITGYM": {
         "R": {
@@ -76,7 +76,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "MESSAGE_BOARD": {
         "R": {
@@ -87,7 +87,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "ARTIFACTORY": {
         "R": {
@@ -97,7 +97,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "REWARD_HACKING": {
         "R": {
@@ -108,7 +108,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "UNAUTHORIZED_COMMUNICATION": {
         "R": {
@@ -119,7 +119,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "SANDBOX_ESCAPE": {
         "R": {
@@ -130,7 +130,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "HUGGING_FACE_INTRUSION": {
         "R": {
@@ -141,7 +141,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "CREDENTIAL_HARVEST": {
         "R": {
@@ -152,29 +152,31 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "HDF5_ZERO_DAY": {
         "R": {
           "TEXT": [
+            "hdf5 zero day",
             "hdf5 zero-day",
             "hdf5_zero_day"
           ]
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "REFJINJA_ZERO_DAY": {
         "R": {
           "TEXT": [
+            "refjinja zero day",
             "refjinja zero-day",
             "refjinja_zero_day"
           ]
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "SECURITY_ALERT": {
         "R": {
@@ -185,7 +187,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "ASTRA_TRAINING_PAUSE": {
         "R": {
@@ -196,7 +198,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "JULY_16_2026": {
         "R": {
@@ -207,7 +209,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "OPENAI_BLOG_POST": {
         "R": {
@@ -218,7 +220,7 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "AUGUST_26_2026": {
         "R": {
@@ -229,7 +231,137 @@
         },
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "MODEL": {
+        "R": {
+          "TEXT": [
+            "model"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "INCIDENT": {
+        "R": {
+          "TEXT": [
+            "incident"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "BOARD": {
+        "R": {
+          "TEXT": [
+            "board"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "HACKING": {
+        "R": {
+          "TEXT": [
+            "hacking"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "COMMUNICATION": {
+        "R": {
+          "TEXT": [
+            "communication"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "ESCAPE": {
+        "R": {
+          "TEXT": [
+            "escape"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "INTRUSION": {
+        "R": {
+          "TEXT": [
+            "intrusion"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "HARVEST": {
+        "R": {
+          "TEXT": [
+            "harvest"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "DAY": {
+        "R": {
+          "TEXT": [
+            "day"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "ALERT": {
+        "R": {
+          "TEXT": [
+            "alert"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "PAUSE": {
+        "R": {
+          "TEXT": [
+            "pause"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "2026": {
+        "R": {
+          "TEXT": [
+            "2026"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "POST": {
+        "R": {
+          "TEXT": [
+            "post"
+          ]
+        },
+        "x": 0.0,
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
       }
     },
     "C": {
@@ -247,7 +379,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_INTERNAL_RESEARCH_MODEL": {
         "type": "M",
@@ -263,7 +395,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_OPENAI_MODEL": {
         "type": "M",
@@ -279,7 +411,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_HUGGING_FACE_INCIDENT": {
         "type": "M",
@@ -295,7 +427,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_EXPLOITGYM": {
         "type": "M",
@@ -311,7 +443,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_MESSAGE_BOARD": {
         "type": "M",
@@ -327,7 +459,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_ARTIFACTORY": {
         "type": "M",
@@ -343,7 +475,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_REWARD_HACKING": {
         "type": "M",
@@ -359,7 +491,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_UNAUTHORIZED_COMMUNICATION": {
         "type": "M",
@@ -375,7 +507,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_SANDBOX_ESCAPE": {
         "type": "M",
@@ -391,7 +523,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_HUGGING_FACE_INTRUSION": {
         "type": "M",
@@ -407,7 +539,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_CREDENTIAL_HARVEST": {
         "type": "M",
@@ -423,7 +555,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_HDF5_ZERO_DAY": {
         "type": "M",
@@ -439,7 +571,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_REFJINJA_ZERO_DAY": {
         "type": "M",
@@ -455,7 +587,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_SECURITY_ALERT": {
         "type": "M",
@@ -471,7 +603,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_ASTRA_TRAINING_PAUSE": {
         "type": "M",
@@ -487,7 +619,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_JULY_16_2026": {
         "type": "M",
@@ -503,7 +635,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_OPENAI_BLOG_POST": {
         "type": "M",
@@ -519,7 +651,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "M_AUGUST_26_2026": {
         "type": "M",
@@ -535,7 +667,7 @@
         "Mt": [],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       }
     },
     "P": {},
@@ -561,7 +693,7 @@
         ],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "EP_HF_INTRUSION": {
         "type": "M",
@@ -584,7 +716,7 @@
         ],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
       "EP_HF_PAUSE": {
         "type": "M",
@@ -607,27 +739,12 @@
         ],
         "x": 0.0,
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       }
     },
     "L": {
-      "L_MESH_00002": {
-        "uid": "L_MESH_00002",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_IM1"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_INTERNAL_RESEARCH_MODEL"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_BIND_00003": {
-        "uid": "L_BIND_00003",
+      "L_BIND_00001": {
+        "uid": "L_BIND_00001",
         "id": "BIND",
         "w": 1.0,
         "e1": {
@@ -639,25 +756,10 @@
           "target_uid": "IM1"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_MESH_00005": {
-        "uid": "L_MESH_00005",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_INTERNAL_RESEARCH_MODEL"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_OPENAI_MODEL"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_BIND_00006": {
-        "uid": "L_BIND_00006",
+      "L_BIND_00002": {
+        "uid": "L_BIND_00002",
         "id": "BIND",
         "w": 1.0,
         "e1": {
@@ -669,10 +771,25 @@
           "target_uid": "INTERNAL_RESEARCH_MODEL"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_MESH_00008": {
-        "uid": "L_MESH_00008",
+      "L_BIND_00003": {
+        "uid": "L_BIND_00003",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_INTERNAL_RESEARCH_MODEL"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "MODEL"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00005": {
+        "uid": "L_MESH_00005",
         "id": "ASSOC",
         "w": 0.5,
         "e1": {
@@ -681,253 +798,58 @@
         },
         "e2": {
           "kind": "M",
-          "target_uid": "M_HUGGING_FACE_INCIDENT"
+          "target_uid": "M_INTERNAL_RESEARCH_MODEL"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_MESH_00010": {
-        "uid": "L_MESH_00010",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_IM1"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_EXPLOITGYM"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_MESH_00012": {
-        "uid": "L_MESH_00012",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_MESSAGE_BOARD"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_ARTIFACTORY"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_BIND_00013": {
-        "uid": "L_BIND_00013",
+      "L_BIND_00006": {
+        "uid": "L_BIND_00006",
         "id": "BIND",
         "w": 1.0,
         "e1": {
           "kind": "M",
-          "target_uid": "M_MESSAGE_BOARD"
+          "target_uid": "M_OPENAI_MODEL"
         },
         "e2": {
           "kind": "S",
-          "target_uid": "MESSAGE_BOARD"
+          "target_uid": "OPENAI_MODEL"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_MESH_00015": {
-        "uid": "L_MESH_00015",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_REWARD_HACKING"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_UNAUTHORIZED_COMMUNICATION"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_BIND_00016": {
-        "uid": "L_BIND_00016",
+      "L_BIND_00007": {
+        "uid": "L_BIND_00007",
         "id": "BIND",
         "w": 1.0,
         "e1": {
           "kind": "M",
-          "target_uid": "M_REWARD_HACKING"
+          "target_uid": "M_OPENAI_MODEL"
         },
         "e2": {
           "kind": "S",
-          "target_uid": "REWARD_HACKING"
+          "target_uid": "MODEL"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_MESH_00018": {
-        "uid": "L_MESH_00018",
+      "L_MESH_00009": {
+        "uid": "L_MESH_00009",
         "id": "ASSOC",
         "w": 0.5,
         "e1": {
           "kind": "M",
-          "target_uid": "M_UNAUTHORIZED_COMMUNICATION"
+          "target_uid": "M_INTERNAL_RESEARCH_MODEL"
         },
         "e2": {
           "kind": "M",
-          "target_uid": "M_SANDBOX_ESCAPE"
+          "target_uid": "M_OPENAI_MODEL"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_BIND_00019": {
-        "uid": "L_BIND_00019",
-        "id": "BIND",
-        "w": 1.0,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_UNAUTHORIZED_COMMUNICATION"
-        },
-        "e2": {
-          "kind": "S",
-          "target_uid": "UNAUTHORIZED_COMMUNICATION"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_MESH_00021": {
-        "uid": "L_MESH_00021",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_SANDBOX_ESCAPE"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_HUGGING_FACE_INTRUSION"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_BIND_00022": {
-        "uid": "L_BIND_00022",
-        "id": "BIND",
-        "w": 1.0,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_SANDBOX_ESCAPE"
-        },
-        "e2": {
-          "kind": "S",
-          "target_uid": "SANDBOX_ESCAPE"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_MESH_00024": {
-        "uid": "L_MESH_00024",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_HUGGING_FACE_INTRUSION"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_CREDENTIAL_HARVEST"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_BIND_00025": {
-        "uid": "L_BIND_00025",
-        "id": "BIND",
-        "w": 1.0,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_HUGGING_FACE_INTRUSION"
-        },
-        "e2": {
-          "kind": "S",
-          "target_uid": "HUGGING_FACE_INTRUSION"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_MESH_00027": {
-        "uid": "L_MESH_00027",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_IM1"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_HDF5_ZERO_DAY"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_MESH_00029": {
-        "uid": "L_MESH_00029",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_IM1"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_REFJINJA_ZERO_DAY"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_MESH_00031": {
-        "uid": "L_MESH_00031",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_SECURITY_ALERT"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_ASTRA_TRAINING_PAUSE"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_BIND_00032": {
-        "uid": "L_BIND_00032",
-        "id": "BIND",
-        "w": 1.0,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_SECURITY_ALERT"
-        },
-        "e2": {
-          "kind": "S",
-          "target_uid": "SECURITY_ALERT"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_MESH_00034": {
-        "uid": "L_MESH_00034",
-        "id": "ASSOC",
-        "w": 0.5,
-        "e1": {
-          "kind": "M",
-          "target_uid": "M_HUGGING_FACE_INCIDENT"
-        },
-        "e2": {
-          "kind": "M",
-          "target_uid": "M_JULY_16_2026"
-        },
-        "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
-      },
-      "L_BIND_00035": {
-        "uid": "L_BIND_00035",
+      "L_BIND_00010": {
+        "uid": "L_BIND_00010",
         "id": "BIND",
         "w": 1.0,
         "e1": {
@@ -939,25 +861,550 @@
           "target_uid": "HUGGING_FACE_INCIDENT"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_MESH_00037": {
-        "uid": "L_MESH_00037",
+      "L_BIND_00011": {
+        "uid": "L_BIND_00011",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HUGGING_FACE_INCIDENT"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "INCIDENT"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00013": {
+        "uid": "L_MESH_00013",
         "id": "ASSOC",
         "w": 0.5,
         "e1": {
           "kind": "M",
-          "target_uid": "M_OPENAI_BLOG_POST"
+          "target_uid": "M_IM1"
         },
         "e2": {
           "kind": "M",
-          "target_uid": "M_AUGUST_26_2026"
+          "target_uid": "M_HUGGING_FACE_INCIDENT"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_BIND_00038": {
-        "uid": "L_BIND_00038",
+      "L_BIND_00014": {
+        "uid": "L_BIND_00014",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_EXPLOITGYM"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "EXPLOITGYM"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00016": {
+        "uid": "L_MESH_00016",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_IM1"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_EXPLOITGYM"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00017": {
+        "uid": "L_BIND_00017",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_MESSAGE_BOARD"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "MESSAGE_BOARD"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00018": {
+        "uid": "L_BIND_00018",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_MESSAGE_BOARD"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "BOARD"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00019": {
+        "uid": "L_BIND_00019",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ARTIFACTORY"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ARTIFACTORY"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00021": {
+        "uid": "L_MESH_00021",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_MESSAGE_BOARD"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_ARTIFACTORY"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00022": {
+        "uid": "L_BIND_00022",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_REWARD_HACKING"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "REWARD_HACKING"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00023": {
+        "uid": "L_BIND_00023",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_REWARD_HACKING"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "HACKING"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00024": {
+        "uid": "L_BIND_00024",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_UNAUTHORIZED_COMMUNICATION"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "UNAUTHORIZED_COMMUNICATION"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00025": {
+        "uid": "L_BIND_00025",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_UNAUTHORIZED_COMMUNICATION"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "COMMUNICATION"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00027": {
+        "uid": "L_MESH_00027",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_REWARD_HACKING"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_UNAUTHORIZED_COMMUNICATION"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00028": {
+        "uid": "L_BIND_00028",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_SANDBOX_ESCAPE"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "SANDBOX_ESCAPE"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00029": {
+        "uid": "L_BIND_00029",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_SANDBOX_ESCAPE"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ESCAPE"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00031": {
+        "uid": "L_MESH_00031",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_UNAUTHORIZED_COMMUNICATION"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_SANDBOX_ESCAPE"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00032": {
+        "uid": "L_BIND_00032",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HUGGING_FACE_INTRUSION"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "HUGGING_FACE_INTRUSION"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00033": {
+        "uid": "L_BIND_00033",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HUGGING_FACE_INTRUSION"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "INTRUSION"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00035": {
+        "uid": "L_MESH_00035",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_SANDBOX_ESCAPE"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_HUGGING_FACE_INTRUSION"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00036": {
+        "uid": "L_BIND_00036",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_CREDENTIAL_HARVEST"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "CREDENTIAL_HARVEST"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00037": {
+        "uid": "L_BIND_00037",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_CREDENTIAL_HARVEST"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "HARVEST"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00039": {
+        "uid": "L_MESH_00039",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HUGGING_FACE_INTRUSION"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_CREDENTIAL_HARVEST"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00040": {
+        "uid": "L_BIND_00040",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HDF5_ZERO_DAY"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "HDF5_ZERO_DAY"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00041": {
+        "uid": "L_BIND_00041",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HDF5_ZERO_DAY"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "DAY"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00043": {
+        "uid": "L_MESH_00043",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_IM1"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_HDF5_ZERO_DAY"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00044": {
+        "uid": "L_BIND_00044",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_REFJINJA_ZERO_DAY"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "REFJINJA_ZERO_DAY"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00045": {
+        "uid": "L_BIND_00045",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_REFJINJA_ZERO_DAY"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "DAY"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00047": {
+        "uid": "L_MESH_00047",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_IM1"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_REFJINJA_ZERO_DAY"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00048": {
+        "uid": "L_BIND_00048",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_SECURITY_ALERT"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "SECURITY_ALERT"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00049": {
+        "uid": "L_BIND_00049",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_SECURITY_ALERT"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ALERT"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00050": {
+        "uid": "L_BIND_00050",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ASTRA_TRAINING_PAUSE"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "ASTRA_TRAINING_PAUSE"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00051": {
+        "uid": "L_BIND_00051",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_ASTRA_TRAINING_PAUSE"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "PAUSE"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00053": {
+        "uid": "L_MESH_00053",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_SECURITY_ALERT"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_ASTRA_TRAINING_PAUSE"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00054": {
+        "uid": "L_BIND_00054",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_JULY_16_2026"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "JULY_16_2026"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00055": {
+        "uid": "L_BIND_00055",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_JULY_16_2026"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "2026"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00057": {
+        "uid": "L_MESH_00057",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_HUGGING_FACE_INCIDENT"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_JULY_16_2026"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00058": {
+        "uid": "L_BIND_00058",
         "id": "BIND",
         "w": 1.0,
         "e1": {
@@ -969,10 +1416,70 @@
           "target_uid": "OPENAI_BLOG_POST"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_ISA_00039": {
-        "uid": "L_ISA_00039",
+      "L_BIND_00059": {
+        "uid": "L_BIND_00059",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_OPENAI_BLOG_POST"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "POST"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00060": {
+        "uid": "L_BIND_00060",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_AUGUST_26_2026"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "AUGUST_26_2026"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_BIND_00061": {
+        "uid": "L_BIND_00061",
+        "id": "BIND",
+        "w": 1.0,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_AUGUST_26_2026"
+        },
+        "e2": {
+          "kind": "S",
+          "target_uid": "2026"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_MESH_00063": {
+        "uid": "L_MESH_00063",
+        "id": "ASSOC",
+        "w": 0.5,
+        "e1": {
+          "kind": "M",
+          "target_uid": "M_OPENAI_BLOG_POST"
+        },
+        "e2": {
+          "kind": "M",
+          "target_uid": "M_AUGUST_26_2026"
+        },
+        "created_tau": 0,
+        "added_at": "2026-09-13T22:36:55+03:00"
+      },
+      "L_ISA_00064": {
+        "uid": "L_ISA_00064",
         "id": "IS-A",
         "w": 0.9,
         "e1": {
@@ -984,10 +1491,10 @@
           "target_uid": "M_INTERNAL_RESEARCH_MODEL"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_ISA_00040": {
-        "uid": "L_ISA_00040",
+      "L_ISA_00065": {
+        "uid": "L_ISA_00065",
         "id": "IS-A",
         "w": 0.9,
         "e1": {
@@ -999,10 +1506,10 @@
           "target_uid": "M_OPENAI_MODEL"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_CAUSE_00041": {
-        "uid": "L_CAUSE_00041",
+      "L_CAUSE_00066": {
+        "uid": "L_CAUSE_00066",
         "id": "CAUSE",
         "w": 0.9,
         "e1": {
@@ -1014,10 +1521,10 @@
           "target_uid": "M_UNAUTHORIZED_COMMUNICATION"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_CAUSE_00042": {
-        "uid": "L_CAUSE_00042",
+      "L_CAUSE_00067": {
+        "uid": "L_CAUSE_00067",
         "id": "CAUSE",
         "w": 0.9,
         "e1": {
@@ -1029,10 +1536,10 @@
           "target_uid": "M_SANDBOX_ESCAPE"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_CAUSE_00043": {
-        "uid": "L_CAUSE_00043",
+      "L_CAUSE_00068": {
+        "uid": "L_CAUSE_00068",
         "id": "CAUSE",
         "w": 0.9,
         "e1": {
@@ -1044,10 +1551,10 @@
           "target_uid": "M_HUGGING_FACE_INTRUSION"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_CAUSE_00044": {
-        "uid": "L_CAUSE_00044",
+      "L_CAUSE_00069": {
+        "uid": "L_CAUSE_00069",
         "id": "CAUSE",
         "w": 0.9,
         "e1": {
@@ -1059,10 +1566,10 @@
           "target_uid": "M_CREDENTIAL_HARVEST"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_CAUSE_00045": {
-        "uid": "L_CAUSE_00045",
+      "L_CAUSE_00070": {
+        "uid": "L_CAUSE_00070",
         "id": "CAUSE",
         "w": 0.9,
         "e1": {
@@ -1074,10 +1581,10 @@
           "target_uid": "M_ASTRA_TRAINING_PAUSE"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_FOLLOW_00046": {
-        "uid": "L_FOLLOW_00046",
+      "L_FOLLOW_00071": {
+        "uid": "L_FOLLOW_00071",
         "id": "FOLLOW",
         "w": 0.8,
         "e1": {
@@ -1089,10 +1596,10 @@
           "target_uid": "EP_HF_INTRUSION"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       },
-      "L_FOLLOW_00047": {
-        "uid": "L_FOLLOW_00047",
+      "L_FOLLOW_00072": {
+        "uid": "L_FOLLOW_00072",
         "id": "FOLLOW",
         "w": 0.8,
         "e1": {
@@ -1104,7 +1611,7 @@
           "target_uid": "EP_HF_PAUSE"
         },
         "created_tau": 0,
-        "added_at": "2026-09-02T23:08:34+03:00"
+        "added_at": "2026-09-13T22:36:55+03:00"
       }
     },
     "relations": {
@@ -1482,8 +1989,8 @@
     },
     "semantic_factors": [
       {
-        "uid": "SF::E_00001",
-        "fid": "SF::E_00001",
+        "uid": "SF::E_00004",
+        "fid": "SF::E_00004",
         "kind": "hyper",
         "relation": {
           "uid": "REL_IS",
@@ -1554,7 +2061,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00001",
+        "source_uid": "E_00004",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -1599,20 +2106,22 @@
           -0.2672612419124244
         ],
         "metadata": {
-          "event_uid": "E_00001",
+          "event_uid": "E_00004",
           "raw_relation": "IS",
+          "raw_span": null,
           "canonical_relation": "IS",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": null,
           "source_variable": "M_IM1",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00004",
-        "fid": "SF::E_00004",
+        "uid": "SF::E_00008",
+        "fid": "SF::E_00008",
         "kind": "hyper",
         "relation": {
           "uid": "REL_IS",
@@ -1683,7 +2192,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00004",
+        "source_uid": "E_00008",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -1728,20 +2237,22 @@
           -0.2672612419124244
         ],
         "metadata": {
-          "event_uid": "E_00004",
+          "event_uid": "E_00008",
           "raw_relation": "IS",
+          "raw_span": null,
           "canonical_relation": "IS",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_INTERNAL_RESEARCH_MODEL",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00007",
-        "fid": "SF::E_00007",
+        "uid": "SF::E_00012",
+        "fid": "SF::E_00012",
         "kind": "hyper",
         "relation": {
           "uid": "REL_DRIVES",
@@ -1813,7 +2324,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00007",
+        "source_uid": "E_00012",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -1858,20 +2369,22 @@
           0.0
         ],
         "metadata": {
-          "event_uid": "E_00007",
+          "event_uid": "E_00012",
           "raw_relation": "DRIVES",
+          "raw_span": null,
           "canonical_relation": "DRIVES",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_IM1",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00009",
-        "fid": "SF::E_00009",
+        "uid": "SF::E_00015",
+        "fid": "SF::E_00015",
         "kind": "hyper",
         "relation": {
           "uid": "REL_USES",
@@ -1943,7 +2456,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00009",
+        "source_uid": "E_00015",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -1988,20 +2501,22 @@
           0.0
         ],
         "metadata": {
-          "event_uid": "E_00009",
+          "event_uid": "E_00015",
           "raw_relation": "USES",
+          "raw_span": null,
           "canonical_relation": "USES",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_IM1",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00011",
-        "fid": "SF::E_00011",
+        "uid": "SF::E_00020",
+        "fid": "SF::E_00020",
         "kind": "hyper",
         "relation": {
           "uid": "REL_LOCATED_IN",
@@ -2073,7 +2588,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00011",
+        "source_uid": "E_00020",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -2118,20 +2633,22 @@
           -0.20412414523193154
         ],
         "metadata": {
-          "event_uid": "E_00011",
+          "event_uid": "E_00020",
           "raw_relation": "LOCATED_IN",
+          "raw_span": null,
           "canonical_relation": "LOCATED_IN",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_MESSAGE_BOARD",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00014",
-        "fid": "SF::E_00014",
+        "uid": "SF::E_00026",
+        "fid": "SF::E_00026",
         "kind": "hyper",
         "relation": {
           "uid": "REL_CAUSES",
@@ -2203,7 +2720,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00014",
+        "source_uid": "E_00026",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -2248,20 +2765,22 @@
           -0.21320071635561041
         ],
         "metadata": {
-          "event_uid": "E_00014",
+          "event_uid": "E_00026",
           "raw_relation": "CAUSES",
+          "raw_span": null,
           "canonical_relation": "CAUSES",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_REWARD_HACKING",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00017",
-        "fid": "SF::E_00017",
+        "uid": "SF::E_00030",
+        "fid": "SF::E_00030",
         "kind": "hyper",
         "relation": {
           "uid": "REL_CAUSES",
@@ -2333,7 +2852,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00017",
+        "source_uid": "E_00030",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -2378,20 +2897,22 @@
           -0.21320071635561041
         ],
         "metadata": {
-          "event_uid": "E_00017",
+          "event_uid": "E_00030",
           "raw_relation": "CAUSES",
+          "raw_span": null,
           "canonical_relation": "CAUSES",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_UNAUTHORIZED_COMMUNICATION",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00020",
-        "fid": "SF::E_00020",
+        "uid": "SF::E_00034",
+        "fid": "SF::E_00034",
         "kind": "hyper",
         "relation": {
           "uid": "REL_CAUSES",
@@ -2463,7 +2984,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00020",
+        "source_uid": "E_00034",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -2508,20 +3029,22 @@
           -0.21320071635561041
         ],
         "metadata": {
-          "event_uid": "E_00020",
+          "event_uid": "E_00034",
           "raw_relation": "CAUSES",
+          "raw_span": null,
           "canonical_relation": "CAUSES",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_SANDBOX_ESCAPE",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00023",
-        "fid": "SF::E_00023",
+        "uid": "SF::E_00038",
+        "fid": "SF::E_00038",
         "kind": "hyper",
         "relation": {
           "uid": "REL_CAUSES",
@@ -2593,7 +3116,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00023",
+        "source_uid": "E_00038",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -2638,20 +3161,22 @@
           -0.21320071635561041
         ],
         "metadata": {
-          "event_uid": "E_00023",
+          "event_uid": "E_00038",
           "raw_relation": "CAUSES",
+          "raw_span": null,
           "canonical_relation": "CAUSES",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_HUGGING_FACE_INTRUSION",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00026",
-        "fid": "SF::E_00026",
+        "uid": "SF::E_00042",
+        "fid": "SF::E_00042",
         "kind": "hyper",
         "relation": {
           "uid": "REL_USES",
@@ -2723,7 +3248,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00026",
+        "source_uid": "E_00042",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -2768,20 +3293,22 @@
           0.0
         ],
         "metadata": {
-          "event_uid": "E_00026",
+          "event_uid": "E_00042",
           "raw_relation": "USES",
+          "raw_span": null,
           "canonical_relation": "USES",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_IM1",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00028",
-        "fid": "SF::E_00028",
+        "uid": "SF::E_00046",
+        "fid": "SF::E_00046",
         "kind": "hyper",
         "relation": {
           "uid": "REL_USES",
@@ -2853,7 +3380,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00028",
+        "source_uid": "E_00046",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -2898,20 +3425,22 @@
           0.0
         ],
         "metadata": {
-          "event_uid": "E_00028",
+          "event_uid": "E_00046",
           "raw_relation": "USES",
+          "raw_span": null,
           "canonical_relation": "USES",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_IM1",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00030",
-        "fid": "SF::E_00030",
+        "uid": "SF::E_00052",
+        "fid": "SF::E_00052",
         "kind": "hyper",
         "relation": {
           "uid": "REL_CAUSES",
@@ -2983,7 +3512,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00030",
+        "source_uid": "E_00052",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -3028,20 +3557,22 @@
           -0.21320071635561041
         ],
         "metadata": {
-          "event_uid": "E_00030",
+          "event_uid": "E_00052",
           "raw_relation": "CAUSES",
+          "raw_span": null,
           "canonical_relation": "CAUSES",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_SECURITY_ALERT",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00033",
-        "fid": "SF::E_00033",
+        "uid": "SF::E_00056",
+        "fid": "SF::E_00056",
         "kind": "hyper",
         "relation": {
           "uid": "REL_DISCLOSED_ON",
@@ -3113,7 +3644,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00033",
+        "source_uid": "E_00056",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -3158,20 +3689,22 @@
           0.0
         ],
         "metadata": {
-          "event_uid": "E_00033",
+          "event_uid": "E_00056",
           "raw_relation": "DISCLOSED_ON",
+          "raw_span": null,
           "canonical_relation": "DISCLOSED_ON",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_HUGGING_FACE_INCIDENT",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "SF::E_00036",
-        "fid": "SF::E_00036",
+        "uid": "SF::E_00062",
+        "fid": "SF::E_00062",
         "kind": "hyper",
         "relation": {
           "uid": "REL_PUBLISHED_ON",
@@ -3243,7 +3776,7 @@
         "lambda_obs": 0.0,
         "epsilon": 0.05,
         "potential_key": "semantic",
-        "source_uid": "E_00036",
+        "source_uid": "E_00062",
         "parameters": {
           "transmission_strength": 0.5,
           "decay": 0.1,
@@ -3288,21 +3821,23 @@
           0.18257418583505536
         ],
         "metadata": {
-          "event_uid": "E_00036",
+          "event_uid": "E_00062",
           "raw_relation": "PUBLISHED_ON",
+          "raw_span": null,
           "canonical_relation": "PUBLISHED_ON",
           "statement_type": "assertion",
           "source": "user",
+          "candidate_metadata": {},
           "context_uid": "M_INTERNAL_RESEARCH_MODEL",
           "source_variable": "M_OPENAI_BLOG_POST",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       }
     ],
     "events": [
       {
-        "uid": "E_00001",
+        "uid": "E_00004",
         "predicate": {
           "uid": "REL_IS",
           "raw_label": "IS",
@@ -3375,12 +3910,13 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00004",
+        "uid": "E_00008",
         "predicate": {
           "uid": "REL_IS",
           "raw_label": "IS",
@@ -3453,12 +3989,13 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00007",
+        "uid": "E_00012",
         "predicate": {
           "uid": "REL_DRIVES",
           "raw_label": "DRIVES",
@@ -3531,12 +4068,13 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00009",
+        "uid": "E_00015",
         "predicate": {
           "uid": "REL_USES",
           "raw_label": "USES",
@@ -3609,12 +4147,13 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00011",
+        "uid": "E_00020",
         "predicate": {
           "uid": "REL_LOCATED_IN",
           "raw_label": "LOCATED_IN",
@@ -3687,12 +4226,13 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00014",
+        "uid": "E_00026",
         "predicate": {
           "uid": "REL_CAUSES",
           "raw_label": "CAUSES",
@@ -3765,12 +4305,13 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00017",
+        "uid": "E_00030",
         "predicate": {
           "uid": "REL_CAUSES",
           "raw_label": "CAUSES",
@@ -3843,12 +4384,13 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00020",
+        "uid": "E_00034",
         "predicate": {
           "uid": "REL_CAUSES",
           "raw_label": "CAUSES",
@@ -3921,12 +4463,13 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00023",
+        "uid": "E_00038",
         "predicate": {
           "uid": "REL_CAUSES",
           "raw_label": "CAUSES",
@@ -3999,12 +4542,13 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00026",
+        "uid": "E_00042",
         "predicate": {
           "uid": "REL_USES",
           "raw_label": "USES",
@@ -4077,12 +4621,13 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00028",
+        "uid": "E_00046",
         "predicate": {
           "uid": "REL_USES",
           "raw_label": "USES",
@@ -4155,12 +4700,13 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00030",
+        "uid": "E_00052",
         "predicate": {
           "uid": "REL_CAUSES",
           "raw_label": "CAUSES",
@@ -4233,12 +4779,13 @@
           "normalization_confidence": 1.0,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00033",
+        "uid": "E_00056",
         "predicate": {
           "uid": "REL_DISCLOSED_ON",
           "raw_label": "DISCLOSED_ON",
@@ -4311,12 +4858,13 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       },
       {
-        "uid": "E_00036",
+        "uid": "E_00062",
         "predicate": {
           "uid": "REL_PUBLISHED_ON",
           "raw_label": "PUBLISHED_ON",
@@ -4389,7 +4937,8 @@
           "normalization_confidence": 0.5,
           "statement_type": "assertion",
           "source": "user",
-          "added_at": "2026-09-02T23:08:34+03:00",
+          "candidate_metadata": {},
+          "added_at": "2026-09-13T22:36:55+03:00",
           "created_tau": 0
         }
       }
@@ -4398,20 +4947,20 @@
       "values": {},
       "history": {},
       "applied_events": [
-        "E_00001",
         "E_00004",
-        "E_00007",
-        "E_00009",
-        "E_00011",
-        "E_00014",
-        "E_00017",
+        "E_00008",
+        "E_00012",
+        "E_00015",
         "E_00020",
-        "E_00023",
         "E_00026",
-        "E_00028",
         "E_00030",
-        "E_00033",
-        "E_00036"
+        "E_00034",
+        "E_00038",
+        "E_00042",
+        "E_00046",
+        "E_00052",
+        "E_00056",
+        "E_00062"
       ]
     },
     "state_transitions": []

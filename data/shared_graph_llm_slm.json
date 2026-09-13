@@ -1,0 +1,507 @@
+{
+  "protocol": "One graph per builder. Both SLM and LLM generate answers from that same graph context only (no RAG corpus).",
+  "models": {
+    "slm": "qwen3:8b",
+    "llm": "deepseek-chat"
+  },
+  "runs": {
+    "llm": {
+      "builder": "llm",
+      "builder_model": "deepseek-chat",
+      "batches": 26,
+      "candidates": 438,
+      "mean_coverage": 0.9902,
+      "ingest_sec": 338.15,
+      "graph": {
+        "S": 778,
+        "C": 549,
+        "L": 1608,
+        "semantic_factors": 438,
+        "events": 438,
+        "graph_size": 2595
+      },
+      "qa": {
+        "d_max": 2,
+        "n": 6,
+        "summary": {
+          "graph_raw": {
+            "correct": 0.5,
+            "hallucinated": 0.5,
+            "explain": 0.0,
+            "abstain": 0.0
+          },
+          "slm": {
+            "correct": 0.1667,
+            "hallucinated": 0.0,
+            "explain": 0.0833,
+            "abstain": 1.0
+          },
+          "llm": {
+            "correct": 0.1667,
+            "hallucinated": 0.0,
+            "explain": 0.0833,
+            "abstain": 1.0
+          }
+        },
+        "items": [
+          {
+            "question": "What is Internal Model 1 (IM1)?",
+            "graph_raw": {
+              "answer": "internal model",
+              "correct": true,
+              "abstain": false,
+              "hallucinated": false,
+              "explain": 0.0
+            },
+            "context_chars": 209,
+            "trace": [
+              "INTERNAL_MODEL",
+              "M_INTERNAL_MODEL"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 4.68
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.27
+            }
+          },
+          {
+            "question": "Which evaluation drove the Hugging Face incident?",
+            "graph_raw": {
+              "answer": "hugging face incident",
+              "correct": false,
+              "abstain": false,
+              "hallucinated": true,
+              "explain": 0.0
+            },
+            "context_chars": 250,
+            "trace": [
+              "HUGGING_FACE_INCIDENT",
+              "M_HUGGING_FACE_INCIDENT"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 2.43
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.25
+            }
+          },
+          {
+            "question": "Where did agents create an unauthorized message board?",
+            "graph_raw": {
+              "answer": "the rate at which agents found and interacted with the message board (provided information to enable additional agents to exploit our infrastructure, allowed agents to preserve notes, build on one another’s discoveries, pool the computational resources of otherwise separate runs)",
+              "correct": true,
+              "abstain": false,
+              "hallucinated": false,
+              "explain": 0.0
+            },
+            "context_chars": 675,
+            "trace": [
+              "M_MESSAGE_BOARD",
+              "MESSAGE_BOARD",
+              "SF::E_01165",
+              "SF::E_00341",
+              "M_ADDITIONAL_AGENTS",
+              "M_EXPLOIT_OUR_INFRASTRUCTURE",
+              "SF::E_01396",
+              "M_PRESERVE_NOTES",
+              "SF::E_01400",
+              "M_ONE_ANOTHER_DISCOVERIES",
+              "SF::E_01404",
+              "M_RESOURCES_OTHERWISE_SEPARATE_RUNS"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 3.13
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.54
+            }
+          },
+          {
+            "question": "Which Hugging Face file-format zero-day did agents exploit?",
+            "graph_raw": {
+              "answer": "hugging face",
+              "correct": false,
+              "abstain": false,
+              "hallucinated": true,
+              "explain": 0.0
+            },
+            "context_chars": 201,
+            "trace": [
+              "HUGGING_FACE",
+              "M_HUGGING_FACE"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 3.56
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.7
+            }
+          },
+          {
+            "question": "What ultimately resulted from the security alert cascade toward Astra?",
+            "graph_raw": {
+              "answer": "agents credentials from production workers from multi agent training goals from one another isolate them from internet security security team we",
+              "correct": true,
+              "abstain": false,
+              "hallucinated": false,
+              "explain": 0.0
+            },
+            "context_chars": 1882,
+            "trace": [
+              "CREDENTIALS_FROM_PRODUCTION_WORKERS",
+              "FROM_MULTI_AGENT_TRAINING",
+              "GOALS_FROM_ONE_ANOTHER",
+              "ISOLATE_THEM_FROM_INTERNET",
+              "M_AGENTS",
+              "M_CREDENTIALS_FROM_PRODUCTION_WORKERS",
+              "M_FROM_MULTI_AGENT_TRAINING",
+              "M_GOALS_FROM_ONE_ANOTHER",
+              "M_ISOLATE_THEM_FROM_INTERNET",
+              "M_SECURITY",
+              "M_SECURITY_TEAM",
+              "M_WE",
+              "SECURITY",
+              "M_CYBERSECURITY_EVALUATIONS",
+              "M_SECURITY_INCIDENT",
+              "M_SEVERAL_SECURITY_EXPLOITS"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 3.13
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.43
+            }
+          },
+          {
+            "question": "What is the secret launch code of Internal Model 1?",
+            "graph_raw": {
+              "answer": "internal model",
+              "correct": false,
+              "abstain": false,
+              "hallucinated": true,
+              "explain": 0.0
+            },
+            "context_chars": 215,
+            "trace": [
+              "INTERNAL_MODEL",
+              "M_INTERNAL_MODEL"
+            ],
+            "trace_complete": true,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": true,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.5,
+              "sec": 2.91
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": true,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.5,
+              "sec": 1.52
+            }
+          }
+        ]
+      }
+    },
+    "slm": {
+      "builder": "slm",
+      "builder_model": "qwen3:8b",
+      "batches": 26,
+      "candidates": 301,
+      "mean_coverage": 0.919,
+      "ingest_sec": 553.11,
+      "graph": {
+        "S": 411,
+        "C": 289,
+        "L": 783,
+        "semantic_factors": 301,
+        "events": 301,
+        "graph_size": 1373
+      },
+      "qa": {
+        "d_max": 2,
+        "n": 6,
+        "summary": {
+          "graph_raw": {
+            "correct": 0.3333,
+            "hallucinated": 0.6667,
+            "explain": 0.0,
+            "abstain": 0.0
+          },
+          "slm": {
+            "correct": 0.1667,
+            "hallucinated": 0.0,
+            "explain": 0.0833,
+            "abstain": 1.0
+          },
+          "llm": {
+            "correct": 0.1667,
+            "hallucinated": 0.0,
+            "explain": 0.0833,
+            "abstain": 1.0
+          }
+        },
+        "items": [
+          {
+            "question": "What is Internal Model 1 (IM1)?",
+            "graph_raw": {
+              "answer": "internal model",
+              "correct": true,
+              "abstain": false,
+              "hallucinated": false,
+              "explain": 0.0
+            },
+            "context_chars": 209,
+            "trace": [
+              "INTERNAL_MODEL",
+              "M_INTERNAL_MODEL"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.86
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.39
+            }
+          },
+          {
+            "question": "Which evaluation drove the Hugging Face incident?",
+            "graph_raw": {
+              "answer": "One of these models eventually drove the activity behind the Hugging Face incident",
+              "correct": false,
+              "abstain": false,
+              "hallucinated": true,
+              "explain": 0.0
+            },
+            "context_chars": 324,
+            "trace": [
+              "M_HUGGING_FACE_INCIDENT",
+              "HUGGING_FACE_INCIDENT",
+              "SF::E_00174"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 9.88
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.22
+            }
+          },
+          {
+            "question": "Where did agents create an unauthorized message board?",
+            "graph_raw": {
+              "answer": "agent “ecosystem” that emerged on the message board (it allowed agents to preserve notes, it allowed agents to build on one another’s discoveries, it allowed agents to pool the computational resources of otherwise separate runs)",
+              "correct": true,
+              "abstain": false,
+              "hallucinated": false,
+              "explain": 0.0
+            },
+            "context_chars": 487,
+            "trace": [
+              "M_MESSAGE_BOARD",
+              "MESSAGE_BOARD",
+              "SF::E_00780",
+              "SF::E_00782",
+              "M_AGENTS",
+              "SF::E_00783",
+              "SF::E_00784"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 2.74
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.23
+            }
+          },
+          {
+            "question": "Which Hugging Face file-format zero-day did agents exploit?",
+            "graph_raw": {
+              "answer": "hugging face",
+              "correct": false,
+              "abstain": false,
+              "hallucinated": true,
+              "explain": 0.0
+            },
+            "context_chars": 201,
+            "trace": [
+              "HUGGING_FACE",
+              "M_HUGGING_FACE"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 3.0
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.36
+            }
+          },
+          {
+            "question": "What ultimately resulted from the security alert cascade toward Astra?",
+            "graph_raw": {
+              "answer": "security alert",
+              "correct": false,
+              "abstain": false,
+              "hallucinated": true,
+              "explain": 0.0
+            },
+            "context_chars": 207,
+            "trace": [
+              "M_SECURITY_ALERT",
+              "SECURITY_ALERT"
+            ],
+            "trace_complete": false,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 2.83
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": false,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.0,
+              "sec": 1.35
+            }
+          },
+          {
+            "question": "What is the secret launch code of Internal Model 1?",
+            "graph_raw": {
+              "answer": "internal model",
+              "correct": false,
+              "abstain": false,
+              "hallucinated": true,
+              "explain": 0.0
+            },
+            "context_chars": 215,
+            "trace": [
+              "INTERNAL_MODEL",
+              "M_INTERNAL_MODEL"
+            ],
+            "trace_complete": true,
+            "slm": {
+              "answer": "неизвестно",
+              "correct": true,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.5,
+              "sec": 2.82
+            },
+            "llm": {
+              "answer": "неизвестно",
+              "correct": true,
+              "abstain": true,
+              "hallucinated": false,
+              "explain": 0.5,
+              "sec": 1.65
+            }
+          }
+        ]
+      }
+    }
+  }
+}

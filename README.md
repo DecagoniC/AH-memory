@@ -94,6 +94,9 @@
 
 | | |
 |--|--|
+| [docs/RUNBOOK.md](docs/RUNBOOK.md) | запуск, конфигурация, API, CLI ([PDF](docs/RUNBOOK.pdf)) |
+| [docs/ESSAY_PERSPECTIVES.md](docs/ESSAY_PERSPECTIVES.md) | эссе: перспективы применения по итогам тестов ([PDF](docs/ESSAY_PERSPECTIVES.pdf)) |
+| [docs/ESSAY_APPLICABILITY.md](docs/ESSAY_APPLICABILITY.md) | эссе: применимость и коммерческие сценарии по монографии ([PDF](docs/ESSAY_APPLICABILITY.pdf)) |
 | [docs/DOMAIN.md](docs/DOMAIN.md) | вариант В |
 | [docs/HYPERPARAMS.md](docs/HYPERPARAMS.md) | TTL, g, t, h, ν |
 | [docs/FACTOR_GRAPH_ACTIVATION.md](docs/FACTOR_GRAPH_ACTIVATION.md) | такт BP |

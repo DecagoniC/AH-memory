@@ -14,7 +14,7 @@ class HyperParams:
     pacemaker_period: int = 8
     seed_delta: float = 0.8
     initial_w: float = 0.5
-    # Factor-graph BP (docs/FACTOR_GRAPH_ACTIVATION.md §12)
+    # Factor-graph BP
     fg_kappa: float = 2.0
     fg_lambda: float = 3.0
     fg_epsilon: float = 0.05

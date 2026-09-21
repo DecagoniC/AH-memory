@@ -85,7 +85,7 @@
 | 4 | h | clip(w + η x_out x_in, 0, 1), η = 0,05 | Хебб |
 | 5 | ν | 1 импульс / 8 тактов | pacemaker; ν = 0 → коллапс без входа |
 
-Обоснование и калибровка на защите: [`docs/HYPERPARAMS.md`](docs/HYPERPARAMS.md). Функция активации f — сигмоида (линейный / ReLU-sat — в `config.yaml:experiment`).
+Гиперпараметры ignition зафиксированы в `config.yaml` и `HyperParams`; на защите — пояснительная записка. Функция активации f — сигмоида (линейный / ReLU-sat — в `config.yaml:experiment`).
 
 ---
 
@@ -94,11 +94,5 @@
 
 | | |
 |--|--|
-| [docs/RUNBOOK.md](docs/RUNBOOK.md) | запуск, конфигурация, API, CLI ([PDF](docs/RUNBOOK.pdf)) |
-| [docs/ESSAY_PERSPECTIVES.md](docs/ESSAY_PERSPECTIVES.md) | эссе: перспективы применения по итогам тестов ([PDF](docs/ESSAY_PERSPECTIVES.pdf)) |
-| [docs/ESSAY_APPLICABILITY.md](docs/ESSAY_APPLICABILITY.md) | эссе: применимость и коммерческие сценарии по монографии ([PDF](docs/ESSAY_APPLICABILITY.pdf)) |
-| [docs/DOMAIN.md](docs/DOMAIN.md) | вариант В |
-| [docs/HYPERPARAMS.md](docs/HYPERPARAMS.md) | TTL, g, t, h, ν |
-| [docs/FACTOR_GRAPH_ACTIVATION.md](docs/FACTOR_GRAPH_ACTIVATION.md) | такт BP |
-| [docs/INTERFACES.md](docs/INTERFACES.md) | контракты модулей |
+| [docs/submission/POYASNITELNAYA_ZAPISKA.md](docs/submission/POYASNITELNAYA_ZAPISKA.md) | пояснительная записка, метрики, корпус и дамп |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | контур + open semantics |

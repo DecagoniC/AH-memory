@@ -1,4 +1,4 @@
-"""Ignition via factor-graph belief propagation (docs/FACTOR_GRAPH_ACTIVATION.md)."""
+"""Ignition via factor-graph belief propagation."""
 from __future__ import annotations
 
 import time
